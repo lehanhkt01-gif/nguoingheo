@@ -1,22 +1,22 @@
 import Link from "next/link";
-import { ShieldCheck, Phone, Mail, MapPin, Landmark, Award } from "lucide-react";
+import { ShieldCheck, Mail, MapPin, Landmark, Award } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-900 text-slate-300 pt-12 pb-6 border-t-2 border-blue-600">
+    <footer className="bg-slate-900 text-slate-300 pt-12 pb-6 border-t-2 border-rose-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 text-xs">
           {/* Cột 1: Giới thiệu & Pháp lý */}
           <div className="space-y-2.5">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white font-bold text-xs shadow-xs">
                 MT
               </div>
               <div>
                 <h3 className="text-white font-bold text-xs leading-tight">
                   QUỸ VÌ NGƯỜI NGHÈO EA SÚP
                 </h3>
-                <p className="text-[11px] text-sky-400">Tỉnh Đắk Lắk</p>
+                <p className="text-[11px] text-rose-300">Tỉnh Đắk Lắk</p>
               </div>
             </div>
             <p className="text-slate-400 leading-relaxed text-xs">
@@ -30,8 +30,8 @@ export default function Footer() {
 
           {/* Cột 2: Thường trực Ban Vận Động */}
           <div className="space-y-1.5">
-            <h4 className="font-bold text-white uppercase tracking-wider text-sky-300 border-b border-slate-800 pb-1.5 flex items-center gap-1.5">
-              <Award className="w-3.5 h-3.5 text-sky-400" />
+            <h4 className="font-bold text-white uppercase tracking-wider text-rose-300 border-b border-slate-800 pb-1.5 flex items-center gap-1.5">
+              <Award className="w-3.5 h-3.5 text-rose-400" />
               Ban Vận Động Quỹ
             </h4>
             <ul className="space-y-1.5 text-slate-300">
@@ -52,18 +52,18 @@ export default function Footer() {
 
           {/* Cột 3: Tài khoản ngân hàng duy nhất */}
           <div className="space-y-1.5">
-            <h4 className="font-bold text-white uppercase tracking-wider text-sky-300 border-b border-slate-800 pb-1.5 flex items-center gap-1.5">
-              <Landmark className="w-3.5 h-3.5 text-sky-400" />
+            <h4 className="font-bold text-white uppercase tracking-wider text-rose-300 border-b border-slate-800 pb-1.5 flex items-center gap-1.5">
+              <Landmark className="w-3.5 h-3.5 text-rose-400" />
               Tài Khoản Tiếp Nhận Duy Nhất
             </h4>
-            <div className="bg-slate-950 p-2.5 rounded-lg border border-blue-900/50 space-y-1">
+            <div className="bg-slate-950 p-2.5 rounded-lg border border-rose-900/50 space-y-1">
               <div>
                 <span className="text-[10px] text-slate-400 block">Ngân hàng:</span>
                 <strong className="text-white text-xs">BIDV Chi nhánh Ea Súp</strong>
               </div>
               <div>
                 <span className="text-[10px] text-slate-400 block">Số tài khoản duy nhất:</span>
-                <span className="text-sky-300 font-mono text-sm font-bold tracking-wider">8630100930</span>
+                <span className="text-rose-300 font-mono text-sm font-bold tracking-wider">8630100930</span>
               </div>
               <div>
                 <span className="text-[10px] text-slate-400 block">Chủ tài khoản:</span>
@@ -74,7 +74,7 @@ export default function Footer() {
 
           {/* Cột 4: Địa bàn 20 thôn buôn */}
           <div className="space-y-1.5">
-            <h4 className="font-bold text-white uppercase tracking-wider text-sky-300 border-b border-slate-800 pb-1.5">
+            <h4 className="font-bold text-white uppercase tracking-wider text-rose-300 border-b border-slate-800 pb-1.5">
               Địa Bàn Quản Lý (20 Thôn Buôn)
             </h4>
             <p className="text-slate-400 leading-relaxed text-xs">
@@ -82,11 +82,11 @@ export default function Footer() {
             </p>
             <div className="space-y-1 pt-1 text-slate-300 text-xs">
               <div className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                 <span>Trụ sở UBMTTQ Việt Nam xã Ea Súp, Đắk Lắk</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                <Mail className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                 <span>ubmttq.easup@gmail.com</span>
               </div>
             </div>
@@ -99,9 +99,9 @@ export default function Footer() {
             © {new Date().getFullYear()} Bản quyền thuộc Ban Vận động Quỹ "Vì người nghèo" xã Ea Súp, tỉnh Đắk Lắk.
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/sao-ke" className="hover:text-slate-300 transition-colors">Báo cáo Thu - Chi</Link>
-            <Link href="/van-ban" className="hover:text-slate-300 transition-colors">Văn bản Pháp lý</Link>
-            <Link href="/admin/login" className="hover:text-slate-300 transition-colors">Cổng Nội bộ</Link>
+            <Link href="/sao-ke" className="hover:text-rose-400 transition-colors">Báo cáo Thu - Chi</Link>
+            <Link href="/van-ban" className="hover:text-rose-400 transition-colors">Văn bản Pháp lý</Link>
+            <Link href="/admin/login" className="hover:text-rose-400 transition-colors">Cổng Nội bộ</Link>
           </div>
         </div>
       </div>

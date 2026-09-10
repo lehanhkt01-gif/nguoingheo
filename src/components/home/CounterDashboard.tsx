@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatVND, formatNumber } from "@/lib/utils";
-import { ArrowUpRight, ArrowDownRight, Wallet, Home, Users, CheckCircle2 } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Wallet, Home } from "lucide-react";
 
 interface StatsData {
   totalIn: number;
@@ -20,9 +20,8 @@ export default function CounterDashboard() {
     currentBalance: 301000000,
     totalDonationsCount: 142,
     totalDisbursementsCount: 5,
-    beneficiaryCount: 18,
+    beneficiaryCount: 23,
   });
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {
@@ -41,94 +40,84 @@ export default function CounterDashboard() {
         }
       } catch (err) {
         console.error("Fetch stats error:", err);
-      } finally {
-        setLoading(false);
       }
     }
     fetchStats();
   }, []);
 
   return (
-    <section className="relative -mt-10 z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-200/80 p-6 lg:p-8">
+    <section className="relative -mt-8 z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-white rounded-2xl shadow-xl shadow-rose-100/50 border border-rose-100 p-5 sm:p-6">
         {/* Tiêu đề tóm tắt */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-slate-100 gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-rose-100 gap-2">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-red-700 block">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-rose-600 block">
               BỘ ĐẾM THỜI GIAN THỰC (LIVE COUNTER)
             </span>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900">
               Minh Bạch Dòng Tiền Quỹ "Vì Người Nghèo" Xã Ea Súp
             </h2>
           </div>
-          <div className="inline-flex items-center gap-2 self-start sm:self-auto text-xs text-slate-500 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="inline-flex items-center gap-1.5 text-xs text-rose-700 bg-rose-50/80 px-2.5 py-1 rounded-full border border-rose-200 self-start sm:self-auto">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
             <span>Đối soát tức thời từ BIDV 8630100930</span>
           </div>
         </div>
 
         {/* 4 Khối Thống Kê Chính */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1: Tổng tiền ủng hộ */}
-          <div className="bg-emerald-50/50 rounded-xl p-5 border border-emerald-100 hover:border-emerald-300 transition-colors">
-            <div className="flex items-center justify-between text-emerald-700 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Tổng tiền tiếp nhận (+)</span>
-              <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-                <ArrowUpRight className="w-5 h-5" />
-              </div>
+          <div className="bg-emerald-50/70 rounded-xl p-4 border border-emerald-200/70">
+            <div className="flex items-center justify-between text-emerald-700 text-xs mb-1">
+              <span className="font-semibold uppercase">Tiền tiếp nhận (+)</span>
+              <ArrowUpRight className="w-4 h-4" />
             </div>
-            <div className="text-2xl lg:text-3xl font-extrabold text-emerald-800 tracking-tight">
+            <div className="text-xl sm:text-2xl font-bold text-emerald-800 tracking-tight font-mono">
               {formatVND(stats.totalIn)}
             </div>
-            <p className="text-xs text-emerald-600/80 mt-1 font-medium">
+            <p className="text-[11px] text-emerald-700/80 mt-1 font-medium">
               Từ {formatNumber(stats.totalDonationsCount)} lượt tổ chức & cá nhân
             </p>
           </div>
 
           {/* Card 2: Tổng giải ngân */}
-          <div className="bg-red-50/50 rounded-xl p-5 border border-red-100 hover:border-red-300 transition-colors">
-            <div className="flex items-center justify-between text-red-700 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Tổng đã giải ngân (-)</span>
-              <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
-                <ArrowDownRight className="w-5 h-5" />
-              </div>
+          <div className="bg-rose-50 rounded-xl p-4 border border-rose-200">
+            <div className="flex items-center justify-between text-rose-700 text-xs mb-1">
+              <span className="font-semibold uppercase">Đã giải ngân (-)</span>
+              <ArrowDownRight className="w-4 h-4" />
             </div>
-            <div className="text-2xl lg:text-3xl font-extrabold text-red-800 tracking-tight">
+            <div className="text-xl sm:text-2xl font-bold text-rose-800 tracking-tight font-mono">
               {formatVND(stats.totalOut)}
             </div>
-            <p className="text-xs text-red-600/80 mt-1 font-medium">
-              {stats.totalDisbursementsCount} đợt chi có đầy đủ biên bản scan
+            <p className="text-[11px] text-rose-700/80 mt-1 font-medium">
+              {stats.totalDisbursementsCount} đợt chi có biên bản mộc đỏ
             </p>
           </div>
 
           {/* Card 3: Số dư khả dụng BIDV 8630100930 */}
-          <div className="bg-blue-50/50 rounded-xl p-5 border border-blue-100 hover:border-blue-300 transition-colors">
-            <div className="flex items-center justify-between text-blue-700 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Số dư khả dụng BIDV (=)</span>
-              <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                <Wallet className="w-5 h-5" />
-              </div>
+          <div className="bg-pink-50/80 rounded-xl p-4 border border-pink-200">
+            <div className="flex items-center justify-between text-pink-700 text-xs mb-1">
+              <span className="font-semibold uppercase">Dư khả dụng BIDV (=)</span>
+              <Wallet className="w-4 h-4" />
             </div>
-            <div className="text-2xl lg:text-3xl font-extrabold text-blue-900 tracking-tight">
+            <div className="text-xl sm:text-2xl font-bold text-pink-900 tracking-tight font-mono">
               {formatVND(stats.currentBalance)}
             </div>
-            <p className="text-xs text-blue-600/80 mt-1 font-medium">
+            <p className="text-[11px] text-pink-700/80 mt-1 font-medium">
               Tài khoản BIDV 8630100930
             </p>
           </div>
 
           {/* Card 4: Nhà ĐĐK & Ca hỗ trợ */}
-          <div className="bg-amber-50/50 rounded-xl p-5 border border-amber-100 hover:border-amber-300 transition-colors">
-            <div className="flex items-center justify-between text-amber-800 mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider">Mái ấm & Ca trợ giúp</span>
-              <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
-                <Home className="w-5 h-5" />
-              </div>
+          <div className="bg-amber-50/80 rounded-xl p-4 border border-amber-200">
+            <div className="flex items-center justify-between text-amber-800 text-xs mb-1">
+              <span className="font-semibold uppercase">Mái ấm & Ca trợ giúp</span>
+              <Home className="w-4 h-4" />
             </div>
-            <div className="text-2xl lg:text-3xl font-extrabold text-amber-900 tracking-tight">
+            <div className="text-xl sm:text-2xl font-bold text-amber-900 tracking-tight">
               {stats.beneficiaryCount} Hộ gia đình
             </div>
-            <p className="text-xs text-amber-700/80 mt-1 font-medium">
+            <p className="text-[11px] text-amber-700/80 mt-1 font-medium">
               Phủ kín khắp 20 thôn buôn xã Ea Súp
             </p>
           </div>

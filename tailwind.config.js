@@ -9,21 +9,17 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          50: "#eff6ff",
-          100: "#dbeafe",
-          200: "#bfdbfe",
-          300: "#93c5fd",
-          400: "#60a5fa",
-          500: "#3b82f6",
-          600: "#2563eb", // Xanh da dương chủ đạo hiện đại, tin cậy
-          700: "#1d4ed8",
-          800: "#1e40af",
-          900: "#1e3a8a",
-          950: "#0f172a",
-        },
-        sky: {
-          400: "#38bdf8",
-          500: "#0ea5e9",
+          50: "#fff1f2",
+          100: "#ffe4e6",
+          200: "#fecdd3",
+          300: "#fda4af",
+          400: "#fb7185",
+          500: "#f43f5e",
+          600: "#e11d48", // Hồng tươi sáng, rực rỡ, ấm áp
+          700: "#be123c",
+          800: "#9f1239",
+          900: "#881337",
+          950: "#4c0519",
         },
       },
       fontFamily: {

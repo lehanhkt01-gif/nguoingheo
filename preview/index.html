@@ -14,15 +14,16 @@
         extend: {
           colors: {
             brand: {
-              50: "#eff6ff",
-              100: "#dbeafe",
-              200: "#bfdbfe",
-              500: "#3b82f6",
-              600: "#2563eb",
-              700: "#1d4ed8",
-              800: "#1e40af",
-              900: "#1e3a8a",
-              950: "#0f172a",
+              50: "#fff1f2",
+              100: "#ffe4e6",
+              200: "#fecdd3",
+              300: "#fda4af",
+              400: "#fb7185",
+              500: "#f43f5e",
+              600: "#e11d48",
+              700: "#be123c",
+              800: "#9f1239",
+              900: "#881337",
             }
           },
           fontFamily: {
@@ -33,30 +34,30 @@
     }
   </script>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased text-sm selection:bg-blue-600 selection:text-white">
+<body class="bg-rose-50/20 text-slate-800 font-sans antialiased text-sm selection:bg-rose-500 selection:text-white">
 
-  <!-- TOP BANNER (Đã bỏ đoạn 'Không sử dụng tài khoản Kho bạc', chuyển sang tông xanh dương thanh lịch) -->
-  <div class="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-blue-100 text-xs py-1.5 px-4 text-center font-normal flex items-center justify-center gap-2 border-b border-blue-700/50">
+  <!-- TOP BANNER (Tông hồng tươi sáng, thanh lịch) -->
+  <div class="bg-gradient-to-r from-rose-600 via-pink-600 to-rose-600 text-white text-xs py-1.5 px-4 text-center font-normal flex items-center justify-center gap-2 border-b border-rose-400/30">
     <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-    <span>Tài khoản tiếp nhận duy nhất: <strong class="text-white font-medium">BIDV 8630100930</strong> (UB MTTQ VN XA EA SUP) - Chi nhánh Ea Súp</span>
+    <span>Tài khoản tiếp nhận duy nhất: <strong class="text-white font-semibold">BIDV 8630100930</strong> (UB MTTQ VN XA EA SUP) - Chi nhánh Ea Súp</span>
   </div>
 
   <!-- HEADER -->
-  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-rose-100 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
-        <!-- Logo & Title (Đã loại bỏ badge QĐ 13/QĐ-MTTQ như yêu cầu) -->
+        <!-- Logo & Title -->
         <a href="#" class="flex items-center gap-3 group">
-          <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm group-hover:bg-blue-700 transition-colors">
-            <svg class="w-5 h-5 fill-current text-amber-300" viewBox="0 0 24 24">
+          <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-white shadow-sm shadow-rose-200 group-hover:scale-105 transition-transform">
+            <svg class="w-5 h-5 fill-current text-amber-200" viewBox="0 0 24 24">
               <path d="M12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2Z" />
             </svg>
           </div>
           <div>
-            <div class="text-[11px] uppercase tracking-wider font-semibold text-blue-700">
+            <div class="text-[11px] uppercase tracking-wider font-semibold text-rose-700">
               UBMTTQ VIỆT NAM XÃ EA SÚP
             </div>
-            <div class="text-base font-bold text-slate-900 tracking-tight group-hover:text-blue-600 transition-colors">
+            <div class="text-base font-bold text-slate-900 tracking-tight group-hover:text-rose-600 transition-colors">
               Quỹ Vì Người Nghèo Ea Súp
             </div>
           </div>
@@ -64,11 +65,11 @@
 
         <!-- Nav -->
         <nav class="hidden md:flex items-center gap-1 text-xs font-medium text-slate-600">
-          <a href="#" class="px-3 py-1.5 rounded-md bg-blue-50 text-blue-700 font-semibold">Trang chủ</a>
-          <a href="#sao-ke" class="px-3 py-1.5 rounded-md hover:text-blue-600 hover:bg-slate-50 transition-colors">Sao kê thời gian thực</a>
-          <a href="#chien-dich" class="px-3 py-1.5 rounded-md hover:text-blue-600 hover:bg-slate-50 transition-colors">Nơi gieo hy vọng</a>
-          <a href="#nghiem-thu" class="px-3 py-1.5 rounded-md hover:text-blue-600 hover:bg-slate-50 transition-colors">Thư viện nghiệm thu</a>
-          <a href="#phap-ly" class="px-3 py-1.5 rounded-md hover:text-blue-600 hover:bg-slate-50 transition-colors">Văn bản & Pháp lý</a>
+          <a href="#" class="px-3 py-1.5 rounded-md bg-rose-50 text-rose-700 font-semibold">Trang chủ</a>
+          <a href="#sao-ke" class="px-3 py-1.5 rounded-md hover:text-rose-600 hover:bg-rose-50/50 transition-colors">Sao kê thời gian thực</a>
+          <a href="#chien-dich" class="px-3 py-1.5 rounded-md hover:text-rose-600 hover:bg-rose-50/50 transition-colors">Nơi gieo hy vọng</a>
+          <a href="#nghiem-thu" class="px-3 py-1.5 rounded-md hover:text-rose-600 hover:bg-rose-50/50 transition-colors">Thư viện nghiệm thu</a>
+          <a href="#phap-ly" class="px-3 py-1.5 rounded-md hover:text-rose-600 hover:bg-rose-50/50 transition-colors">Văn bản & Pháp lý</a>
         </nav>
 
         <!-- CTA & Badge -->
@@ -77,7 +78,7 @@
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>Casso Verified</span>
           </div>
-          <a href="#dong-gop" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm hover:shadow transition-all flex items-center gap-1.5">
+          <a href="#dong-gop" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white text-xs font-semibold shadow-sm shadow-rose-200 hover:shadow transition-all flex items-center gap-1.5">
             <svg class="w-3.5 h-3.5 fill-current text-white" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
             <span>Đóng góp ngay</span>
           </a>
@@ -86,127 +87,78 @@
     </div>
   </header>
 
-  <!-- HERO BANNER VỚI ẢNH NỀN TÂY NGUYÊN TÔNG TRẮNG HỒNG & ĐỎ -->
-  <section class="relative overflow-hidden bg-slate-950 text-white pt-10 pb-20 lg:pt-14 lg:pb-24">
-    <!-- Ảnh nền Tây Nguyên & Trẻ em buôn làng trong trang phục thổ cẩm đỏ trắng -->
+  <!-- HERO BANNER TÔNG HỒNG TƯƠI SÁNG, NẮNG ẤM & KHÔNG GIAN THOÁNG ĐÃNG -->
+  <section class="relative overflow-hidden bg-rose-50/60 pt-12 pb-24 lg:pt-16 lg:pb-32">
+    <!-- Ảnh nền Tây Nguyên nắng ấm tươi sáng -->
     <div class="absolute inset-0 z-0">
       <img src="/hero-charity-bg.jpg" alt="Quỹ vì người nghèo Ea Súp" class="w-full h-full object-cover object-right lg:object-center" />
-      <!-- Lớp phủ gradient mượt mà: bên trái sẫm hơn để chữ đọc cực rõ, bên phải trong suốt lộ cảnh buôn làng và nụ cười trẻ thơ -->
-      <div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/75 to-slate-950/30"></div>
-      <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/40"></div>
+      <!-- Lớp phủ gradient sáng hồng - trắng trong trẻo: chữ trên nền sáng cực kỳ dễ đọc, toàn bộ bên phải mở rộng trọn vẹn phong cảnh và các em nhỏ -->
+      <div class="absolute inset-0 bg-gradient-to-r from-white/95 via-white/85 to-white/30 lg:to-transparent"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-rose-100/50 via-transparent to-white/40"></div>
     </div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        <!-- Left Content -->
-        <div class="lg:col-span-7 space-y-4 text-center lg:text-left">
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-900/60 border border-blue-700/60 text-blue-200 text-xs font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Cổng Thông Tin An Sinh Xã Hội Xã Ea Súp - Tỉnh Đắk Lắk</span>
+      <!-- Nội dung Hero thoáng đãng, tươi sáng, ấm áp -->
+      <div class="max-w-2xl space-y-4 text-left">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100/90 border border-rose-300 text-rose-800 text-xs font-semibold backdrop-blur-sm shadow-xs">
+          <span class="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></span>
+          <span>Cổng Thông Tin An Sinh Xã Hội Xã Ea Súp - Tỉnh Đắk Lắk</span>
+        </div>
+
+        <h1 class="text-2xl sm:text-4xl font-bold tracking-tight text-slate-900 leading-snug">
+          Chung tay vì người nghèo <br>
+          <span class="bg-gradient-to-r from-rose-600 via-pink-600 to-rose-700 bg-clip-text text-transparent">
+            Không để ai bị bỏ lại phía sau
+          </span>
+        </h1>
+
+        <p class="text-slate-700 text-xs sm:text-sm leading-relaxed max-w-xl font-medium">
+          Minh bạch 100% từng đồng tiền ủng hộ của đồng bào và kiều bào hảo tâm dành cho các gia đình có hoàn cảnh khó khăn tại <strong>20 thôn, buôn</strong> trên địa bàn xã Ea Súp. Dữ liệu ngân hàng đối soát trực tiếp qua Casso.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 text-xs text-slate-800 max-w-md">
+          <div class="flex items-center gap-2 bg-white/90 backdrop-blur-sm p-2.5 rounded-lg border border-rose-200/80 shadow-xs">
+            <span class="text-rose-600 font-bold">✓</span>
+            <span class="font-medium">Quy chế QĐ 13/QĐ-MTTQ công khai</span>
           </div>
-
-          <h1 class="text-2xl sm:text-4xl font-bold tracking-tight leading-snug">
-            Chung tay vì người nghèo <br>
-            <span class="bg-gradient-to-r from-sky-300 via-blue-200 to-sky-400 bg-clip-text text-transparent">
-              Không để ai bị bỏ lại phía sau
-            </span>
-          </h1>
-
-          <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto lg:mx-0">
-            Minh bạch 100% từng đồng tiền ủng hộ của đồng bào và kiều bào hảo tâm dành cho các gia đình có hoàn cảnh khó khăn tại <strong>20 thôn, buôn</strong> trên địa bàn xã Ea Súp. Dữ liệu ngân hàng đối soát trực tiếp qua Casso.
-          </p>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-xs text-slate-300 max-w-md mx-auto lg:mx-0">
-            <div class="flex items-center gap-2 bg-slate-900/50 p-2 rounded-md border border-slate-800">
-              <span class="text-sky-400 font-bold">✓</span>
-              <span>Quy chế QĐ 13/QĐ-MTTQ công khai</span>
-            </div>
-            <div class="flex items-center gap-2 bg-slate-900/50 p-2 rounded-md border border-slate-800">
-              <span class="text-sky-400 font-bold">✓</span>
-              <span>Định mức xây nhà 8 triệu/nhà từ xã</span>
-            </div>
-            <div class="flex items-center gap-2 bg-slate-900/50 p-2 rounded-md border border-slate-800">
-              <span class="text-sky-400 font-bold">✓</span>
-              <span>Tài khoản BIDV 8630100930 đối soát 24/7</span>
-            </div>
-            <div class="flex items-center gap-2 bg-slate-900/50 p-2 rounded-md border border-slate-800">
-              <span class="text-sky-400 font-bold">✓</span>
-              <span>Biên bản nghiệm thu có chữ ký Ban CTMT</span>
-            </div>
+          <div class="flex items-center gap-2 bg-white/90 backdrop-blur-sm p-2.5 rounded-lg border border-rose-200/80 shadow-xs">
+            <span class="text-rose-600 font-bold">✓</span>
+            <span class="font-medium">Định mức xây nhà 8 triệu/nhà từ xã</span>
           </div>
-
-          <div class="pt-3 flex flex-wrap items-center justify-center lg:justify-start gap-3">
-            <a href="#dong-gop" class="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-md transition-all">
-              Đóng góp trực tuyến VietQR
-            </a>
-            <a href="#sao-ke" class="px-5 py-2.5 rounded-lg bg-slate-800 text-slate-200 font-medium text-xs border border-slate-700 hover:bg-slate-700 hover:text-white transition-all">
-              Xem sao kê minh bạch
-            </a>
+          <div class="flex items-center gap-2 bg-white/90 backdrop-blur-sm p-2.5 rounded-lg border border-rose-200/80 shadow-xs">
+            <span class="text-rose-600 font-bold">✓</span>
+            <span class="font-medium">Tài khoản BIDV 8630100930 đối soát 24/7</span>
+          </div>
+          <div class="flex items-center gap-2 bg-white/90 backdrop-blur-sm p-2.5 rounded-lg border border-rose-200/80 shadow-xs">
+            <span class="text-rose-600 font-bold">✓</span>
+            <span class="font-medium">Biên bản nghiệm thu có chữ ký Ban CTMT</span>
           </div>
         </div>
 
-        <!-- Right Card: BIDV 8630100930 Card -->
-        <div class="lg:col-span-5">
-          <div class="max-w-sm mx-auto rounded-2xl bg-gradient-to-br from-slate-900 via-blue-950 to-slate-950 p-5 border border-sky-500/30 shadow-xl">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-xs">
-                  BIDV
-                </div>
-                <div>
-                  <span class="text-[10px] text-sky-400 uppercase tracking-wider block font-semibold">Tài khoản tiếp nhận duy nhất</span>
-                  <span class="text-white text-xs font-semibold">Ngân hàng BIDV - Ea Súp</span>
-                </div>
-              </div>
-              <span class="text-[10px] font-mono bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded">
-                Live 24/7
-              </span>
-            </div>
-
-            <div class="space-y-2.5 text-xs">
-              <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800">
-                <span class="text-[10px] text-slate-400 uppercase block">Số tài khoản BIDV:</span>
-                <div class="flex items-center justify-between mt-0.5">
-                  <span class="text-xl font-bold font-mono text-sky-300 tracking-wider">8630100930</span>
-                  <button onclick="copyText('8630100930')" class="text-[10px] text-slate-300 bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded transition-colors">
-                    Sao chép
-                  </button>
-                </div>
-              </div>
-
-              <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800">
-                <span class="text-[10px] text-slate-400 uppercase block">Tên chủ tài khoản:</span>
-                <span class="text-xs font-semibold text-white tracking-wide mt-0.5 block">UY BAN MTTQ VN XA EA SUP</span>
-              </div>
-
-              <div class="text-[11px] text-slate-400 flex justify-between pt-0.5">
-                <span>Mã ngân hàng (BIN):</span>
-                <span class="text-slate-200 font-mono">970418 (BIDV)</span>
-              </div>
-            </div>
-
-            <div class="mt-4 pt-3 border-t border-slate-800">
-              <a href="#dong-gop" class="w-full block text-center py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors">
-                Quét VietQR Tự Động Ngay
-              </a>
-            </div>
-          </div>
+        <div class="pt-3 flex flex-wrap items-center gap-3">
+          <a href="#dong-gop" class="px-5 py-2.5 rounded-lg bg-gradient-to-r from-pink-500 via-rose-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-semibold text-xs shadow-md shadow-rose-300/40 hover:scale-105 transition-all flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            <span>Đóng góp trực tuyến VietQR</span>
+          </a>
+          <a href="#sao-ke" class="px-5 py-2.5 rounded-lg bg-white/90 hover:bg-white text-rose-700 font-semibold text-xs border border-rose-300 shadow-xs backdrop-blur-sm transition-all">
+            Xem sao kê minh bạch
+          </a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- LIVE COUNTER DASHBOARD -->
+  <!-- LIVE COUNTER DASHBOARD TƯƠI SÁNG -->
   <section class="relative -mt-8 z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-5 sm:p-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-2">
+    <div class="bg-white rounded-2xl shadow-xl shadow-rose-100/50 border border-rose-100 p-5 sm:p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-rose-100 gap-2">
         <div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-blue-700 block">BỘ ĐẾM THỜI GIAN THỰC</span>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-rose-600 block">BỘ ĐẾM THỜI GIAN THỰC</span>
           <h2 class="text-lg sm:text-xl font-bold text-slate-900">
             Minh Bạch Dòng Tiền Quỹ "Vì Người Nghèo" Xã Ea Súp
           </h2>
         </div>
-        <div class="inline-flex items-center gap-1.5 text-xs text-slate-500 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-200 self-start sm:self-auto">
+        <div class="inline-flex items-center gap-1.5 text-xs text-rose-700 bg-rose-50/80 px-2.5 py-1 rounded-full border border-rose-200 self-start sm:self-auto">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
           <span>Đối soát tức thời BIDV 8630100930</span>
         </div>
@@ -214,7 +166,7 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Card 1 -->
-        <div class="bg-emerald-50/60 rounded-xl p-4 border border-emerald-100">
+        <div class="bg-emerald-50/70 rounded-xl p-4 border border-emerald-200/70">
           <div class="flex items-center justify-between text-emerald-700 text-xs mb-1">
             <span class="font-semibold uppercase">Tiền tiếp nhận (+)</span>
             <span>↗</span>
@@ -226,7 +178,7 @@
         </div>
 
         <!-- Card 2 -->
-        <div class="bg-rose-50/60 rounded-xl p-4 border border-rose-100">
+        <div class="bg-rose-50 rounded-xl p-4 border border-rose-200">
           <div class="flex items-center justify-between text-rose-700 text-xs mb-1">
             <span class="font-semibold uppercase">Đã giải ngân (-)</span>
             <span>↘</span>
@@ -238,37 +190,37 @@
         </div>
 
         <!-- Card 3 -->
-        <div class="bg-blue-50/60 rounded-xl p-4 border border-blue-100">
-          <div class="flex items-center justify-between text-blue-700 text-xs mb-1">
+        <div class="bg-pink-50/80 rounded-xl p-4 border border-pink-200">
+          <div class="flex items-center justify-between text-pink-700 text-xs mb-1">
             <span class="font-semibold uppercase">Dư khả dụng BIDV (=)</span>
             <span>💳</span>
           </div>
-          <div class="text-xl sm:text-2xl font-bold text-blue-900 tracking-tight font-mono">
+          <div class="text-xl sm:text-2xl font-bold text-pink-900 tracking-tight font-mono">
             301.000.000 đ
           </div>
-          <span class="text-[11px] text-blue-700/80 mt-1 block">Tài khoản BIDV 8630100930</span>
+          <span class="text-[11px] text-pink-700/80 mt-1 block">Tài khoản BIDV 8630100930</span>
         </div>
 
         <!-- Card 4 -->
-        <div class="bg-sky-50/60 rounded-xl p-4 border border-sky-100">
-          <div class="flex items-center justify-between text-sky-800 text-xs mb-1">
+        <div class="bg-amber-50/80 rounded-xl p-4 border border-amber-200">
+          <div class="flex items-center justify-between text-amber-800 text-xs mb-1">
             <span class="font-semibold uppercase">Mái ấm & Ca trợ giúp</span>
             <span>🏠</span>
           </div>
-          <div class="text-xl sm:text-2xl font-bold text-sky-900 tracking-tight">
+          <div class="text-xl sm:text-2xl font-bold text-amber-900 tracking-tight">
             23 Hộ gia đình
           </div>
-          <span class="text-[11px] text-sky-700/80 mt-1 block">Phủ kín khắp 20 thôn buôn</span>
+          <span class="text-[11px] text-amber-700/80 mt-1 block">Phủ kín khắp 20 thôn buôn</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- VIETQR DYNAMIC GENERATOR WIDGET -->
-  <section id="dong-gop" class="py-12 bg-slate-100/70 mt-6">
+  <!-- VIETQR DYNAMIC GENERATOR WIDGET TÔNG HỒNG TƯƠI SÁNG -->
+  <section id="dong-gop" class="py-12 bg-rose-50/40 mt-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-8 space-y-1">
-        <span class="inline-block px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold uppercase">
+        <span class="inline-block px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-xs font-semibold uppercase">
           TỰ ĐỘNG SINH MÃ VIETQR NAPAS 247
         </span>
         <h2 class="text-xl sm:text-3xl font-bold text-slate-900">
@@ -279,14 +231,14 @@
         </p>
       </div>
 
-      <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-12">
+      <div class="bg-white rounded-2xl shadow-xl shadow-rose-100/40 border border-rose-100 overflow-hidden max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-12">
         <!-- Form Left -->
         <div class="lg:col-span-7 p-5 sm:p-6 space-y-4">
           <div>
             <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">
               1. Chọn nội dung / chiến dịch ủng hộ:
             </label>
-            <select id="campaignSelect" onchange="updateQR()" class="w-full rounded-lg border border-slate-300 p-2.5 text-xs focus:border-blue-600 focus:ring-1 focus:ring-blue-600 bg-white font-medium">
+            <select id="campaignSelect" onchange="updateQR()" class="w-full rounded-lg border border-rose-200 p-2.5 text-xs focus:border-rose-500 focus:ring-1 focus:ring-rose-500 bg-white font-medium">
               <option value="CHUNG">Quỹ Vì Người Nghèo Xã Ea Súp (Chung 20 thôn buôn)</option>
               <option value="NDDK01">Xây nhà Đại đoàn kết bà Y Thị (Buôn Drai)</option>
               <option value="NDDK02">Xóa nhà tạm hộ ông Nguyễn Văn Sáng (Thôn 5)</option>
@@ -299,45 +251,45 @@
           <div>
             <div class="flex items-center justify-between mb-1">
               <label class="text-xs font-semibold uppercase text-slate-700">2. Chọn số tiền đóng góp:</label>
-              <span id="amountDisplay" class="text-xs font-bold text-blue-700 font-mono">200.000 đ</span>
+              <span id="amountDisplay" class="text-xs font-bold text-rose-600 font-mono">200.000 đ</span>
             </div>
             <div class="grid grid-cols-4 gap-1.5 mb-2">
-              <button onclick="setPresetAmount(50000)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100">50k</button>
-              <button onclick="setPresetAmount(100000)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100">100k</button>
-              <button onclick="setPresetAmount(200000)" class="preset-btn py-1.5 text-xs font-semibold rounded-lg border border-blue-600 bg-blue-600 text-white shadow-sm">200k</button>
-              <button onclick="setPresetAmount(500000)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100">500k</button>
-              <button onclick="setPresetAmount(1000000)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100">1 Triệu</button>
-              <button onclick="setPresetAmount(2000000)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100">2 Triệu</button>
-              <button onclick="setPresetAmount(5000000)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100">5 Triệu</button>
+              <button onclick="setPresetAmount(50000)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">50k</button>
+              <button onclick="setPresetAmount(100000)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">100k</button>
+              <button onclick="setPresetAmount(200000)" class="preset-btn py-1.5 text-xs font-semibold rounded-lg border border-rose-600 bg-rose-600 text-white shadow-sm shadow-rose-200">200k</button>
+              <button onclick="setPresetAmount(500000)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">500k</button>
+              <button onclick="setPresetAmount(1000000)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">1 Triệu</button>
+              <button onclick="setPresetAmount(2000000)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">2 Triệu</button>
+              <button onclick="setPresetAmount(5000000)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">5 Triệu</button>
             </div>
-            <input type="number" id="customAmountInput" placeholder="Hoặc nhập số tiền khác (VNĐ)..." oninput="handleCustomAmount(this.value)" class="w-full rounded-lg border border-slate-300 p-2 text-xs focus:border-blue-600">
+            <input type="number" id="customAmountInput" placeholder="Hoặc nhập số tiền khác (VNĐ)..." oninput="handleCustomAmount(this.value)" class="w-full rounded-lg border border-rose-200 p-2 text-xs focus:border-rose-500">
           </div>
 
           <div class="space-y-2">
             <label class="block text-xs font-semibold uppercase text-slate-700">3. Thông tin người gửi:</label>
-            <input type="text" id="donorNameInput" placeholder="Họ và tên của bạn hoặc đơn vị..." oninput="updateQR()" class="w-full rounded-lg border border-slate-300 p-2.5 text-xs focus:border-blue-600">
+            <input type="text" id="donorNameInput" placeholder="Họ và tên của bạn hoặc đơn vị..." oninput="updateQR()" class="w-full rounded-lg border border-rose-200 p-2.5 text-xs focus:border-rose-500">
             <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600">
-              <input type="checkbox" id="anonCheck" onchange="toggleAnon(this.checked)" class="w-3.5 h-3.5 text-blue-600 rounded">
+              <input type="checkbox" id="anonCheck" onchange="toggleAnon(this.checked)" class="w-3.5 h-3.5 text-rose-600 rounded focus:ring-rose-500">
               <span>Tôi muốn ủng hộ <strong>Ẩn Danh</strong> (Giấu tên trên bảng sao kê)</span>
             </label>
           </div>
 
-          <div class="text-[11px] text-slate-500 bg-blue-50/70 p-2.5 rounded-lg border border-blue-100">
-            <strong>Gợi ý:</strong> Quý vị giữ nguyên cú pháp nội dung để hệ thống nhận diện đúng chiến dịch.
+          <div class="text-[11px] text-rose-800 bg-rose-50 p-2.5 rounded-lg border border-rose-200">
+            <strong>Gợi ý:</strong> Quý vị giữ nguyên cú pháp nội dung để hệ thống tự động ghi nhận đúng chiến dịch.
           </div>
         </div>
 
-        <!-- QR Display Right -->
-        <div class="lg:col-span-5 bg-gradient-to-br from-slate-900 to-blue-950 p-5 sm:p-6 text-white flex flex-col items-center justify-between text-center border-t lg:border-t-0 lg:border-l border-slate-800">
+        <!-- QR Display Right (Tông hồng tươi sáng, sang trọng) -->
+        <div class="lg:col-span-5 bg-gradient-to-br from-rose-600 via-pink-600 to-rose-700 p-5 sm:p-6 text-white flex flex-col items-center justify-between text-center border-t lg:border-t-0 lg:border-l border-rose-400/30">
           <div class="w-full space-y-1 mb-2">
-            <span class="inline-block bg-blue-900/70 text-sky-300 text-[11px] px-2.5 py-0.5 rounded font-mono">
+            <span class="inline-block bg-white/20 text-rose-100 text-[11px] px-2.5 py-0.5 rounded font-medium backdrop-blur-xs">
               MÃ VIETQR NAPAS 247
             </span>
-            <p class="text-[11px] text-slate-300">Quét bằng ứng dụng ngân hàng bất kỳ</p>
+            <p class="text-[11px] text-rose-100">Quét bằng ứng dụng ngân hàng bất kỳ</p>
           </div>
 
           <!-- QR IMG -->
-          <div class="bg-white p-2.5 rounded-xl shadow-md max-w-[210px] mx-auto">
+          <div class="bg-white p-2.5 rounded-xl shadow-lg max-w-[210px] mx-auto">
             <img id="qrImage" src="https://img.vietqr.io/image/bidv-8630100930-compact2.png?amount=200000&addInfo=VNN%20UNG%20HO&accountName=UY%20BAN%20MTTQ%20VN%20XA%20EA%20SUP" alt="VietQR BIDV Ea Sup" class="w-full h-auto aspect-square object-contain rounded">
             <div class="text-[10px] text-slate-600 font-mono mt-1 font-semibold">
               BIDV: 8630100930
@@ -346,28 +298,28 @@
 
           <!-- Memo copy -->
           <div class="w-full space-y-1.5 mt-3 text-left">
-            <div class="bg-slate-800/80 p-2 rounded-lg border border-slate-700 text-xs flex items-center justify-between">
+            <div class="bg-black/15 backdrop-blur-sm p-2 rounded-lg border border-white/20 text-xs flex items-center justify-between">
               <div>
-                <span class="text-[10px] text-slate-400 block">Số tài khoản BIDV:</span>
-                <span class="font-mono font-semibold text-sky-300 text-xs">8630100930</span>
+                <span class="text-[10px] text-rose-200 block">Số tài khoản BIDV:</span>
+                <span class="font-mono font-bold text-amber-200 text-xs">8630100930</span>
               </div>
-              <button onclick="copyText('8630100930')" class="text-[10px] bg-slate-700 hover:bg-slate-600 px-2 py-0.5 rounded text-slate-200">
+              <button onclick="copyText('8630100930')" class="text-[10px] bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded text-white font-medium border border-white/20">
                 Chép STK
               </button>
             </div>
 
-            <div class="bg-slate-800/80 p-2 rounded-lg border border-slate-700 text-xs flex items-center justify-between">
+            <div class="bg-black/15 backdrop-blur-sm p-2 rounded-lg border border-white/20 text-xs flex items-center justify-between">
               <div class="truncate mr-2">
-                <span class="text-[10px] text-slate-400 block">Cú pháp nội dung:</span>
-                <span id="memoDisplay" class="font-mono font-semibold text-sky-300 text-[11px] truncate block">VNN UNG HO</span>
+                <span class="text-[10px] text-rose-200 block">Cú pháp nội dung:</span>
+                <span id="memoDisplay" class="font-mono font-bold text-amber-200 text-[11px] truncate block">VNN UNG HO</span>
               </div>
-              <button onclick="copyMemo()" class="shrink-0 text-[10px] bg-slate-700 hover:bg-slate-600 px-2 py-0.5 rounded text-slate-200">
+              <button onclick="copyMemo()" class="shrink-0 text-[10px] bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded text-white font-medium border border-white/20">
                 Chép cú pháp
               </button>
             </div>
           </div>
 
-          <div class="text-[10px] text-slate-400 pt-2">
+          <div class="text-[10px] text-rose-100 pt-2 font-medium">
             Chủ TK: <strong>UY BAN MTTQ VN XA EA SUP</strong>
           </div>
         </div>
@@ -375,12 +327,12 @@
     </div>
   </section>
 
-  <!-- LIVE LEDGER SAO KE SECTION -->
-  <section id="sao-ke" class="py-12 bg-white border-t border-slate-200">
+  <!-- LIVE LEDGER SAO KE SECTION TƯƠI SÁNG -->
+  <section id="sao-ke" class="py-12 bg-white border-t border-rose-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-3">
         <div>
-          <span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold uppercase">
+          <span class="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-xs font-semibold uppercase">
             BẢNG KÊ GIAO DỊCH THỜI GIAN THỰC
           </span>
           <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mt-1">
@@ -400,11 +352,11 @@
       </div>
 
       <!-- Live Ledger Container -->
-      <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-3">
+      <div class="bg-rose-50/30 rounded-2xl p-5 border border-rose-100 space-y-3">
         <!-- Toolbar -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div class="inline-flex rounded-lg bg-slate-200/70 p-1">
-            <button onclick="filterTable('ALL')" id="tabAll" class="px-3 py-1.5 rounded-md text-xs font-medium bg-white text-slate-900 shadow-sm">
+          <div class="inline-flex rounded-lg bg-rose-100/70 p-1">
+            <button onclick="filterTable('ALL')" id="tabAll" class="px-3 py-1.5 rounded-md text-xs font-semibold bg-rose-600 text-white shadow-sm">
               Tất cả (5)
             </button>
             <button onclick="filterTable('IN')" id="tabIn" class="px-3 py-1.5 rounded-md text-xs font-medium text-emerald-700 hover:bg-emerald-50">
@@ -416,16 +368,16 @@
           </div>
 
           <div class="relative min-w-[240px]">
-            <input type="text" id="searchInput" placeholder="Tìm tên, nội dung, mã TID..." oninput="searchTable(this.value)" class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 focus:border-blue-600 bg-white">
+            <input type="text" id="searchInput" placeholder="Tìm tên, nội dung, mã TID..." oninput="searchTable(this.value)" class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-rose-200 focus:border-rose-500 bg-white">
             <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
           </div>
         </div>
 
         <!-- Table -->
-        <div class="overflow-x-auto bg-white rounded-xl border border-slate-200">
+        <div class="overflow-x-auto bg-white rounded-xl border border-rose-100 shadow-xs">
           <table class="w-full text-left text-xs border-collapse" id="ledgerTable">
             <thead>
-              <tr class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+              <tr class="bg-rose-50/70 text-rose-950 font-semibold border-b border-rose-200">
                 <th class="p-3 whitespace-nowrap">Thời gian</th>
                 <th class="p-3 whitespace-nowrap">Mã TID Ngân hàng</th>
                 <th class="p-3 min-w-[260px]">Nội dung & Chiến dịch</th>
@@ -435,7 +387,7 @@
             </thead>
             <tbody class="divide-y divide-slate-100">
               <!-- Row 1 -->
-              <tr data-type="IN" class="hover:bg-slate-50">
+              <tr data-type="IN" class="hover:bg-rose-50/30">
                 <td class="p-3 whitespace-nowrap">
                   <div class="font-medium text-slate-900">Vừa xong</div>
                   <div class="text-[10px] text-slate-400">10/09/2026 11:05</div>
@@ -446,7 +398,7 @@
                 <td class="p-3">
                   <div class="font-medium text-slate-800">VNN CT MOT NHA HAO TAM AN DANH UNG HO PHAU THUAT TIM</div>
                   <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="px-1 py-0.2 rounded text-[10px] bg-blue-100 text-blue-800 font-mono font-medium">#CT01</span>
+                    <span class="px-1 py-0.2 rounded text-[10px] bg-rose-100 text-rose-800 font-mono font-medium">#CT01</span>
                     <span class="text-[11px] text-slate-500">Người gửi: <strong>Nhà hảo tâm ẩn danh</strong></span>
                   </div>
                 </td>
@@ -459,7 +411,7 @@
               </tr>
 
               <!-- Row 2 -->
-              <tr data-type="IN" class="hover:bg-slate-50">
+              <tr data-type="IN" class="hover:bg-rose-50/30">
                 <td class="p-3 whitespace-nowrap">
                   <div class="font-medium text-slate-900">1 giờ trước</div>
                   <div class="text-[10px] text-slate-400">10/09/2026 10:20</div>
@@ -470,7 +422,7 @@
                 <td class="p-3">
                   <div class="font-medium text-slate-800">VNN TET NGUYEN VAN AN UNG HO NGUOI NGHEO</div>
                   <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="px-1 py-0.2 rounded text-[10px] bg-sky-100 text-sky-800 font-mono font-medium">#TET2026</span>
+                    <span class="px-1 py-0.2 rounded text-[10px] bg-pink-100 text-pink-800 font-mono font-medium">#TET2026</span>
                     <span class="text-[11px] text-slate-500">Người gửi: <strong>Nguyễn Văn An</strong></span>
                   </div>
                 </td>
@@ -483,7 +435,7 @@
               </tr>
 
               <!-- Row 3 -->
-              <tr data-type="IN" class="hover:bg-slate-50">
+              <tr data-type="IN" class="hover:bg-rose-50/30">
                 <td class="p-3 whitespace-nowrap">
                   <div class="font-medium text-slate-900">2 giờ trước</div>
                   <div class="text-[10px] text-slate-400">10/09/2026 09:15</div>
@@ -494,7 +446,7 @@
                 <td class="p-3">
                   <div class="font-medium text-slate-800">VNN NDDK01 CONG TY CP CAO SU DAK LAK UNG HO NHA DAI DOAN KET</div>
                   <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="px-1 py-0.2 rounded text-[10px] bg-blue-100 text-blue-800 font-mono font-medium">#NDDK01</span>
+                    <span class="px-1 py-0.2 rounded text-[10px] bg-rose-100 text-rose-800 font-mono font-medium">#NDDK01</span>
                     <span class="text-[11px] text-slate-500">Đơn vị: <strong>Công ty CP Cao Su Đắk Lắk</strong></span>
                   </div>
                 </td>
@@ -507,7 +459,7 @@
               </tr>
 
               <!-- Row 4 (Disbursement OUT) -->
-              <tr data-type="OUT" class="hover:bg-slate-50 bg-rose-50/20">
+              <tr data-type="OUT" class="hover:bg-rose-50/40 bg-rose-50/20">
                 <td class="p-3 whitespace-nowrap">
                   <div class="font-medium text-slate-900">Hôm qua</div>
                   <div class="text-[10px] text-slate-400">09/09/2026 14:30</div>
@@ -518,7 +470,7 @@
                 <td class="p-3">
                   <div class="font-medium text-slate-900">CHI GIAI NGAN HO TRO XAY NHA DAI DOAN KET HO BA Y THI BUON DRAI DOT 1</div>
                   <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="px-1 py-0.2 rounded text-[10px] bg-blue-100 text-blue-800 font-mono font-medium">#NDDK01</span>
+                    <span class="px-1 py-0.2 rounded text-[10px] bg-rose-100 text-rose-800 font-mono font-medium">#NDDK01</span>
                     <span class="text-[11px] text-rose-700 font-mono">Phiếu chi: PC-2026-0042</span>
                   </div>
                 </td>
@@ -526,14 +478,14 @@
                   -8.000.000 đ
                 </td>
                 <td class="p-3 text-center whitespace-nowrap">
-                  <button onclick="openProofModal('Phiếu Chi PC-2026-0042', 'Hỗ trợ xây nhà Đại đoàn kết bà Y Thị Buôn Drai', '8.000.000 đ', 'Hóa đơn VAT xi măng, tôn hoa sen kèm Biên bản khởi công có xác nhận của Trưởng ban CTMT Buôn Drai Y Krô Bkrông.')" class="px-2 py-0.5 rounded bg-blue-100 hover:bg-blue-200 text-blue-800 text-[11px] font-medium transition-colors">
+                  <button onclick="openProofModal('Phiếu Chi PC-2026-0042', 'Hỗ trợ xây nhà Đại đoàn kết bà Y Thị Buôn Drai', '8.000.000 đ', 'Hóa đơn VAT xi măng, tôn hoa sen kèm Biên bản khởi công có xác nhận của Trưởng ban CTMT Buôn Drai Y Krô Bkrông.')" class="px-2 py-0.5 rounded bg-rose-100 hover:bg-rose-200 text-rose-800 text-[11px] font-medium transition-colors">
                     🔍 Xem hóa đơn scan
                   </button>
                 </td>
               </tr>
 
               <!-- Row 5 (Disbursement OUT) -->
-              <tr data-type="OUT" class="hover:bg-slate-50 bg-rose-50/20">
+              <tr data-type="OUT" class="hover:bg-rose-50/40 bg-rose-50/20">
                 <td class="p-3 whitespace-nowrap">
                   <div class="font-medium text-slate-900">2 ngày trước</div>
                   <div class="text-[10px] text-slate-400">08/09/2026 08:45</div>
@@ -544,7 +496,7 @@
                 <td class="p-3">
                   <div class="font-medium text-slate-900">CHI HO TRO CHI PHI MO TIM CAP CUU CHAU H HEN MLO BUON A2</div>
                   <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="px-1 py-0.2 rounded text-[10px] bg-sky-100 text-sky-800 font-mono font-medium">#CT01</span>
+                    <span class="px-1 py-0.2 rounded text-[10px] bg-rose-100 text-rose-800 font-mono font-medium">#CT01</span>
                     <span class="text-[11px] text-rose-700 font-mono">Phiếu chi: PC-2026-0041</span>
                   </div>
                 </td>
@@ -552,7 +504,7 @@
                   -25.000.000 đ
                 </td>
                 <td class="p-3 text-center whitespace-nowrap">
-                  <button onclick="openProofModal('Phiếu Chi PC-2026-0041', 'Cứu trợ chi phí phẫu thuật tim cháu H\'Hên Mlô', '25.000.000 đ', 'Biên nhận tạm ứng viện phí Bệnh viện Nhi Đồng 2 kèm đơn đề nghị khẩn cấp có xác nhận của UBND xã Ea Súp.')" class="px-2 py-0.5 rounded bg-blue-100 hover:bg-blue-200 text-blue-800 text-[11px] font-medium transition-colors">
+                  <button onclick="openProofModal('Phiếu Chi PC-2026-0041', 'Cứu trợ chi phí phẫu thuật tim cháu H\'Hên Mlô', '25.000.000 đ', 'Biên nhận tạm ứng viện phí Bệnh viện Nhi Đồng 2 kèm đơn đề nghị khẩn cấp có xác nhận của UBND xã Ea Súp.')" class="px-2 py-0.5 rounded bg-rose-100 hover:bg-rose-200 text-rose-800 text-[11px] font-medium transition-colors">
                     🔍 Xem hóa đơn scan
                   </button>
                 </td>
@@ -564,11 +516,11 @@
     </div>
   </section>
 
-  <!-- CAMPAIGNS DIRECTORY ("NƠI GIEO HY VỌNG") -->
-  <section id="chien-dich" class="py-12 bg-slate-50 border-t border-slate-200">
+  <!-- CAMPAIGNS DIRECTORY ("NƠI GIEO HY VỌNG") TÔNG HỒNG TƯƠI SÁNG -->
+  <section id="chien-dich" class="py-12 bg-rose-50/20 border-t border-rose-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
       <div class="text-center max-w-2xl mx-auto space-y-1">
-        <span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold uppercase">
+        <span class="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-xs font-semibold uppercase">
           NƠI GIEO HY VỌNG • 20 THÔN BUÔN
         </span>
         <h2 class="text-xl sm:text-2xl font-bold text-slate-900">
@@ -581,15 +533,15 @@
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Campaign 1 -->
-        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col">
-          <div class="relative aspect-[16/10] overflow-hidden bg-slate-100">
+        <div class="bg-white rounded-2xl border border-rose-100 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col">
+          <div class="relative aspect-[16/10] overflow-hidden bg-rose-50">
             <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80" alt="Nhà bà Y Thị" class="w-full h-full object-cover">
-            <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-600 text-white shadow-sm">Đang quyên góp</span>
-            <span class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded text-[10px] font-mono bg-slate-900/80 text-sky-300">#NDDK01</span>
+            <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-rose-600 text-white shadow-sm">Đang quyên góp</span>
+            <span class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded text-[10px] font-mono bg-slate-900/80 text-rose-200">#NDDK01</span>
           </div>
           <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
             <div class="space-y-1.5">
-              <span class="text-xs text-blue-700 font-medium">📍 Buôn Drai • Bà Y Thị</span>
+              <span class="text-xs text-rose-600 font-semibold">📍 Buôn Drai • Bà Y Thị</span>
               <h3 class="font-bold text-sm text-slate-900 leading-snug">
                 Xây nhà Đại đoàn kết cho hộ bà Y Thị - Buôn Drai
               </h3>
@@ -597,35 +549,35 @@
                 Nhà tranh vách nứa dột nát, neo đơn. Quỹ trích 8 triệu đồng từ nguồn xã phối hợp đối ứng và dân buôn dựng nhà kiên cố.
               </p>
             </div>
-            <div class="space-y-1.5 pt-2 border-t border-slate-100">
+            <div class="space-y-1.5 pt-2 border-t border-rose-100">
               <div class="flex justify-between text-xs">
                 <span class="text-slate-500">Đã vận động:</span>
-                <span class="text-blue-700 font-bold">48.500.000 đ</span>
+                <span class="text-rose-700 font-bold">48.500.000 đ</span>
               </div>
-              <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                <div class="h-full bg-blue-600 rounded-full" style="width: 61%"></div>
+              <div class="w-full h-1.5 bg-rose-100 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-pink-500 to-rose-600 rounded-full" style="width: 61%"></div>
               </div>
               <div class="flex justify-between text-[11px] text-slate-500">
                 <span>Tiến độ: <strong>61%</strong></span>
                 <span>Mục tiêu: <strong>80.000.000 đ</strong></span>
               </div>
             </div>
-            <a href="#dong-gop" class="w-full text-center py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition-colors">
+            <a href="#dong-gop" class="w-full text-center py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-sm shadow-rose-200 transition-colors">
               Ủng hộ hộ bà Y Thị
             </a>
           </div>
         </div>
 
         <!-- Campaign 2 -->
-        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col">
-          <div class="relative aspect-[16/10] overflow-hidden bg-slate-100">
+        <div class="bg-white rounded-2xl border border-rose-100 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col">
+          <div class="relative aspect-[16/10] overflow-hidden bg-rose-50">
             <img src="https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=800&auto=format&fit=crop&q=80" alt="Bò giống sinh kế" class="w-full h-full object-cover">
-            <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-600 text-white shadow-sm">Đang quyên góp</span>
-            <span class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded text-[10px] font-mono bg-slate-900/80 text-sky-300">#SK01</span>
+            <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-rose-600 text-white shadow-sm">Đang quyên góp</span>
+            <span class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded text-[10px] font-mono bg-slate-900/80 text-rose-200">#SK01</span>
           </div>
           <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
             <div class="space-y-1.5">
-              <span class="text-xs text-blue-700 font-medium">📍 Thôn 12 & 14 • 10 Hộ nghèo</span>
+              <span class="text-xs text-rose-600 font-semibold">📍 Thôn 12 & 14 • 10 Hộ nghèo</span>
               <h3 class="font-bold text-sm text-slate-900 leading-snug">
                 Trao tặng Bò giống sinh kế cho 10 hộ nghèo
               </h3>
@@ -633,35 +585,35 @@
                 Định mức 5 triệu đồng/hộ mua bò cái sinh sản giống địa phương giúp bà con từng bước thoát nghèo bền vững.
               </p>
             </div>
-            <div class="space-y-1.5 pt-2 border-t border-slate-100">
+            <div class="space-y-1.5 pt-2 border-t border-rose-100">
               <div class="flex justify-between text-xs">
                 <span class="text-slate-500">Đã vận động:</span>
-                <span class="text-blue-700 font-bold">32.000.000 đ</span>
+                <span class="text-rose-700 font-bold">32.000.000 đ</span>
               </div>
-              <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                <div class="h-full bg-blue-600 rounded-full" style="width: 64%"></div>
+              <div class="w-full h-1.5 bg-rose-100 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-pink-500 to-rose-600 rounded-full" style="width: 64%"></div>
               </div>
               <div class="flex justify-between text-[11px] text-slate-500">
                 <span>Tiến độ: <strong>64%</strong></span>
                 <span>Mục tiêu: <strong>50.000.000 đ</strong></span>
               </div>
             </div>
-            <a href="#dong-gop" class="w-full text-center py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition-colors">
+            <a href="#dong-gop" class="w-full text-center py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-sm shadow-rose-200 transition-colors">
               Ủng hộ chương trình sinh kế
             </a>
           </div>
         </div>
 
         <!-- Campaign 3 -->
-        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col">
-          <div class="relative aspect-[16/10] overflow-hidden bg-slate-100">
+        <div class="bg-white rounded-2xl border border-rose-100 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col">
+          <div class="relative aspect-[16/10] overflow-hidden bg-rose-50">
             <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&auto=format&fit=crop&q=80" alt="Quà Tết vì người nghèo" class="w-full h-full object-cover">
-            <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-600 text-white shadow-sm">Đang quyên góp</span>
-            <span class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded text-[10px] font-mono bg-slate-900/80 text-sky-300">#TET2026</span>
+            <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-rose-600 text-white shadow-sm">Đang quyên góp</span>
+            <span class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded text-[10px] font-mono bg-slate-900/80 text-rose-200">#TET2026</span>
           </div>
           <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
             <div class="space-y-1.5">
-              <span class="text-xs text-blue-700 font-medium">📍 Toàn xã Ea Súp • 500 Suất quà</span>
+              <span class="text-xs text-rose-600 font-semibold">📍 Toàn xã Ea Súp • 500 Suất quà</span>
               <h3 class="font-bold text-sm text-slate-900 leading-snug">
                 Chương trình 'Tết Bính Ngọ vì người nghèo'
               </h3>
@@ -669,20 +621,20 @@
                 Trao tặng 500 suất quà Tết trị giá 500.000đ/suất cho toàn bộ hộ nghèo, gia đình chính sách khó khăn tại 20 thôn buôn.
               </p>
             </div>
-            <div class="space-y-1.5 pt-2 border-t border-slate-100">
+            <div class="space-y-1.5 pt-2 border-t border-rose-100">
               <div class="flex justify-between text-xs">
                 <span class="text-slate-500">Đã vận động:</span>
-                <span class="text-blue-700 font-bold">185.500.000 đ</span>
+                <span class="text-rose-700 font-bold">185.500.000 đ</span>
               </div>
-              <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                <div class="h-full bg-blue-600 rounded-full" style="width: 74%"></div>
+              <div class="w-full h-1.5 bg-rose-100 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-pink-500 to-rose-600 rounded-full" style="width: 74%"></div>
               </div>
               <div class="flex justify-between text-[11px] text-slate-500">
                 <span>Tiến độ: <strong>74%</strong></span>
                 <span>Mục tiêu: <strong>250.000.000 đ</strong></span>
               </div>
             </div>
-            <a href="#dong-gop" class="w-full text-center py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition-colors">
+            <a href="#dong-gop" class="w-full text-center py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-sm shadow-rose-200 transition-colors">
               Chung tay tặng quà Tết
             </a>
           </div>
@@ -692,10 +644,10 @@
   </section>
 
   <!-- LEGAL DOCUMENTS SECTION -->
-  <section id="phap-ly" class="py-12 bg-white border-t border-slate-200">
+  <section id="phap-ly" class="py-12 bg-white border-t border-rose-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
       <div>
-        <span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold uppercase">
+        <span class="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-xs font-semibold uppercase">
           VĂN BẢN PHÁP LÝ
         </span>
         <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
@@ -707,33 +659,33 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div class="p-5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3 flex flex-col justify-between">
+        <div class="p-5 rounded-xl border border-rose-100 bg-rose-50/30 space-y-3 flex flex-col justify-between">
           <div class="space-y-1.5">
-            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-800 font-mono">QĐ 13/QĐ-MTTQ-BTT</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-100 text-rose-800 font-mono">QĐ 13/QĐ-MTTQ-BTT</span>
             <h4 class="font-bold text-xs text-slate-900">Quy chế Vận động, Quản lý và Sử dụng Quỹ</h4>
             <p class="text-xs text-slate-600">
               Quy định rõ tôn chỉ minh bạch, tài khoản tiếp nhận duy nhất BIDV 8630100930 và các định mức chi an sinh.
             </p>
           </div>
-          <a href="/api/v1/export/docx" class="inline-flex items-center justify-center py-2 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition-colors">
+          <a href="/api/v1/export/docx" class="inline-flex items-center justify-center py-2 px-3 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-sm shadow-rose-200 transition-colors">
             <span>Tải Quyết định 13 (.docx)</span>
           </a>
         </div>
 
-        <div class="p-5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3 flex flex-col justify-between">
+        <div class="p-5 rounded-xl border border-rose-100 bg-rose-50/30 space-y-3 flex flex-col justify-between">
           <div class="space-y-1.5">
-            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-800 font-mono">QĐ 12/QĐ-MTTQ-BTT</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-100 text-rose-800 font-mono">QĐ 12/QĐ-MTTQ-BTT</span>
             <h4 class="font-bold text-xs text-slate-900">Quyết định Thành lập Ban Vận Động Quỹ</h4>
             <p class="text-xs text-slate-600">
               Thành lập Ban Vận động gồm Trưởng ban Lê Hồng Hạnh, Phó ban Nguyễn Bá Bân, Phó ban thường trực Nguyễn Thị Miên.
             </p>
           </div>
-          <a href="/api/v1/export/docx" class="inline-flex items-center justify-center py-2 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition-colors">
+          <a href="/api/v1/export/docx" class="inline-flex items-center justify-center py-2 px-3 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-sm shadow-rose-200 transition-colors">
             <span>Tải Quyết định 12 (.docx)</span>
           </a>
         </div>
 
-        <div class="p-5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3 flex flex-col justify-between">
+        <div class="p-5 rounded-xl border border-rose-100 bg-rose-50/30 space-y-3 flex flex-col justify-between">
           <div class="space-y-1.5">
             <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 font-mono">NĐ 30/2020/NĐ-CP</span>
             <h4 class="font-bold text-xs text-slate-900">Báo cáo Tài chính Công khai Thể thức Hành chính</h4>
@@ -750,15 +702,15 @@
   </section>
 
   <!-- FOOTER -->
-  <footer class="bg-slate-900 text-slate-300 pt-12 pb-6 border-t-2 border-blue-600">
+  <footer class="bg-slate-900 text-slate-300 pt-12 pb-6 border-t-2 border-rose-500">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div class="space-y-2">
           <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-xs">MT</div>
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white font-bold text-xs">MT</div>
             <div>
               <h3 class="text-white font-bold text-xs leading-tight">QUỸ VÌ NGƯỜI NGHÈO EA SÚP</h3>
-              <p class="text-[11px] text-sky-400">Tỉnh Đắk Lắk</p>
+              <p class="text-[11px] text-rose-300">Tỉnh Đắk Lắk</p>
             </div>
           </div>
           <p class="text-xs text-slate-400 leading-relaxed">
@@ -767,7 +719,7 @@
         </div>
 
         <div class="space-y-1.5 text-xs">
-          <h4 class="text-xs font-bold text-white uppercase tracking-wider text-sky-300 border-b border-slate-800 pb-1.5">
+          <h4 class="text-xs font-bold text-white uppercase tracking-wider text-rose-300 border-b border-slate-800 pb-1.5">
             Thường Trực Ban Vận Động
           </h4>
           <p><strong class="text-white">Đ/c Lê Hồng Hạnh</strong><br><span class="text-slate-400">Trưởng ban - Chủ tịch UBMTTQ xã</span></p>
@@ -776,18 +728,18 @@
         </div>
 
         <div class="space-y-1.5 text-xs">
-          <h4 class="text-xs font-bold text-white uppercase tracking-wider text-sky-300 border-b border-slate-800 pb-1.5">
+          <h4 class="text-xs font-bold text-white uppercase tracking-wider text-rose-300 border-b border-slate-800 pb-1.5">
             Tài Khoản Tiếp Nhận Duy Nhất
           </h4>
-          <div class="bg-slate-950 p-2.5 rounded-lg border border-blue-900/50 space-y-0.5">
+          <div class="bg-slate-950 p-2.5 rounded-lg border border-rose-900/50 space-y-0.5">
             <div class="text-[10px] text-slate-400">BIDV Chi nhánh Ea Súp:</div>
-            <div class="text-sky-300 font-mono font-bold text-sm">8630100930</div>
+            <div class="text-rose-300 font-mono font-bold text-sm">8630100930</div>
             <div class="text-white text-[10px]">UY BAN MTTQ VN XA EA SUP</div>
           </div>
         </div>
 
         <div class="space-y-1.5 text-xs">
-          <h4 class="text-xs font-bold text-white uppercase tracking-wider text-sky-300 border-b border-slate-800 pb-1.5">
+          <h4 class="text-xs font-bold text-white uppercase tracking-wider text-rose-300 border-b border-slate-800 pb-1.5">
             Địa Bàn 20 Thôn Buôn
           </h4>
           <p class="text-slate-400 text-xs">
@@ -807,68 +759,68 @@
 
   <!-- FLOATING CHATBOT AI WIDGET -->
   <div class="fixed bottom-5 right-5 z-50">
-    <button onclick="toggleChat()" id="chatToggleBtn" class="flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all group border border-sky-400/30">
-      <span class="text-amber-300">✨</span>
+    <button onclick="toggleChat()" id="chatToggleBtn" class="flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white shadow-lg shadow-rose-300/40 hover:shadow-xl transition-all group border border-rose-300/30">
+      <span class="text-amber-200">✨</span>
       <span class="text-xs font-bold tracking-wide">Hỏi AI Tra Cứu Sao Kê 24/7</span>
     </button>
 
     <!-- Chat Window -->
-    <div id="chatModal" class="hidden w-[340px] sm:w-[380px] h-[480px] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in zoom-in-95">
-      <div class="bg-gradient-to-r from-blue-900 to-slate-900 p-3.5 text-white flex items-center justify-between">
+    <div id="chatModal" class="hidden w-[340px] sm:w-[380px] h-[480px] bg-white rounded-2xl shadow-2xl border border-rose-200 flex flex-col overflow-hidden animate-in fade-in zoom-in-95">
+      <div class="bg-gradient-to-r from-rose-700 via-rose-600 to-pink-600 p-3.5 text-white flex items-center justify-between">
         <div>
           <h4 class="font-bold text-xs flex items-center gap-1.5">
             <span>Gem Mặt Trận Ea Súp</span>
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
           </h4>
-          <span class="text-[10px] text-sky-200">Trợ lý AI • Sao kê BIDV 8630100930</span>
+          <span class="text-[10px] text-rose-100">Trợ lý AI • Sao kê BIDV 8630100930</span>
         </div>
-        <button onclick="toggleChat()" class="text-slate-300 hover:text-white text-base">✕</button>
+        <button onclick="toggleChat()" class="text-white/80 hover:text-white text-base">✕</button>
       </div>
 
-      <div id="chatMessages" class="flex-1 p-3.5 overflow-y-auto space-y-2.5 bg-slate-50 text-xs">
-        <div class="p-2.5 rounded-xl bg-white border border-slate-200 rounded-tl-none shadow-sm leading-relaxed">
+      <div id="chatMessages" class="flex-1 p-3.5 overflow-y-auto space-y-2.5 bg-rose-50/30 text-xs">
+        <div class="p-2.5 rounded-xl bg-white border border-rose-100 rounded-tl-none shadow-xs leading-relaxed">
           Xin kính chào quý đồng bào và nhà hảo tâm! Tôi là <strong>Gem Mặt Trận Ea Súp</strong>. Tôi có thể hỗ trợ quý vị tra cứu số dư tài khoản BIDV 8630100930, định mức hỗ trợ và quy chế minh bạch 20 thôn buôn.
         </div>
       </div>
 
-      <div class="p-2 bg-white border-t border-slate-100 flex gap-1.5 overflow-x-auto text-[10px]">
-        <button onclick="sendQuickPrompt('Số dư tài khoản BIDV 8630100930?')" class="shrink-0 px-2 py-1 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-700">Số dư BIDV?</button>
-        <button onclick="sendQuickPrompt('Định mức hỗ trợ xây nhà ĐĐK?')" class="shrink-0 px-2 py-1 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-700">Định mức nhà?</button>
-        <button onclick="sendQuickPrompt('20 thôn buôn xã Ea Súp?')" class="shrink-0 px-2 py-1 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-700">20 thôn buôn?</button>
+      <div class="p-2 bg-white border-t border-rose-100 flex gap-1.5 overflow-x-auto text-[10px]">
+        <button onclick="sendQuickPrompt('Số dư tài khoản BIDV 8630100930?')" class="shrink-0 px-2 py-1 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-800 font-medium">Số dư BIDV?</button>
+        <button onclick="sendQuickPrompt('Định mức hỗ trợ xây nhà ĐĐK?')" class="shrink-0 px-2 py-1 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-800 font-medium">Định mức nhà?</button>
+        <button onclick="sendQuickPrompt('20 thôn buôn xã Ea Súp?')" class="shrink-0 px-2 py-1 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-800 font-medium">20 thôn buôn?</button>
       </div>
 
-      <form onsubmit="handleChatSubmit(event)" class="p-2.5 bg-white border-t border-slate-200 flex items-center gap-1.5">
-        <input type="text" id="chatInput" placeholder="Nhập câu hỏi tra cứu..." class="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-xs focus:border-blue-600">
-        <button type="submit" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold">Gửi</button>
+      <form onsubmit="handleChatSubmit(event)" class="p-2.5 bg-white border-t border-rose-100 flex items-center gap-1.5">
+        <input type="text" id="chatInput" placeholder="Nhập câu hỏi tra cứu..." class="flex-1 rounded-lg border border-rose-200 px-3 py-1.5 text-xs focus:border-rose-500">
+        <button type="submit" class="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold">Gửi</button>
       </form>
     </div>
   </div>
 
   <!-- PROOF MODAL -->
   <div id="proofModal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200">
-      <div class="bg-slate-900 p-3.5 text-white flex items-center justify-between">
+    <div class="bg-white rounded-xl max-w-lg w-full overflow-hidden shadow-2xl border border-rose-200">
+      <div class="bg-gradient-to-r from-rose-700 to-rose-800 p-3.5 text-white flex items-center justify-between">
         <div>
           <h4 id="proofTitle" class="font-bold text-xs">Minh Chứng Hồ Sơ Chi</h4>
-          <span id="proofAmount" class="text-xs text-sky-300 font-mono"></span>
+          <span id="proofAmount" class="text-xs text-amber-200 font-mono font-bold"></span>
         </div>
-        <button onclick="closeProofModal()" class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center hover:bg-rose-600 text-xs">✕</button>
+        <button onclick="closeProofModal()" class="w-6 h-6 rounded-full bg-rose-900 text-white flex items-center justify-center hover:bg-rose-600 text-xs">✕</button>
       </div>
       <div class="p-5 space-y-3">
         <div>
           <label class="text-[10px] font-bold text-slate-500 uppercase">Khoản chi:</label>
           <p id="proofDesc" class="text-xs font-bold text-slate-900"></p>
         </div>
-        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs text-slate-700">
+        <div class="bg-rose-50/50 p-3 rounded-lg border border-rose-200 text-xs text-slate-700">
           <strong>Biên bản & Kiểm soát:</strong>
           <p id="proofNote" class="mt-0.5 leading-relaxed"></p>
         </div>
-        <div class="rounded-lg overflow-hidden border border-slate-200 aspect-[16/10] bg-slate-100">
+        <div class="rounded-lg overflow-hidden border border-rose-200 aspect-[16/10] bg-rose-50">
           <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&auto=format&fit=crop&q=80" alt="Hóa đơn VAT" class="w-full h-full object-cover">
         </div>
       </div>
-      <div class="p-3 bg-slate-50 border-t border-slate-200 text-right">
-        <button onclick="closeProofModal()" class="px-3.5 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold">Đóng</button>
+      <div class="p-3 bg-rose-50/50 border-t border-rose-100 text-right">
+        <button onclick="closeProofModal()" class="px-3.5 py-1.5 rounded-lg bg-rose-700 hover:bg-rose-800 text-white text-xs font-semibold">Đóng</button>
       </div>
     </div>
   </div>
@@ -882,9 +834,9 @@
       currentAmount = val;
       document.getElementById('customAmountInput').value = '';
       document.querySelectorAll('.preset-btn').forEach(b => {
-        b.className = "preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100";
+        b.className = "preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700";
       });
-      event.target.className = "preset-btn py-1.5 text-xs font-semibold rounded-lg border border-blue-600 bg-blue-600 text-white shadow-sm";
+      event.target.className = "preset-btn py-1.5 text-xs font-semibold rounded-lg border border-rose-600 bg-rose-600 text-white shadow-sm shadow-rose-200";
       updateQR();
     }
 
@@ -892,7 +844,7 @@
       if (val && parseInt(val) > 0) {
         currentAmount = parseInt(val);
         document.querySelectorAll('.preset-btn').forEach(b => {
-          b.className = "preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100";
+          b.className = "preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700";
         });
         updateQR();
       }
@@ -937,7 +889,7 @@
           r.style.display = 'none';
         }
       });
-      document.getElementById('tabAll').className = type === 'ALL' ? "px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-slate-900 shadow-sm" : "px-3 py-1.5 rounded-md text-xs font-medium text-slate-700 hover:bg-slate-100";
+      document.getElementById('tabAll').className = type === 'ALL' ? "px-3 py-1.5 rounded-md text-xs font-semibold bg-rose-600 text-white shadow-sm" : "px-3 py-1.5 rounded-md text-xs font-medium text-slate-700 hover:bg-rose-50";
       document.getElementById('tabIn').className = type === 'IN' ? "px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-600 text-white shadow-sm" : "px-3 py-1.5 rounded-md text-xs font-medium text-emerald-700 hover:bg-emerald-50";
       document.getElementById('tabOut').className = type === 'OUT' ? "px-3 py-1.5 rounded-md text-xs font-semibold bg-rose-600 text-white shadow-sm" : "px-3 py-1.5 rounded-md text-xs font-medium text-rose-700 hover:bg-rose-50";
     }
@@ -983,7 +935,7 @@
       inp.value = '';
 
       const box = document.getElementById('chatMessages');
-      box.innerHTML += `<div class="p-2 rounded-xl bg-blue-600 text-white ml-auto max-w-[80%] text-right rounded-tr-none shadow-sm">${text}</div>`;
+      box.innerHTML += `<div class="p-2 rounded-xl bg-rose-600 text-white ml-auto max-w-[80%] text-right rounded-tr-none shadow-sm">${text}</div>`;
       box.scrollTop = box.scrollHeight;
 
       try {
@@ -993,9 +945,9 @@
           body: JSON.stringify({ message: text })
         });
         const data = await res.json();
-        box.innerHTML += `<div class="p-2.5 rounded-xl bg-white border border-slate-200 rounded-tl-none shadow-sm leading-relaxed">${data.reply}</div>`;
+        box.innerHTML += `<div class="p-2.5 rounded-xl bg-white border border-rose-100 rounded-tl-none shadow-xs leading-relaxed">${data.reply}</div>`;
       } catch {
-        box.innerHTML += `<div class="p-2.5 rounded-xl bg-white border border-slate-200 rounded-tl-none shadow-sm leading-relaxed">Dạ, hiện tại số dư Quỹ trong tài khoản BIDV 8630100930 là 301.000.000 đ. Mọi đóng góp xin gửi về STK: 8630100930 (BIDV Ea Súp)!</div>`;
+        box.innerHTML += `<div class="p-2.5 rounded-xl bg-white border border-rose-100 rounded-tl-none shadow-xs leading-relaxed">Dạ, hiện tại số dư Quỹ trong tài khoản BIDV 8630100930 là 301.000.000 đ. Mọi đóng góp xin gửi về STK: 8630100930 (BIDV Ea Súp)!</div>`;
       }
       box.scrollTop = box.scrollHeight;
     }

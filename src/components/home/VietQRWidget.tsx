@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Image from "next/image";
 import { formatVND, buildVietQRUrl } from "@/lib/utils";
-import { QrCode, Copy, Check, Heart, Sparkles, Download, ShieldCheck } from "lucide-react";
+import { QrCode, Copy, Check, Heart, ShieldCheck } from "lucide-react";
 
 interface CampaignOption {
   code: string;
@@ -36,7 +35,6 @@ export default function VietQRWidget() {
   const transferMemo = useMemo(() => {
     const prefix = selectedCampaign === "CHUNG" ? "VNN" : `VNN ${selectedCampaign}`;
     const namePart = isAnonymous ? "AN DANH" : donorName.trim() ? donorName.trim() : "UNG HO";
-    // Chuyển đổi tên tiếng Việt không dấu cho chuẩn SMS/Banking
     const cleanName = namePart
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
@@ -67,33 +65,33 @@ export default function VietQRWidget() {
   };
 
   return (
-    <section id="dong-gop" className="py-16 bg-slate-100/70">
+    <section id="dong-gop" className="py-12 bg-rose-50/40 mt-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold mb-3">
-            <Heart className="w-3.5 h-3.5 fill-current" />
-            <span>Tự Động Sinh Mã VietQR Chuẩn NAPAS 247</span>
+        <div className="text-center max-w-2xl mx-auto mb-8 space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-xs font-semibold uppercase">
+            <Heart className="w-3.5 h-3.5 fill-current text-rose-600" />
+            <span>TỰ ĐỘNG SINH MÃ VIETQR NAPAS 247</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-xl sm:text-3xl font-bold text-slate-900">
             Đóng Góp Trực Tuyến Vì Người Nghèo Ea Súp
           </h2>
-          <p className="text-slate-600 mt-2 text-sm sm:text-base">
-            Hệ thống ngân hàng kết nối Casso sẽ tự động ghi nhận tên và số tiền của bạn lên bảng sao kê minh bạch ngay sau khi chuyển khoản thành công.
+          <p className="text-slate-600 text-xs">
+            Hệ thống ngân hàng tự động đối soát và cập nhật lên bảng sao kê minh bạch.
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12">
+        <div className="bg-white rounded-2xl shadow-xl shadow-rose-100/40 border border-rose-100 overflow-hidden max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-12">
           {/* Cột trái: Form nhập thông tin */}
-          <div className="lg:col-span-7 p-6 sm:p-8 space-y-6">
+          <div className="lg:col-span-7 p-5 sm:p-6 space-y-4">
             {/* 1. Chọn chiến dịch */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+              <label className="block text-xs font-semibold uppercase text-slate-700 mb-1">
                 1. Chọn nội dung / chiến dịch ủng hộ:
               </label>
               <select
                 value={selectedCampaign}
                 onChange={(e) => setSelectedCampaign(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 p-3 text-sm focus:border-red-600 focus:ring-1 focus:ring-red-600 bg-white"
+                className="w-full rounded-lg border border-rose-200 p-2.5 text-xs focus:border-rose-500 focus:ring-1 focus:ring-rose-500 bg-white font-medium"
               >
                 {CAMPAIGNS.map((c) => (
                   <option key={c.code} value={c.code}>
@@ -105,15 +103,15 @@ export default function VietQRWidget() {
 
             {/* 2. Chọn số tiền */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-semibold uppercase text-slate-700">
                   2. Chọn số tiền đóng góp:
                 </label>
-                <span className="text-sm font-bold text-red-700">
+                <span className="text-xs font-bold text-rose-600 font-mono">
                   {formatVND(effectiveAmount)}
                 </span>
               </div>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-3">
+              <div className="grid grid-cols-4 gap-1.5 mb-2">
                 {PRESET_AMOUNTS.map((val) => (
                   <button
                     key={val}
@@ -122,10 +120,10 @@ export default function VietQRWidget() {
                       setAmount(val);
                       setCustomAmount("");
                     }}
-                    className={`py-2 px-2 text-xs sm:text-sm font-medium rounded-xl border transition-all ${
+                    className={`py-1.5 text-xs rounded-lg border transition-all ${
                       effectiveAmount === val && !customAmount
-                        ? "bg-red-700 text-white border-red-700 shadow-sm"
-                        : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                        ? "border-rose-600 bg-rose-600 text-white shadow-sm shadow-rose-200 font-semibold"
+                        : "border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700"
                     }`}
                   >
                     {val >= 1000000 ? `${val / 1000000} Triệu` : `${val / 1000}k`}
@@ -141,14 +139,14 @@ export default function VietQRWidget() {
                     const raw = e.target.value.replace(/\D/g, "");
                     setCustomAmount(raw ? Number(raw).toLocaleString("vi-VN") : "");
                   }}
-                  className="w-full rounded-xl border border-slate-300 p-2.5 text-sm focus:border-red-600 focus:ring-1 focus:ring-red-600"
+                  className="w-full rounded-lg border border-rose-200 p-2 text-xs focus:border-rose-500"
                 />
               </div>
             </div>
 
             {/* 3. Thông tin người gửi */}
-            <div className="space-y-3">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold uppercase text-slate-700">
                 3. Thông tin người ủng hộ:
               </label>
               <div>
@@ -158,100 +156,100 @@ export default function VietQRWidget() {
                   disabled={isAnonymous}
                   value={donorName}
                   onChange={(e) => setDonorName(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 p-3 text-sm focus:border-red-600 focus:ring-1 focus:ring-red-600 disabled:bg-slate-100 disabled:text-slate-400"
+                  className="w-full rounded-lg border border-rose-200 p-2.5 text-xs focus:border-rose-500 disabled:bg-slate-100 disabled:text-slate-400"
                 />
               </div>
 
               <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer text-xs sm:text-sm text-slate-700">
+                <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-600">
                   <input
                     type="checkbox"
                     checked={isAnonymous}
                     onChange={(e) => setIsAnonymous(e.target.checked)}
-                    className="w-4 h-4 text-red-600 rounded border-slate-300 focus:ring-red-500"
+                    className="w-3.5 h-3.5 text-rose-600 rounded focus:ring-rose-500"
                   />
-                  <span>Tôi muốn ủng hộ <strong>Ẩn Danh</strong> (Giấu tên trên bảng sao kê công khai)</span>
+                  <span>Tôi muốn ủng hộ <strong>Ẩn Danh</strong> (Giấu tên trên bảng sao kê)</span>
                 </label>
               </div>
 
               <div>
                 <input
                   type="tel"
-                  placeholder="Số điện thoại liên hệ (không bắt buộc, để nhận tin nhắn cảm ơn)"
+                  placeholder="Số điện thoại liên hệ (không bắt buộc)"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 p-2.5 text-sm focus:border-red-600 focus:ring-1 focus:ring-red-600"
+                  className="w-full rounded-lg border border-rose-200 p-2 text-xs focus:border-rose-500"
                 />
               </div>
             </div>
 
-            {/* Hướng dẫn an toàn */}
-            <div className="text-[11px] text-slate-500 bg-amber-50 p-3 rounded-xl border border-amber-200 flex items-start gap-2">
-              <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+            {/* Hướng dẫn */}
+            <div className="text-[11px] text-rose-800 bg-rose-50 p-2.5 rounded-lg border border-rose-200 flex items-start gap-2">
+              <ShieldCheck className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
               <span>
-                <strong>Lưu ý:</strong> Vui lòng giữ nguyên cú pháp nội dung chuyển tiền để hệ thống Casso tự động phân loại đúng vào quỹ hỗ trợ và hiển thị lên bảng sao kê trực tuyến.
+                <strong>Gợi ý:</strong> Quý vị giữ nguyên cú pháp nội dung để hệ thống tự động ghi nhận đúng chiến dịch.
               </span>
             </div>
           </div>
 
-          {/* Cột phải: Khung hiển thị VietQR động */}
-          <div className="lg:col-span-5 bg-gradient-to-br from-slate-900 to-red-950 p-6 sm:p-8 text-white flex flex-col items-center justify-between text-center border-t lg:border-t-0 lg:border-l border-slate-800">
-            <div className="w-full space-y-2 mb-4">
-              <div className="inline-flex items-center gap-1 bg-red-900/60 text-amber-300 text-xs px-2.5 py-1 rounded-full border border-red-700">
+          {/* Cột phải: Khung hiển thị VietQR động tông hồng tươi sáng */}
+          <div className="lg:col-span-5 bg-gradient-to-br from-rose-600 via-pink-600 to-rose-700 p-5 sm:p-6 text-white flex flex-col items-center justify-between text-center border-t lg:border-t-0 lg:border-l border-rose-400/30">
+            <div className="w-full space-y-1 mb-2">
+              <div className="inline-flex items-center gap-1 bg-white/20 text-rose-100 text-[11px] px-2.5 py-0.5 rounded font-medium backdrop-blur-xs">
                 <QrCode className="w-3.5 h-3.5" />
-                <span>MÃ VIETQR CHUẨN NAPAS 247</span>
+                <span>MÃ VIETQR NAPAS 247</span>
               </div>
-              <p className="text-xs text-slate-300">
-                Mở ứng dụng ngân hàng bất kỳ để quét mã
+              <p className="text-[11px] text-rose-100">
+                Quét bằng ứng dụng ngân hàng bất kỳ
               </p>
             </div>
 
             {/* Khung ảnh QR */}
-            <div className="bg-white p-3 rounded-2xl shadow-2xl relative group max-w-[260px] mx-auto">
+            <div className="bg-white p-2.5 rounded-xl shadow-lg max-w-[210px] mx-auto">
               <img
                 src={qrUrl}
                 alt="VietQR BIDV Ea Sup"
-                className="w-full h-auto aspect-square object-contain rounded-xl"
+                className="w-full h-auto aspect-square object-contain rounded"
               />
-              <div className="text-[10px] text-slate-600 text-center mt-2 font-mono font-medium">
-                BIDV: 8630100930 • {formatVND(effectiveAmount)}
+              <div className="text-[10px] text-slate-600 font-mono mt-1 font-semibold">
+                BIDV: 8630100930
               </div>
             </div>
 
             {/* Chi tiết nội dung chuyển khoản & nút sao chép */}
-            <div className="w-full space-y-2 mt-4 text-left">
-              <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700 text-xs flex items-center justify-between">
+            <div className="w-full space-y-1.5 mt-3 text-left">
+              <div className="bg-black/15 backdrop-blur-sm p-2 rounded-lg border border-white/20 text-xs flex items-center justify-between">
                 <div>
-                  <span className="text-slate-400 block text-[10px]">Số tài khoản BIDV:</span>
-                  <span className="font-mono font-bold text-amber-300 text-sm">8630100930</span>
+                  <span className="text-[10px] text-rose-200 block">Số tài khoản BIDV:</span>
+                  <span className="font-mono font-bold text-amber-200 text-xs">8630100930</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleCopy("8630100930", "stk")}
-                  className="flex items-center gap-1 text-[11px] bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded transition-colors text-slate-200"
+                  className="flex items-center gap-1 text-[10px] bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded text-white font-medium border border-white/20"
                 >
-                  {copiedField === "stk" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedField === "stk" ? "Đã chép" : "Chép"}</span>
+                  {copiedField === "stk" ? <Check className="w-3 h-3 text-emerald-300" /> : <Copy className="w-3 h-3" />}
+                  <span>{copiedField === "stk" ? "Đã chép" : "Chép STK"}</span>
                 </button>
               </div>
 
-              <div className="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700 text-xs flex items-center justify-between">
+              <div className="bg-black/15 backdrop-blur-sm p-2 rounded-lg border border-white/20 text-xs flex items-center justify-between">
                 <div className="truncate mr-2">
-                  <span className="text-slate-400 block text-[10px]">Cú pháp nội dung:</span>
-                  <span className="font-mono font-bold text-amber-300 text-xs truncate block">{transferMemo}</span>
+                  <span className="text-[10px] text-rose-200 block">Cú pháp nội dung:</span>
+                  <span className="font-mono font-bold text-amber-200 text-[11px] truncate block">{transferMemo}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleCopy(transferMemo, "memo")}
-                  className="shrink-0 flex items-center gap-1 text-[11px] bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded transition-colors text-slate-200"
+                  className="shrink-0 flex items-center gap-1 text-[10px] bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded text-white font-medium border border-white/20"
                 >
-                  {copiedField === "memo" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedField === "memo" ? "Đã chép" : "Chép"}</span>
+                  {copiedField === "memo" ? <Check className="w-3 h-3 text-emerald-300" /> : <Copy className="w-3 h-3" />}
+                  <span>{copiedField === "memo" ? "Đã chép" : "Chép cú pháp"}</span>
                 </button>
               </div>
             </div>
 
-            <div className="text-[11px] text-slate-400 pt-3">
+            <div className="text-[10px] text-rose-100 pt-2 font-medium">
               Chủ TK: <strong>UY BAN MTTQ VN XA EA SUP</strong>
             </div>
           </div>
