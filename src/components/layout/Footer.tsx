@@ -9,9 +9,11 @@ export default function Footer() {
           {/* Cột 1: Giới thiệu & Pháp lý */}
           <div className="space-y-2.5">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white font-bold text-xs shadow-xs">
-                MT
-              </div>
+              <img
+                src="/images/logo-mttq.png"
+                alt="Mặt trận Tổ quốc Việt Nam"
+                className="w-10 h-10 object-contain drop-shadow-sm"
+              />
               <div>
                 <h3 className="text-white font-bold text-xs leading-tight">
                   QUỸ VÌ NGƯỜI NGHÈO EA SÚP

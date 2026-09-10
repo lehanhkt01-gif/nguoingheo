@@ -28,11 +28,11 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo & Platform Name */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center text-white shadow-sm shadow-rose-200 group-hover:scale-105 transition-transform">
-              <svg className="w-5 h-5 fill-current text-amber-200" viewBox="0 0 24 24">
-                <path d="M12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2Z" />
-              </svg>
-            </div>
+            <img
+              src="/images/logo-mttq.png"
+              alt="Mặt trận Tổ quốc Việt Nam"
+              className="w-11 h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+            />
             <div>
               <div className="text-[11px] uppercase tracking-wider font-semibold text-rose-700">
                 UBMTTQ VIỆT NAM XÃ EA SÚP

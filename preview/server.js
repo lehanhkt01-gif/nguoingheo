@@ -4,30 +4,28 @@ const path = require('path');
 
 const PORT = process.env.PORT || 3333;
 
+const MIME_TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+};
+
 const server = http.createServer((req, res) => {
-  if (req.url === '/' || req.url === '/index.html') {
-    const filePath = path.join(__dirname, 'index.html');
-    fs.readFile(filePath, (err, data) => {
-      if (err) {
-        res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
-        res.end('Lỗi đọc file giao diện');
-        return;
-      }
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      res.end(data);
-    });
-  } else if (req.url === '/hero-charity-bg.jpg') {
-    const imgPath = path.join(__dirname, 'hero-charity-bg.jpg');
-    fs.readFile(imgPath, (err, data) => {
-      if (err) {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('Image Not Found');
-        return;
-      }
-      res.writeHead(200, { 'Content-Type': 'image/jpeg' });
-      res.end(data);
-    });
-  } else if (req.url.startsWith('/api/chat')) {
+  const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  let pathname = parsedUrl.pathname;
+
+  if (pathname === '/') {
+    pathname = '/index.html';
+  }
+
+  if (pathname.startsWith('/api/chat')) {
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', () => {
@@ -46,10 +44,28 @@ const server = http.createServer((req, res) => {
         res.end(JSON.stringify({ success: false }));
       }
     });
-  } else {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not Found');
+    return;
   }
+
+  // Phục vụ file tĩnh
+  const safePath = path.normalize(path.join(__dirname, pathname));
+  if (!safePath.startsWith(__dirname)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain' });
+    res.end('Forbidden');
+    return;
+  }
+
+  fs.readFile(safePath, (err, data) => {
+    if (err) {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end('Not Found');
+      return;
+    }
+    const ext = path.extname(safePath).toLowerCase();
+    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+    res.writeHead(200, { 'Content-Type': contentType });
+    res.end(data);
+  });
 });
 
 server.listen(PORT, () => {
