@@ -492,7 +492,7 @@ https://images.unsplash.com/..."
                 <input
                   type="text"
                   readOnly
-                  value="https://vinguoingheo.easupso.com/api/v1/webhook/casso"
+                  value="https://nguoingheo.easupso.com/api/v1/webhook/casso"
                   className="w-full bg-slate-100 text-slate-600 rounded-xl border border-slate-300 p-2.5 text-xs font-mono"
                 />
               </div>

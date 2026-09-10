@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Quỹ Vì Người Nghèo Ea Súp - Minh Bạch Dòng Tiền An Sinh Cấp Xã",
     description: "Toàn bộ dòng tiền tiếp nhận và giải ngân 20 thôn buôn công khai 100% trên tài khoản BIDV 8630100930.",
-    url: "https://vinguoingheo.easupso.com",
+    url: "https://nguoingheo.easupso.com",
     siteName: "Quỹ Vì Người Nghèo Ea Súp",
     locale: "vi_VN",
     type: "website",

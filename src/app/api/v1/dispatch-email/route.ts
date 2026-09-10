@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
         <div style="background-color: #991b1b; padding: 24px; text-align: center; color: #fff;">
           <h2 style="margin: 0; font-size: 18px; text-transform: uppercase;">ỦY BAN MẶT TRẬN TỔ QUỐC VIỆT NAM XÃ EA SÚP</h2>
           <h3 style="margin: 6px 0 0; font-size: 20px; font-weight: bold; color: #fef08a;">BAN VẬN ĐỘNG QUỸ "VÌ NGƯỜI NGHÈO"</h3>
-          <p style="margin: 6px 0 0; font-size: 13px; opacity: 0.9;">Tài khoản tiếp nhận duy nhất: BIDV 8630100930 - Cổng thông tin: vinguoingheo.easupso.com</p>
+          <p style="margin: 6px 0 0; font-size: 13px; opacity: 0.9;">Tài khoản tiếp nhận duy nhất: BIDV 8630100930 - Cổng thông tin: nguoingheo.easupso.com</p>
         </div>
 
         <div style="padding: 24px;">
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
             <li>Quyết định số 12/QĐ-MTTQ-BTT ngày 14/01/2026 thành lập Ban Vận động Quỹ.</li>
           </ul>
 
-          <p>Toàn bộ hóa đơn chứng từ, phiếu chi và biên bản nghiệm thu có chữ ký xác nhận của Ban CTMT 20 thôn buôn đã được số hóa công khai tại: <a href="https://vinguoingheo.easupso.com/sao-ke" style="color: #b91c1c; font-weight: bold;">vinguoingheo.easupso.com/sao-ke</a>.</p>
+          <p>Toàn bộ hóa đơn chứng từ, phiếu chi và biên bản nghiệm thu có chữ ký xác nhận của Ban CTMT 20 thôn buôn đã được số hóa công khai tại: <a href="https://nguoingheo.easupso.com/sao-ke" style="color: #b91c1c; font-weight: bold;">nguoingheo.easupso.com/sao-ke</a>.</p>
 
           <p style="margin-top: 30px; text-align: right;">
             <strong>TM. BAN VẬN ĐỘNG QUỸ "VÌ NGƯỜI NGHÈO"<br>TRƯỞNG BAN - CHỦ TỊCH UBMTTQ XÃ<br><br><br>Lê Hồng Hạnh</strong>

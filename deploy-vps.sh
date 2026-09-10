@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
-# KỊCH BẢN TỰ ĐỘNG CÀI ĐẶT & TRIỂN KHAI 1-CHẠM TRÊN CLOUD SERVER GDATA
-# Ứng dụng: Quỹ Vì Người Nghèo Xã Ea Súp (vinguoingheo.easupso.com)
+# KỊCH BẢN TỰ ĐỘNG CÀI ĐẶT & TRIỂN KHAI 1-CHẠM TRÊN CLOUD SERVER VPS (THƯ MỤC /var/www/nguoingheo)
+# Ứng dụng: Quỹ Vì Người Nghèo Xã Ea Súp (nguoingheo.easupso.com)
 # Cấu hình máy chủ mục tiêu: CPU 04 Core, RAM 08 GB, SSD 80 GB, Ubuntu 22.04/24.04 LTS
 # ==============================================================================
 
@@ -15,7 +15,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 echo -e "${BLUE}==============================================================================${NC}"
-echo -e "${GREEN}  KHỞI CHẠY TRIỂN KHAI: QUỸ VÌ NGƯỜI NGHÈO XÃ EA SÚP (vinguoingheo.easupso.com)${NC}"
+echo -e "${GREEN}  KHỞI CHẠY TRIỂN KHAI: QUỸ VÌ NGƯỜI NGHÈO XÃ EA SÚP (nguoingheo.easupso.com)${NC}"
 echo -e "${BLUE}==============================================================================${NC}"
 
 # 1. Kiểm tra quyền root
@@ -59,8 +59,8 @@ ufw allow 443/tcp comment 'HTTPS SSL'
 ufw --force enable
 echo -e "${GREEN}Tường lửa UFW đã kích hoạt thành công!${NC}"
 
-# 5. Khởi tạo thư mục dự án và Clone mã nguồn
-APP_DIR="/var/www/vinguoingheo-easupso"
+# 5. Khởi tạo thư mục dự án tại /var/www/nguoingheo và Clone mã nguồn
+APP_DIR="/var/www/nguoingheo"
 echo -e "\n${YELLOW}[4/7] Thiết lập thư mục triển khai tại ${APP_DIR}...${NC}"
 mkdir -p "${APP_DIR}"
 
@@ -69,8 +69,10 @@ if [ -d "${APP_DIR}/.git" ]; then
   cd "${APP_DIR}"
   git pull origin main || true
 else
-  echo -e "Thư mục mã nguồn sẵn sàng. Nếu bạn clone từ GitHub:"
-  echo -e "git clone https://github.com/<GITHUB_USERNAME>/<REPO_NAME>.git ${APP_DIR}"
+  echo -e "Đang clone mã nguồn từ GitHub vào ${APP_DIR}..."
+  if [ -z "$(ls -A ${APP_DIR})" ]; then
+    git clone https://github.com/lehanhkt01-gif/nguoingheo.git "${APP_DIR}" || true
+  fi
   cd "${APP_DIR}"
 fi
 
@@ -86,11 +88,11 @@ fi
 # Tạo thư mục SSL cho Nginx
 mkdir -p "${APP_DIR}/docker/nginx/ssl"
 if [ ! -f "${APP_DIR}/docker/nginx/ssl/fullchain.pem" ]; then
-  echo -e "Đang khởi tạo chứng chỉ SSL tự ký tạm thời (khuyến nghị dùng Cloudflare SSL Full)..."
+  echo -e "Đang khởi tạo chứng chỉ SSL tự ký tạm thời (khuyến nghị dùng Cloudflare SSL Full / Origin Certificate)..."
   openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
     -keyout "${APP_DIR}/docker/nginx/ssl/privkey.pem" \
     -out "${APP_DIR}/docker/nginx/ssl/fullchain.pem" \
-    -subj "/C=VN/ST=DakLak/L=EaSup/O=UBMTTQ Xa Ea Sup/CN=vinguoingheo.easupso.com"
+    -subj "/C=VN/ST=DakLak/L=EaSup/O=UBMTTQ Xa Ea Sup/CN=nguoingheo.easupso.com"
 fi
 
 # 7. Khởi chạy toàn bộ hệ thống bằng Docker Compose
@@ -109,10 +111,11 @@ docker compose exec -T web npm run prisma:seed || true
 echo -e "\n${GREEN}==============================================================================${NC}"
 echo -e "${GREEN}  🎉 TRIỂN KHAI THÀNH CÔNG NỀN TẢNG QUỸ VÌ NGƯỜI NGHÈO XÃ EA SÚP!  ${NC}"
 echo -e "${GREEN}==============================================================================${NC}"
-echo -e "• Tên miền truy cập:   ${BLUE}https://vinguoingheo.easupso.com${NC}"
-echo -e "• Trang Báo cáo sao kê: ${BLUE}https://vinguoingheo.easupso.com/sao-ke${NC}"
-echo -e "• Cổng Quản trị Cán bộ: ${BLUE}https://vinguoingheo.easupso.com/admin/login${NC}"
+echo -e "• Thư mục cài đặt VPS: ${YELLOW}/var/www/nguoingheo${NC}"
+echo -e "• Tên miền truy cập:   ${BLUE}https://nguoingheo.easupso.com${NC}"
+echo -e "• Trang Báo cáo sao kê: ${BLUE}https://nguoingheo.easupso.com/sao-ke${NC}"
+echo -e "• Cổng Quản trị Cán bộ: ${BLUE}https://nguoingheo.easupso.com/admin/login${NC}"
 echo -e "  (Tài khoản: ${YELLOW}lehonghanh${NC} / Mật khẩu: ${YELLOW}EaSup@2026${NC})"
-echo -e "• Endpoint Casso Webhook: ${BLUE}https://vinguoingheo.easupso.com/api/v1/webhook/casso${NC}"
+echo -e "• Endpoint Casso Webhook: ${BLUE}https://nguoingheo.easupso.com/api/v1/webhook/casso${NC}"
 echo -e "------------------------------------------------------------------------------"
-echo -e "Lưu ý Cloudflare DNS: Trỏ bản ghi A 'vinguoingheo.easupso.com' về IP VPS này và bật Proxy đám mây cam."
+echo -e "Lưu ý Cloudflare DNS: Trỏ bản ghi A 'nguoingheo.easupso.com' về IP VPS này và bật Proxy đám mây cam."

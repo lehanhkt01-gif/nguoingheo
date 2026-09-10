@@ -2,7 +2,7 @@
 
 > **Cơ quan chủ quản:** Ban Thường trực Ủy ban Mặt trận Tổ quốc Việt Nam xã Ea Súp, tỉnh Đắk Lắk.  
 > **Căn cứ pháp lý:** Quyết định số 13/QĐ-MTTQ-BTT (Quy chế vận động, quản lý Quỹ) & Quyết định số 12/QĐ-MTTQ-BTT (Thành lập Ban Vận động) ngày 14/01/2026.  
-> **Tên miền chính thức:** `vinguoingheo.easupso.com`
+> **Tên miền chính thức:** `nguoingheo.easupso.com`
 
 ---
 
@@ -111,20 +111,18 @@
 2. **Tải và thực thi kịch bản cài đặt tự động:**
    ```bash
    # Cách 1: Tải trực tiếp script
-   curl -fsSL https://raw.githubusercontent.com/<GITHUB_USERNAME>/<REPO_NAME>/main/deploy-vps.sh -o deploy-vps.sh
-   chmod +x deploy-vps.sh
-   bash deploy-vps.sh
+   curl -sSL https://raw.githubusercontent.com/lehanhkt01-gif/nguoingheo/main/deploy-vps.sh | sudo bash
 
    # Cách 2: Clone repository và chạy deploy-vps.sh
-   mkdir -p /var/www/vinguoingheo-easupso
-   cd /var/www/vinguoingheo-easupso
-   git clone https://github.com/<GITHUB_USERNAME>/<REPO_NAME>.git .
+   mkdir -p /var/www/nguoingheo
+   cd /var/www/nguoingheo
+   git clone https://github.com/lehanhkt01-gif/nguoingheo.git .
    chmod +x deploy-vps.sh
-   bash deploy-vps.sh
+   sudo bash deploy-vps.sh
    ```
 
 3. **Cấu hình Tên miền & Cloudflare SSL:**
-   - **DNS Records:** Thêm bản ghi `A` trỏ tên miền `vinguoingheo.easupso.com` về địa chỉ IP của VPS.
+   - **DNS Records:** Thêm bản ghi `A` trỏ tên miền `nguoingheo.easupso.com` về địa chỉ IP của VPS.
    - **Proxy Status:** Bật biểu tượng đám mây màu cam (Proxied) để kích hoạt WAF chống DDoS.
    - **SSL/TLS Mode:** Chọn **Full** hoặc **Full (Strict)**.
 
@@ -132,7 +130,7 @@
 
 ## 👥 THÔNG TIN TÀI KHOẢN NỘI BỘ MẶC ĐỊNH
 
-- **Trang đăng nhập:** `https://vinguoingheo.easupso.com/admin/login`
+- **Trang đăng nhập:** `https://nguoingheo.easupso.com/admin/login`
 - **Tài khoản Admin (Chủ tịch UBMTTQ xã):** `lehonghanh` / `EaSup@2026`
 - **Tài khoản Kế toán Quỹ:** `ketoan_mttq` / `EaSup@2026`
 - **Tài khoản Trưởng ban CTMT Buôn Drai:** `ctmt_buondrai` / `EaSup@2026`

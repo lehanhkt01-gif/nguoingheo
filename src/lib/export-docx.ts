@@ -240,7 +240,7 @@ export async function generateNghiDinh30Report(data: DocxReportData): Promise<Bu
                 size: 24,
               }),
               new TextRun({
-                text: "          Mọi công dân và nhà hảo tâm đều có thể tra cứu sao kê trực tiếp 24/7 trên cổng thông tin: https://vinguoingheo.easupso.com",
+                text: "          Mọi công dân và nhà hảo tâm đều có thể tra cứu sao kê trực tiếp 24/7 trên cổng thông tin: https://nguoingheo.easupso.com",
                 font: "Times New Roman",
                 size: 24,
               }),

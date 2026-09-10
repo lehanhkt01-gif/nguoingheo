@@ -1,6 +1,6 @@
 # ==============================================================================
 # Dockerfile - Multi-stage Build cho Next.js 15 Standalone (Tối ưu < 180MB)
-# WebApp: Quỹ Vì Người Nghèo Ea Súp (vinguoingheo.easupso.com)
+# WebApp: Quỹ Vì Người Nghèo Ea Súp (nguoingheo.easupso.com)
 # ==============================================================================
 
 # Stage 1: Cài đặt Dependencies
