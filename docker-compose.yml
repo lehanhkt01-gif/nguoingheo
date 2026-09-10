@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # 1. Next.js 15 Standalone Web Application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vinguoingheo_web
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-EaSupSecureDb2026}@postgres:5432/${POSTGRES_DB:-vinguoingheo_db}?schema=public
+      - REDIS_URL=redis://redis:6379
+      - CASSO_WEBHOOK_SECRET=${CASSO_WEBHOOK_SECRET:-EaSup_Charity_2026_Secure_Token_Secret}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - NEXT_PUBLIC_BIDV_ACCOUNT=8630100930
+      - NEXT_PUBLIC_BIDV_BIN=970418
+      - NEXT_PUBLIC_ACCOUNT_NAME=UY BAN MTTQ VN XA EA SUP
+      - NEXT_PUBLIC_SITE_URL=https://vinguoingheo.easupso.com
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - vinguoingheo_net
+
+  # 2. Cơ sở dữ liệu PostgreSQL 16
+  postgres:
+    image: postgres:16-alpine
+    container_name: vinguoingheo_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-EaSupSecureDb2026}
+      POSTGRES_DB: ${POSTGRES_DB:-vinguoingheo_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-vinguoingheo_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vinguoingheo_net
+
+  # 3. Bộ nhớ đệm Redis 7
+  redis:
+    image: redis:7-alpine
+    container_name: vinguoingheo_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - vinguoingheo_net
+
+  # 4. Nginx Reverse Proxy & SSL Gateway
+  nginx:
+    image: nginx:alpine
+    container_name: vinguoingheo_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - web
+    networks:
+      - vinguoingheo_net
+
+  # 5. Service Tự Động Sao Lưu Cơ Sở Dữ Liệu Mỗi Ngày (00:00)
+  backup:
+    image: postgres:16-alpine
+    container_name: vinguoingheo_backup
+    restart: unless-stopped
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: ${POSTGRES_USER:-postgres}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-EaSupSecureDb2026}
+      PGDATABASE: ${POSTGRES_DB:-vinguoingheo_db}
+    volumes:
+      - ./docker/backup/backup.sh:/backup.sh:ro
+      - backup_data:/backups
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        chmod +x /backup.sh
+        echo "0 0 * * * /backup.sh >> /backups/backup.log 2>&1" > /var/spool/cron/crontabs/root
+        crond -f -l 2
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vinguoingheo_net
+
+networks:
+  vinguoingheo_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  backup_data:
+    driver: local

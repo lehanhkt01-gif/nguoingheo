@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Transaction {
+  id                  Int       @id @default(autoincrement())
+  cassoId             BigInt?   @unique
+  reference           String?
+  type                String    @default("IN") // IN (Ủng hộ vào), OUT (Giải ngân ra)
+  amount              Decimal   @db.Decimal(18, 2)
+  runningBalance      Decimal?  @db.Decimal(18, 2)
+  description         String
+  transactionDateTime DateTime  @default(now())
+  accountNumber       String    @default("8630100930")
+  bankName            String    @default("BIDV")
+  bankAbbreviation    String?   @default("BIDV")
+  donorName           String?
+  donorPhone          String?
+  isAnonymous         Boolean   @default(false)
+  campaignCode        String?
+  proofUrls           String[]
+  receiptNumber       String?   // Số phiếu thu / phiếu chi
+  verifiedBy          String?
+  note                String?
+  createdAt           DateTime  @default(now())
+
+  campaign            Campaign? @relation(fields: [campaignCode], references: [code])
+
+  @@index([transactionDateTime])
+  @@index([type])
+  @@index([campaignCode])
+}
+
+model Campaign {
+  id                Int           @id @default(autoincrement())
+  code              String        @unique // NDDK01, TET2026, SK01, CT01
+  slug              String        @unique
+  title             String
+  description       String
+  beneficiaryName   String?       // Chủ hộ thụ hưởng
+  village           String?       // 1 trong 20 thôn buôn Ea Súp
+  targetAmount      Decimal       @db.Decimal(18, 2)
+  currentAmount     Decimal       @default(0) @db.Decimal(18, 2)
+  category          String        // NHA_DAI_DOAN_KET, SUA_NHA, SINH_KE, CUU_TRO, TET
+  status            String        @default("ACTIVE") // ACTIVE, COMPLETED, CLOSED
+  imageUrl          String?
+  proofUrls         String[]
+  completionNotes   String?
+  startDate         DateTime      @default(now())
+  endDate           DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  transactions      Transaction[]
+
+  @@index([category])
+  @@index([status])
+  @@index([village])
+}
+
+model ScanDocument {
+  id          Int      @id @default(autoincrement())
+  title       String
+  docNumber   String?  // Số Quyết định / Số BC
+  category    String   // QUYET_DINH, BAO_CAO, BIEN_BAN
+  issuer      String   @default("UBND - UBMTTQ Việt Nam xã Ea Súp")
+  signer      String?  // Đ/c Lê Hồng Hạnh / Nguyễn Bá Bân
+  issueDate   DateTime
+  fileUrl     String
+  fileSize    String?
+  summary     String?
+  createdAt   DateTime @default(now())
+
+  @@index([category])
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  fullName     String
+  role         String   @default("MONITOR") // ADMIN, ACCOUNTANT, MONITOR
+  village      String?  // Thôn/buôn nếu là Trưởng ban CTMT
+  email        String?
+  phone        String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model WebhookLog {
+  id        Int      @id @default(autoincrement())
+  source    String   @default("CASSO")
+  cassoId   BigInt?
+  payload   String   @db.Text
+  status    String   // SUCCESS, DUPLICATE, ERROR
+  message   String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model SystemSetting {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique
+  value       String   @db.Text
+  description String?
+  updatedAt   DateTime @updatedAt
+}
