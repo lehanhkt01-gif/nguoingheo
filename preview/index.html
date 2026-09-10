@@ -55,7 +55,7 @@
               UBMTTQ VIỆT NAM XÃ EA SÚP
             </div>
             <div class="text-base font-bold text-slate-900 tracking-tight group-hover:text-rose-600 transition-colors">
-              Quỹ Vì Người Nghèo Ea Súp
+              Quỹ Vì Người Nghèo
             </div>
           </div>
         </a>
@@ -218,10 +218,10 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-8 space-y-1">
         <span class="inline-block px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-xs font-semibold uppercase">
-          TỰ ĐỘNG SINH MÃ VIETQR NAPAS 247
+          MÃ VIETQR NAPAS 247 CHUẨN NGÂN HÀNG
         </span>
         <h2 class="text-xl sm:text-3xl font-bold text-slate-900">
-          Đóng Góp Trực Tuyến Vì Người Nghèo Ea Súp
+          Đóng Góp Trực Tuyến Vì Người Nghèo
         </h2>
         <p class="text-slate-600 text-xs">
           Hệ thống ngân hàng tự động đối soát và cập nhật lên bảng sao kê minh bạch.
@@ -231,63 +231,79 @@
       <div class="bg-white rounded-2xl shadow-xl shadow-rose-100/40 border border-rose-100 overflow-hidden max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-12">
         <!-- Form Left -->
         <div class="lg:col-span-7 p-5 sm:p-6 space-y-4">
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">
-              1. Chọn nội dung / chiến dịch ủng hộ:
+          <!-- Toggle Checkbox (v) -->
+          <div class="bg-rose-50 p-3.5 rounded-xl border border-rose-200 transition-all">
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+              <input type="checkbox" id="autoFillToggle" onchange="toggleAutoFill(this.checked)" class="w-4 h-4 text-rose-600 rounded border-rose-300 focus:ring-rose-500 cursor-pointer">
+              <span class="text-xs font-bold text-rose-950 flex items-center gap-1.5">
+                <span>Tùy chỉnh số tiền & chiến dịch để sinh mã QR điền sẵn</span>
+              </span>
             </label>
-            <select id="campaignSelect" onchange="updateQR()" class="w-full rounded-lg border border-rose-200 p-2.5 text-xs focus:border-rose-500 focus:ring-1 focus:ring-rose-500 bg-white font-medium">
-              <option value="CHUNG">Quỹ Vì Người Nghèo Xã Ea Súp (Chung 20 thôn buôn)</option>
-              <option value="NDDK01">Xây nhà Đại đoàn kết bà Y Thị (Buôn Drai)</option>
-              <option value="NDDK02">Xóa nhà tạm hộ ông Nguyễn Văn Sáng (Thôn 5)</option>
-              <option value="SK01">Trao tặng Bò giống sinh kế (Thôn 12 & Thôn 14)</option>
-              <option value="TET">Quà Tết Bính Ngọ vì người nghèo (500 suất quà)</option>
-              <option value="CT">Cứu trợ y tế đột xuất & bệnh hiểm nghèo</option>
-            </select>
+            <p id="modeDescription" class="text-[11px] text-slate-600 mt-1 pl-6.5">
+              Chưa tích (Mặc định): Quét mã tự do, bạn tự nhập số tiền và nội dung chuyển khoản trên ứng dụng ngân hàng.
+            </p>
           </div>
 
-          <div>
-            <div class="flex items-center justify-between mb-1">
-              <label class="text-xs font-semibold uppercase text-slate-700">2. Chọn số tiền đóng góp:</label>
-              <span id="amountDisplay" class="text-xs font-bold text-rose-600 font-mono">200.000 đ</span>
+          <!-- 3 Steps Fields Container -->
+          <div id="formFieldsContainer" class="space-y-4 opacity-50 pointer-events-none transition-all duration-200">
+            <div>
+              <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">
+                1. Chọn nội dung / chiến dịch ủng hộ:
+              </label>
+              <select id="campaignSelect" onchange="updateQR()" class="w-full rounded-lg border border-rose-200 p-2.5 text-xs focus:border-rose-500 focus:ring-1 focus:ring-rose-500 bg-white font-medium">
+                <option value="CHUNG">Quỹ Vì Người Nghèo Xã Ea Súp (Chung 20 thôn buôn)</option>
+                <option value="NDDK01">Xây nhà Đại đoàn kết bà Y Thị (Buôn Drai)</option>
+                <option value="NDDK02">Xóa nhà tạm hộ ông Nguyễn Văn Sáng (Thôn 5)</option>
+                <option value="SK01">Trao tặng Bò giống sinh kế (Thôn 12 & Thôn 14)</option>
+                <option value="TET">Quà Tết Bính Ngọ vì người nghèo (500 suất quà)</option>
+                <option value="CT">Cứu trợ y tế đột xuất & bệnh hiểm nghèo</option>
+              </select>
             </div>
-            <div class="grid grid-cols-4 gap-1.5 mb-2">
-              <button onclick="setPresetAmount(50000, this)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">50k</button>
-              <button onclick="setPresetAmount(100000, this)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">100k</button>
-              <button onclick="setPresetAmount(200000, this)" class="preset-btn py-1.5 text-xs font-semibold rounded-lg border border-rose-600 bg-rose-600 text-white shadow-sm shadow-rose-200">200k</button>
-              <button onclick="setPresetAmount(500000, this)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">500k</button>
-              <button onclick="setPresetAmount(1000000, this)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">1 Triệu</button>
-              <button onclick="setPresetAmount(2000000, this)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">2 Triệu</button>
-              <button onclick="setPresetAmount(5000000, this)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">5 Triệu</button>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-xs font-semibold uppercase text-slate-700">2. Chọn số tiền đóng góp:</label>
+                <span id="amountDisplay" class="text-xs font-bold text-rose-600 font-mono">200.000 đ</span>
+              </div>
+              <div class="grid grid-cols-4 gap-1.5 mb-2">
+                <button onclick="setPresetAmount(50000, this)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">50k</button>
+                <button onclick="setPresetAmount(100000, this)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">100k</button>
+                <button onclick="setPresetAmount(200000, this)" class="preset-btn py-1.5 text-xs font-semibold rounded-lg border border-rose-600 bg-rose-600 text-white shadow-sm shadow-rose-200">200k</button>
+                <button onclick="setPresetAmount(500000, this)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">500k</button>
+                <button onclick="setPresetAmount(1000000, this)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">1 Triệu</button>
+                <button onclick="setPresetAmount(2000000, this)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">2 Triệu</button>
+                <button onclick="setPresetAmount(5000000, this)" class="preset-btn py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 text-slate-700">5 Triệu</button>
+              </div>
+              <input type="number" id="customAmountInput" placeholder="Hoặc nhập số tiền khác (VNĐ)..." oninput="handleCustomAmount(this.value)" class="w-full rounded-lg border border-rose-200 p-2 text-xs focus:border-rose-500">
             </div>
-            <input type="number" id="customAmountInput" placeholder="Hoặc nhập số tiền khác (VNĐ)..." oninput="handleCustomAmount(this.value)" class="w-full rounded-lg border border-rose-200 p-2 text-xs focus:border-rose-500">
-          </div>
 
-          <div class="space-y-2">
-            <label class="block text-xs font-semibold uppercase text-slate-700">3. Thông tin người gửi:</label>
-            <input type="text" id="donorNameInput" placeholder="Họ và tên của bạn hoặc đơn vị..." oninput="updateQR()" class="w-full rounded-lg border border-rose-200 p-2.5 text-xs focus:border-rose-500">
-            <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600">
-              <input type="checkbox" id="anonCheck" onchange="toggleAnon(this.checked)" class="w-3.5 h-3.5 text-rose-600 rounded focus:ring-rose-500">
-              <span>Tôi muốn ủng hộ <strong>Ẩn Danh</strong> (Giấu tên trên bảng sao kê)</span>
-            </label>
-          </div>
+            <div class="space-y-2">
+              <label class="block text-xs font-semibold uppercase text-slate-700">3. Thông tin người gửi:</label>
+              <input type="text" id="donorNameInput" placeholder="Họ và tên của bạn hoặc đơn vị..." oninput="updateQR()" class="w-full rounded-lg border border-rose-200 p-2.5 text-xs focus:border-rose-500">
+              <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600">
+                <input type="checkbox" id="anonCheck" onchange="toggleAnon(this.checked)" class="w-3.5 h-3.5 text-rose-600 rounded focus:ring-rose-500">
+                <span>Tôi muốn ủng hộ <strong>Ẩn Danh</strong> (Giấu tên trên bảng sao kê)</span>
+              </label>
+            </div>
 
-          <div class="text-[11px] text-rose-800 bg-rose-50 p-2.5 rounded-lg border border-rose-200">
-            <strong>Gợi ý:</strong> Quý vị giữ nguyên cú pháp nội dung để hệ thống tự động ghi nhận đúng chiến dịch.
+            <div class="text-[11px] text-rose-800 bg-rose-50 p-2.5 rounded-lg border border-rose-200">
+              <strong>Gợi ý:</strong> Quý vị giữ nguyên cú pháp nội dung để hệ thống tự động ghi nhận đúng chiến dịch.
+            </div>
           </div>
         </div>
 
         <!-- QR Display Right (Tông hồng tươi sáng, sang trọng) -->
         <div class="lg:col-span-5 bg-gradient-to-br from-rose-600 via-pink-600 to-rose-700 p-5 sm:p-6 text-white flex flex-col items-center justify-between text-center border-t lg:border-t-0 lg:border-l border-rose-400/30">
           <div class="w-full space-y-1 mb-2">
-            <span class="inline-block bg-white/20 text-rose-100 text-[11px] px-2.5 py-0.5 rounded font-medium backdrop-blur-xs">
-              MÃ VIETQR NAPAS 247
+            <span id="qrBadge" class="inline-block bg-white/20 text-rose-100 text-[11px] px-2.5 py-0.5 rounded font-medium backdrop-blur-xs">
+              MÃ VIETQR ĐIỀN THỦ CÔNG
             </span>
-            <p class="text-[11px] text-rose-100">Quét bằng ứng dụng ngân hàng bất kỳ</p>
+            <p id="qrSubText" class="text-[11px] text-rose-100">Quét bằng ứng dụng ngân hàng bất kỳ</p>
           </div>
 
           <!-- QR IMG -->
           <div class="bg-white p-2.5 rounded-xl shadow-lg max-w-[210px] mx-auto">
-            <img id="qrImage" src="https://img.vietqr.io/image/bidv-8630100930-compact2.png?amount=200000&addInfo=VNN%20UNG%20HO&accountName=UY%20BAN%20MTTQ%20VN%20XA%20EA%20SUP" alt="VietQR BIDV Ea Sup" class="w-full h-auto aspect-square object-contain rounded">
+            <img id="qrImage" src="https://img.vietqr.io/image/bidv-8630100930-compact2.png?accountName=UY%20BAN%20MTTQ%20VN%20XA%20EA%20SUP" alt="VietQR BIDV Ea Sup" class="w-full h-auto aspect-square object-contain rounded">
             <div class="text-[10px] text-slate-600 font-mono mt-1 font-semibold">
               BIDV: 8630100930
             </div>
@@ -824,6 +840,7 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
+    let isAutoFill = false;
     let currentAmount = 200000;
     let isAnon = false;
 
@@ -840,6 +857,20 @@
       setTimeout(() => {
         toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
       }, 2500);
+    }
+
+    function toggleAutoFill(checked) {
+      isAutoFill = checked;
+      const container = document.getElementById('formFieldsContainer');
+      const desc = document.getElementById('modeDescription');
+      if (checked) {
+        container.className = "space-y-4 opacity-100 pointer-events-auto transition-all duration-200 bg-rose-50/40 p-3 rounded-xl border border-rose-200 ring-2 ring-rose-400/20";
+        desc.innerHTML = '<strong class="text-rose-700">✓ Đã bật chế độ tự động:</strong> Mã QR bên phải sẽ tự điền sẵn số tiền và nội dung chiến dịch bạn chọn.';
+      } else {
+        container.className = "space-y-4 opacity-50 pointer-events-none transition-all duration-200";
+        desc.innerText = "Chưa tích (Mặc định): Quét mã tự do, bạn tự nhập số tiền và nội dung chuyển khoản trên ứng dụng ngân hàng.";
+      }
+      updateQR();
     }
 
     function setPresetAmount(val, btn) {
@@ -879,11 +910,27 @@
       name = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toUpperCase().replace(/[^A-Z0-9 ]/g, "");
       const memo = `${prefix} ${name}`.trim();
 
-      document.getElementById('amountDisplay').innerText = new Intl.NumberFormat('vi-VN').format(currentAmount) + ' đ';
-      document.getElementById('memoDisplay').innerText = memo;
+      const qrBadge = document.getElementById('qrBadge');
+      const qrSubText = document.getElementById('qrSubText');
+      const amountDisp = document.getElementById('amountDisplay');
+      const memoDisp = document.getElementById('memoDisplay');
+      const qrImg = document.getElementById('qrImage');
 
-      const url = `https://img.vietqr.io/image/bidv-8630100930-compact2.png?amount=${currentAmount}&addInfo=${encodeURIComponent(memo)}&accountName=UY%20BAN%20MTTQ%20VN%20XA%20EA%20SUP`;
-      document.getElementById('qrImage').src = url;
+      if (isAutoFill) {
+        if (qrBadge) qrBadge.innerText = "MÃ VIETQR ĐIỀN SẴN TỰ ĐỘNG";
+        if (qrSubText) qrSubText.innerText = `Đã gán sẵn ${new Intl.NumberFormat('vi-VN').format(currentAmount)} đ & cú pháp`;
+        if (amountDisp) amountDisp.innerText = new Intl.NumberFormat('vi-VN').format(currentAmount) + ' đ';
+        if (memoDisp) memoDisp.innerText = memo;
+        const url = `https://img.vietqr.io/image/bidv-8630100930-compact2.png?amount=${currentAmount}&addInfo=${encodeURIComponent(memo)}&accountName=UY%20BAN%20MTTQ%20VN%20XA%20EA%20SUP`;
+        qrImg.src = url;
+      } else {
+        if (qrBadge) qrBadge.innerText = "MÃ VIETQR ĐIỀN THỦ CÔNG";
+        if (qrSubText) qrSubText.innerText = "Quét mã và tự nhập số tiền tùy tâm trên App";
+        if (amountDisp) amountDisp.innerText = "Tự nhập khi quét";
+        if (memoDisp) memoDisp.innerText = "VNN UNG HO";
+        const url = `https://img.vietqr.io/image/bidv-8630100930-compact2.png?accountName=UY%20BAN%20MTTQ%20VN%20XA%20EA%20SUP`;
+        qrImg.src = url;
+      }
     }
 
     function copyText(txt) {
