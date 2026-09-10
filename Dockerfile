@@ -13,7 +13,7 @@ COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
 
 # Cài đặt toàn bộ dependencies và sinh Prisma Client
-RUN npm ci
+RUN npm install --legacy-peer-deps
 RUN npx prisma generate
 
 # Stage 2: Build Source Code
