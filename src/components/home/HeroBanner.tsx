@@ -5,10 +5,17 @@ import { Heart, ShieldCheck, ArrowRight, CheckCircle2 } from "lucide-react";
 
 export default function HeroBanner() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-blue-950 via-slate-900 to-slate-950 text-white pt-10 pb-20 lg:pt-14 lg:pb-24">
-      {/* Subtle Pattern */}
-      <div className="absolute inset-0 opacity-5 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
+    <section className="relative overflow-hidden bg-slate-950 text-white pt-10 pb-20 lg:pt-14 lg:pb-24">
+      {/* Ảnh nền buôn làng Tây Nguyên tông trắng hồng & đỏ */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/images/hero-charity-bg.jpg"
+          alt="Quỹ vì người nghèo Ea Súp"
+          className="w-full h-full object-cover object-right lg:object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/75 to-slate-950/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/40" />
+      </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">

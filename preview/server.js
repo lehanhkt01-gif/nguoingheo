@@ -16,6 +16,17 @@ const server = http.createServer((req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(data);
     });
+  } else if (req.url === '/hero-charity-bg.jpg') {
+    const imgPath = path.join(__dirname, 'hero-charity-bg.jpg');
+    fs.readFile(imgPath, (err, data) => {
+      if (err) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('Image Not Found');
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'image/jpeg' });
+      res.end(data);
+    });
   } else if (req.url.startsWith('/api/chat')) {
     let body = '';
     req.on('data', chunk => body += chunk);
