@@ -10,35 +10,56 @@
 
 ```mermaid
 graph TD
-    User["🌐 Công Dân / Nhà Hảo Tâm (nguoingheo.easupso.com)"] --> CF_WAF["🛡️ Cloudflare DNS / WAF / DDoS & SSL Proxy"]
-    
-    subgraph Cloudflare_Edge ["⚡ CLOUDFLARE EDGE NETWORK"]
-        CF_Worker["⚡ Cloudflare Worker API (/api/edge/*)"]
-        CF_D1[("🗄️ Cloudflare D1 (Serverless SQL Edge DB)\n• Giao dịch Thu/Chi\n• 20 Thôn Buôn\n• Chiến dịch")]
-        CF_KV[("⚡ Cloudflare KV\n• Bộ đếm Live Counter\n• Rate limit\n• Cache")]
-        CF_R2[("📦 Cloudflare R2 Object Storage\n• Hóa đơn VAT scan\n• Biên bản nghiệm thu")]
-        CF_AI["🤖 Cloudflare Workers AI (Llama-3)\n• Trợ lý AI Gem Mặt Trận 24/7"]
-    end
-    
-    subgraph VPS_Server ["🖥️ VPS CLOUD SERVER (/var/www/nguoingheo)"]
-        Nginx["🌐 Nginx Web Server (Port 80/443)"]
-        NextJS["🚀 Next.js 15 Fullstack App (Port 3000)"]
-        Postgres[("🐘 PostgreSQL Database\n• Lưu trữ chính thức")]
-        CassoSync["💳 Casso Banking Webhook Listener"]
+    %% 1. Môi trường Internet & Clients bên ngoài
+    subgraph Internet_Layer ["🌐 MÔI TRƯỜNG INTERNET & CLIENT BÊN NGOÀI"]
+        User(["👥 Người Dân / Nhà Hảo Tâm<br/>(nguoingheo.easupso.com)"])
+        Casso(["💳 Casso Banking Webhook<br/>(Ngân hàng BIDV 8630100930)"])
+        AdminUser(["🛡️ Ban Vận Động / Kế Toán / 20 Thôn Buôn<br/>(Cổng Quản Trị RBAC)"])
     end
 
-    CF_WAF --> CF_Worker
-    CF_WAF --> Nginx
-    
-    CF_Worker --> CF_D1
-    CF_Worker --> CF_KV
-    CF_Worker --> CF_R2
-    CF_Worker --> CF_AI
-    
-    Nginx --> NextJS
-    NextJS --> Postgres
-    NextJS --> CassoSync
-    NextJS -.->|Đồng bộ sao lưu| CF_D1
+    %% Edge Security Gateway
+    Cloudflare["🛡️ Cloudflare CDN & WAF<br/>(SSL/TLS Full Strict & DDoS Protection)"]
+
+    %% 2. External Cloud Services (BÊN NGOÀI Docker)
+    subgraph External_APIs ["☁️ External Cloud Services / Third-Party APIs"]
+        Gemini["🤖 Google Gemini 2.5/Flash AI<br/>(Trợ Lý Gem Mặt Trận 24/7)"]
+        Resend["📧 Resend Email API<br/>(One-Click Dispatcher SMTP: noreply@easupso.com)"]
+    end
+
+    %% 3. VPS Host Storage (BÊN NGOÀI Docker)
+    Host_Storage[("💾 Host Storage: /var/backups/<br/>(Lưu trữ file pg_dump .sql.gz)")]
+    Docker_Socket[("🐳 Docker Socket: /var/run/docker.sock")]
+
+    %% 4. Docker Infrastructure trên VPS Server
+    subgraph Docker_Infra ["🐳 DOCKER INFRASTRUCTURE (VPS CLOUD SERVER GDATA)"]
+        Nginx["🌐 Nginx Reverse Proxy<br/>(:80 / :443 (HTTP/HTTPS))"]
+        Web["🚀 Next.js 15 Standalone Web App<br/>(Port :3000 Node.js Alpine)"]
+        Postgres[("🐘 PostgreSQL 16: vinguoingheo_db<br/>[Persistent Volume: postgres_data]")]
+        Redis[("⚡ Redis 7 Cache & Rate Limit<br/>(Live Counter & Anti-spam)")]
+        Backup["⏰ Cron Backup Service<br/>(Tự động snapshot 00:00 hằng ngày)"]
+        Dozzle["📋 Dozzle (Log Viewer :8888)<br/>(Giám sát Container Logs Thời Gian Thực)"]
+    end
+
+    %% Dòng chảy dữ liệu thực tế
+    User -->|Truy cập Web / Tra cứu sao kê / Quyên góp| Cloudflare
+    Casso -->|POST Webhook qua HTTPS| Cloudflare
+    AdminUser -->|HTTPS / Đăng nhập Quản trị| Cloudflare
+
+    Cloudflare -->|Chuyển tiếp Traffic an toàn| Nginx
+
+    Nginx -->|Proxy Pass HTTP :3000| Web
+    Nginx -->|POST /api/v1/webhook/casso| Web
+
+    Web -->|Prisma ORM Queries| Postgres
+    Web -->|Bộ đếm Live Counter & Chống trùng lặp| Redis
+
+    Web -.->|API Key / HTTPS| Gemini
+    Web -.->|API Key / HTTPS| Resend
+
+    Backup -->|pg_dump snapshot| Postgres
+    Backup -->|Xuất file backup pg_dump| Host_Storage
+
+    Docker_Socket -.->|Kết nối đọc log realtime| Dozzle
 ```
 
 ---

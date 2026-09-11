@@ -72,7 +72,7 @@ services:
       PGPORT: 5432
     volumes:
       - ./docker/backup/backup.sh:/backup.sh:ro
-      - backup_data:/backups
+      - /var/backups:/backups
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
@@ -82,6 +82,19 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - vinguoingheo_net
+
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: vinguoingheo_dozzle
+    restart: always
+    ports:
+      - "8888:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - DOZZLE_NO_ANALYTICS=true
     networks:
       - vinguoingheo_net
 
