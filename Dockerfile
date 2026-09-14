@@ -1,9 +1,9 @@
 # ==============================================================================
-# Dockerfile - Multi-stage Build cho Next.js 15 Standalone (Tối ưu tốc độ cao)
+# Dockerfile - Multi-stage Build cho Next.js 15 Standalone
 # WebApp: Quỹ Vì Người Nghèo Ea Súp (nguoingheo.easupso.com)
 # ==============================================================================
 
-# Stage 1: Cài đặt Dependencies (Siêu tốc và an toàn với --ignore-scripts)
+# Stage 1: Cài đặt Dependencies
 FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
@@ -12,13 +12,8 @@ WORKDIR /app
 COPY package.json ./
 COPY prisma ./prisma/
 
-# Cấu hình timeout mạng và cài đặt bỏ qua postinstall scripts (tránh lỗi xung đột prisma postinstall)
-RUN npm config set fetch-retries 5 && \
-    npm config set fetch-retry-mintimeout 20000 && \
-    npm install --ignore-scripts --no-audit --no-fund --legacy-peer-deps || \
-    npm install --ignore-scripts --no-audit --no-fund --force
-
-# Sinh Prisma Client sau khi đã cài đặt xong toàn bộ gói
+# Cài đặt toàn bộ dependencies và sinh Prisma Client
+RUN npm install --legacy-peer-deps
 RUN npx prisma generate
 
 # Stage 2: Build Source Code
