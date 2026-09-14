@@ -57,13 +57,13 @@ services:
     networks:
       - internal_net
 
-  # 4. Dozzle - Trình xem log container thời gian thực tại cổng 8888
+  # 4. Dozzle - Trình xem log container thời gian thực tại cổng 8899
   dozzle:
     image: amir20/dozzle:latest
     container_name: vinguoingheo_dozzle
     restart: unless-stopped
     ports:
-      - "8888:8080"
+      - "${DOZZLE_PORT:-8899}:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:

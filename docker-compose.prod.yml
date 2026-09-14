@@ -90,7 +90,7 @@ services:
     container_name: vinguoingheo_dozzle
     restart: always
     ports:
-      - "8888:8080"
+      - "${DOZZLE_PORT:-8899}:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
