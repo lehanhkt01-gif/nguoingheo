@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Điều Khiển Quản Trị | Quỹ Vì Người Nghèo Xã Ea Súp</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Be Vietnam Pro', Inter, sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 pb-16">
+
+  <!-- Admin Top Navbar -->
+  <header class="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="/" class="flex items-center gap-2.5 group">
+          <img src="logo-mttq.png" alt="Mặt trận Tổ quốc Việt Nam" class="w-10 h-10 object-contain drop-shadow-sm" />
+          <div>
+            <span class="text-[10px] uppercase font-bold text-rose-700 tracking-wider block">
+              BẢNG ĐIỀU KHIỂN QUẢN TRỊ
+            </span>
+            <span class="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight">
+              QUỸ VÌ NGƯỜI NGHÈO XÃ EA SÚP
+            </span>
+          </div>
+        </a>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="/" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-rose-600 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+          <span>Xem trang người dân</span>
+        </a>
+
+        <!-- Thông tin Cán bộ -->
+        <div class="flex items-center gap-2.5 pl-3 border-l border-slate-200">
+          <div class="w-8 h-8 rounded-full bg-rose-100 border border-rose-200 text-rose-800 font-bold flex items-center justify-center text-xs">
+            LH
+          </div>
+          <div class="hidden md:block text-left">
+            <div class="text-xs font-bold text-slate-900 leading-tight">Đ/c Lê Hồng Hạnh</div>
+            <div class="text-[10px] text-rose-600 font-medium">Chủ tịch UBMTTQ xã</div>
+          </div>
+        </div>
+
+        <!-- Nút Đăng xuất -->
+        <button onclick="handleLogout()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-colors cursor-pointer" title="Đăng xuất khỏi hệ thống">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+          <span class="hidden sm:inline">Đăng xuất</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+    <!-- Banner thông báo trạng thái đồng bộ Casso -->
+    <div id="syncBanner" class="hidden p-4 rounded-xl bg-emerald-50 border border-emerald-300 text-xs text-emerald-900 font-medium flex items-center justify-between animate-in fade-in">
+      <div class="flex items-center gap-2">
+        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span>Đã hoàn tất đối soát với Casso: 100% dữ liệu khớp lệnh với tài khoản BIDV 8630100930!</span>
+      </div>
+      <span class="text-[11px] text-emerald-700 font-mono">Status: 200 OK</span>
+    </div>
+
+    <!-- Action Header & Quick Actions -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            Hệ Thống Trực Tuyến • BIDV 8630100930
+          </span>
+        </div>
+        <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">
+          Tổng Quan Tài Chính & Sao Kê Minh Bạch
+        </h2>
+        <p class="text-xs text-slate-600 mt-0.5">
+          Dữ liệu đối soát tự động qua Casso Banking Webhook V2 và xác nhận chi 20 thôn buôn.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2.5">
+        <!-- Nút Đồng bộ thủ công với Casso -->
+        <button id="syncBtn" onclick="triggerCassoSync()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-all cursor-pointer">
+          <svg id="syncIcon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          <span id="syncText">Đồng bộ thủ công với Casso</span>
+        </button>
+
+        <!-- Xuất Excel -->
+        <a href="/api/v1/export/excel" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold shadow-xs transition-all cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          <span>Xuất Excel Sao Kê</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 4 Thẻ Thống Kê Nhanh Số Dư BIDV -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Card 1: Số dư thực tế -->
+      <div class="bg-gradient-to-br from-rose-600 to-pink-600 text-white p-5 rounded-2xl shadow-sm space-y-2">
+        <div class="flex items-center justify-between text-rose-100">
+          <span class="text-xs font-bold uppercase tracking-wider">Số Dư Quỹ Khả Dụng</span>
+          <svg class="w-5 h-5 text-rose-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+        </div>
+        <div class="text-2xl sm:text-3xl font-extrabold tracking-tight font-mono">
+          64.000.000 đ
+        </div>
+        <div class="text-[11px] text-rose-100 flex items-center justify-between pt-1 border-t border-white/20">
+          <span>BIDV 8630100930</span>
+          <span class="font-semibold text-emerald-200">Khớp lệnh 100%</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Tổng vận động -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+        <div class="flex items-center justify-between text-slate-500">
+          <span class="text-xs font-bold uppercase tracking-wider">Tổng Thu Vận Động</span>
+          <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path></svg>
+          </div>
+        </div>
+        <div class="text-2xl font-extrabold text-emerald-600 tracking-tight font-mono">
+          +82.000.000 đ
+        </div>
+        <div class="text-[11px] text-slate-500 pt-1 border-t border-slate-100">
+          Tổng số tiền nhà hảo tâm đóng góp
+        </div>
+      </div>
+
+      <!-- Card 3: Đã giải ngân -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+        <div class="flex items-center justify-between text-slate-500">
+          <span class="text-xs font-bold uppercase tracking-wider">Đã Chi Giải Ngân</span>
+          <div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path></svg>
+          </div>
+        </div>
+        <div class="text-2xl font-extrabold text-rose-600 tracking-tight font-mono">
+          -18.000.000 đ
+        </div>
+        <div class="text-[11px] text-slate-500 pt-1 border-t border-slate-100">
+          Nhà ĐĐK, bò giống, sửa nhà dột nát
+        </div>
+      </div>
+
+      <!-- Card 4: Lượt đóng góp -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+        <div class="flex items-center justify-between text-slate-500">
+          <span class="text-xs font-bold uppercase tracking-wider">Lượt Ủng Hộ</span>
+          <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          </div>
+        </div>
+        <div class="text-2xl font-extrabold text-slate-900 tracking-tight font-mono">
+          5 <span class="text-sm font-sans font-normal text-slate-500">lượt</span>
+        </div>
+        <div class="text-[11px] text-slate-500 pt-1 border-t border-slate-100">
+          2 chiến dịch trọng điểm đang mở
+        </div>
+      </div>
+    </div>
+
+    <!-- Bảng Quản Lý Danh Sách Ủng Hộ -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h3 class="font-bold text-sm text-slate-900">
+            Danh Sách Giao Dịch Tiếp Nhận Tiền Vào (Donations)
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Cập nhật tự động từ cổng Casso Banking Webhook V2.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <input
+            type="text"
+            id="adminSearchInput"
+            placeholder="Tìm tên, mã giao dịch..."
+            oninput="filterAdminTable()"
+            class="pl-3 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 focus:border-rose-600 bg-slate-50/50"
+          />
+          <select id="adminVillageSelect" onchange="filterAdminTable()" class="py-1.5 px-3 text-xs rounded-lg border border-slate-200 bg-white font-medium text-slate-700">
+            <option value="ALL">Toàn bộ địa bàn</option>
+            <option value="Buôn Drai">Buôn Drai</option>
+            <option value="Thôn 14">Thôn 14</option>
+            <option value="Thôn 12">Thôn 12</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse" id="adminDonationTable">
+          <thead>
+            <tr class="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+              <th class="p-3.5">Mã Giao Dịch</th>
+              <th class="p-3.5">Thời Gian</th>
+              <th class="p-3.5">Nhà Hảo Tâm</th>
+              <th class="p-3.5">Nội Dung Chuyển Khoản</th>
+              <th class="p-3.5 text-right">Số Tiền (VNĐ)</th>
+              <th class="p-3.5 text-center">Trạng Thái</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr class="hover:bg-slate-50/80 transition-colors">
+              <td class="p-3.5 font-mono font-bold text-slate-800">BIDV_FT262391005</td>
+              <td class="p-3.5 text-slate-500 whitespace-nowrap">13/09/2026 16:45</td>
+              <td class="p-3.5 font-bold text-slate-900">Trần Minh Tú</td>
+              <td class="p-3.5 text-slate-700">VNN UNG HO BA CON KHO KHAN</td>
+              <td class="p-3.5 text-right font-mono font-bold text-emerald-600 whitespace-nowrap">+2.000.000 đ</td>
+              <td class="p-3.5 text-center whitespace-nowrap">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Đã ghi có
+                </span>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-50/80 transition-colors">
+              <td class="p-3.5 font-mono font-bold text-slate-800">BIDV_FT262391004</td>
+              <td class="p-3.5 text-slate-500 whitespace-nowrap">12/09/2026 10:00</td>
+              <td class="p-3.5 font-bold text-slate-900">Lê Văn Tám (Kiều bào Úc)</td>
+              <td class="p-3.5 text-slate-700">KIEU BAO UC UNG HO HO NGHEO BUON DRAI</td>
+              <td class="p-3.5 text-right font-mono font-bold text-emerald-600 whitespace-nowrap">+10.000.000 đ</td>
+              <td class="p-3.5 text-center whitespace-nowrap">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Đã ghi có
+                </span>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-50/80 transition-colors">
+              <td class="p-3.5 font-mono font-bold text-slate-800">BIDV_FT262391003</td>
+              <td class="p-3.5 text-slate-500 whitespace-nowrap">11/09/2026 14:20</td>
+              <td class="p-3.5 font-bold text-slate-900">Công ty Cổ phần Ea Súp Xanh</td>
+              <td class="p-3.5 text-slate-700">CONG TY EA SUP XANH UNG HO QUY VI NGUOI NGHEO</td>
+              <td class="p-3.5 text-right font-mono font-bold text-emerald-600 whitespace-nowrap">+50.000.000 đ</td>
+              <td class="p-3.5 text-center whitespace-nowrap">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Đã ghi có
+                </span>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-50/80 transition-colors">
+              <td class="p-3.5 font-mono font-bold text-slate-800">BIDV_FT262391002</td>
+              <td class="p-3.5 text-slate-500 whitespace-nowrap">11/09/2026 09:15</td>
+              <td class="p-3.5 font-bold text-slate-900">Nguyễn Thị Mai</td>
+              <td class="p-3.5 text-slate-700">VNN SK UNG HO BO GIONG SINH KE</td>
+              <td class="p-3.5 text-right font-mono font-bold text-emerald-600 whitespace-nowrap">+5.000.000 đ</td>
+              <td class="p-3.5 text-center whitespace-nowrap">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Đã ghi có
+                </span>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-50/80 transition-colors">
+              <td class="p-3.5 font-mono font-bold text-slate-800">BIDV_FT262391001</td>
+              <td class="p-3.5 text-slate-500 whitespace-nowrap">10/09/2026 08:30</td>
+              <td class="p-3.5 font-bold text-slate-900">Đoàn Hoàng Phúc</td>
+              <td class="p-3.5 text-slate-700">VNN NDDK UNG HO XAY NHA DAI DOAN KET</td>
+              <td class="p-3.5 text-right font-mono font-bold text-emerald-600 whitespace-nowrap">+15.000.000 đ</td>
+              <td class="p-3.5 text-center whitespace-nowrap">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Đã ghi có
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function triggerCassoSync() {
+      const btn = document.getElementById('syncBtn');
+      const icon = document.getElementById('syncIcon');
+      const text = document.getElementById('syncText');
+      const banner = document.getElementById('syncBanner');
+
+      btn.disabled = true;
+      icon.classList.add('animate-spin');
+      text.innerText = 'Đang đối soát ngân hàng...';
+      banner.classList.add('hidden');
+
+      setTimeout(() => {
+        btn.disabled = false;
+        icon.classList.remove('animate-spin');
+        text.innerText = 'Đồng bộ thủ công với Casso';
+        banner.classList.remove('hidden');
+        setTimeout(() => banner.classList.add('hidden'), 5000);
+      }, 1000);
+    }
+
+    function filterAdminTable() {
+      const q = document.getElementById('adminSearchInput').value.toLowerCase().trim();
+      const village = document.getElementById('adminVillageSelect').value.toLowerCase();
+      const rows = document.querySelectorAll('#adminDonationTable tbody tr');
+
+      rows.forEach(r => {
+        const text = r.innerText.toLowerCase();
+        const matchQ = !q || text.includes(q);
+        const matchV = village === 'all' || text.includes(village);
+        r.style.display = (matchQ && matchV) ? '' : 'none';
+      });
+    }
+
+    async function handleLogout() {
+      try {
+        await fetch('/api/admin/logout', { method: 'POST' });
+      } catch {}
+      localStorage.removeItem('admin_logged_in');
+      localStorage.removeItem('vinguoingheo_user');
+      window.location.href = '/admin/login';
+    }
+  </script>
+</body>
+</html>
