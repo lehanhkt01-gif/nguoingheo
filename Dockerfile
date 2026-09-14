@@ -57,6 +57,6 @@ EXPOSE 3000
 
 # Healthcheck kiểm tra định kỳ tình trạng ứng dụng
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:3000/api/v1/sao-ke?limit=1 || exit 1
+  CMD curl -f http://localhost:3000/api/stats || exit 1
 
 CMD ["node", "server.js"]

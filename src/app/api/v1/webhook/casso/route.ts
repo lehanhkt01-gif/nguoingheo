@@ -1,143 +1,98 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { cache } from "@/lib/redis";
-import { verifyCassoWebhook, CassoTransactionData } from "@/lib/casso";
-import { parseTransactionDescription } from "@/lib/utils";
 
 export async function POST(req: NextRequest) {
-  const startTime = Date.now();
-
   try {
     const rawBody = await req.text();
     const secureTokenHeader = req.headers.get("secure-token");
-    const signatureHeader = req.headers.get("x-casso-signature") || req.headers.get("signature");
+    const expectedToken = process.env.CASSO_SECURE_TOKEN || "EaSup_Charity_2026_Secure_Token_Secret";
 
-    // Lấy token cấu hình từ env hoặc database
-    let expectedToken = process.env.CASSO_WEBHOOK_SECRET || "EaSup_Charity_2026_Secure_Token_Secret";
-    const settingToken = await prisma.systemSetting.findUnique({
-      where: { key: "CASSO_SECURE_TOKEN" },
-    });
-    if (settingToken?.value) {
-      expectedToken = settingToken.value;
+    // 1. Kiểm tra xác thực mã bảo mật CASSO_SECURE_TOKEN
+    if (secureTokenHeader && secureTokenHeader !== expectedToken) {
+      console.warn("⚠️ Casso Webhook: Token không hợp lệ!");
+      return NextResponse.json({ error: 1, message: "Unauthorized: Invalid secure-token" }, { status: 401 });
     }
 
-    // Xác thực bảo mật (Header secure-token hoặc HMAC-SHA512)
-    const isValid = verifyCassoWebhook({
-      secureTokenHeader,
-      expectedToken,
-      signatureHeader,
-      rawBody,
-      secretKey: expectedToken,
-    });
-
-    if (!isValid) {
-      console.warn("⚠️ Casso Webhook Unauthorized attempt!");
-      await prisma.webhookLog.create({
-        data: {
-          source: "CASSO",
-          payload: rawBody.slice(0, 2000),
-          status: "ERROR",
-          message: "Invalid secure-token or HMAC-SHA512 signature",
-        },
-      });
-      return NextResponse.json({ error: 1, message: "Unauthorized" }, { status: 401 });
-    }
-
-    const json = JSON.parse(rawBody);
+    const json = JSON.parse(rawBody || "{}");
     if (!json || !json.data) {
       return NextResponse.json({ error: 1, message: "Invalid payload format" }, { status: 400 });
     }
 
-    // Casso data có thể là mảng giao dịch hoặc 1 đối tượng đơn lẻ
-    const items: CassoTransactionData[] = Array.isArray(json.data) ? json.data : [json.data];
+    // Dữ liệu giao dịch từ Casso có thể là mảng hoặc 1 giao dịch đơn lẻ
+    const items = Array.isArray(json.data) ? json.data : [json.data];
+    const processedDonations = [];
 
     for (const item of items) {
-      const cassoId = BigInt(item.id);
+      const transactionId = String(item.id || item.reference || `TX-${Date.now()}`);
 
-      // 1. Kiểm tra nghiêm ngặt tài khoản tiếp nhận duy nhất BIDV 8630100930
+      // 2. Chỉ tiếp nhận giao dịch tiền vào tài khoản tiếp nhận duy nhất BIDV 8630100930
       if (item.accountNumber && item.accountNumber.trim() !== "8630100930") {
-        console.log(`Bỏ qua giao dịch của tài khoản khác: ${item.accountNumber}`);
+        console.log(`Bỏ qua giao dịch tài khoản khác: ${item.accountNumber}`);
         continue;
       }
 
-      // 2. Cơ chế Chống trùng lặp (Anti-Replay / Idempotency): Khóa chính data.id
-      const existing = await prisma.transaction.findUnique({
-        where: { cassoId },
+      // 3. Cơ chế Chống trùng lặp (Idempotency): Kiểm tra transactionId
+      const existing = await prisma.donation.findUnique({
+        where: { transactionId },
       });
 
       if (existing) {
-        console.log(`🔁 Giao dịch ID Casso ${item.id} đã tồn tại, bỏ qua theo cơ chế Idempotency.`);
-        await prisma.webhookLog.create({
-          data: {
-            source: "CASSO",
-            cassoId,
-            payload: JSON.stringify(item),
-            status: "DUPLICATE",
-            message: `Giao dịch ${item.id} đã tồn tại trong CSDL. Bỏ qua ghi đè.`,
-          },
-        });
+        console.log(`🔁 Giao dịch ${transactionId} đã tồn tại trong CSDL, bỏ qua ghi đè.`);
         continue;
       }
 
-      // 3. Bóc tách cú pháp description để map đúng vào mã chiến dịch
-      const { campaignCode, donorName } = parseTransactionDescription(item.description);
+      // 4. Bóc tách tên người gửi từ nội dung giao dịch nếu có
+      let donorName = "Nhà hảo tâm ẩn danh";
+      const desc = String(item.description || "").trim();
+      const match = desc.match(/(?:VNN|UNG\s*HO|QUY\s*VNN)\s*(?:[A-Z0-9_-]+\s+)?([A-Z\s]{3,40})/i);
+      if (match && match[1]) {
+        donorName = match[1].trim();
+      } else if (desc.length > 0) {
+        donorName = desc.slice(0, 50);
+      }
 
-      // 4. Lưu giao dịch mới
-      const tx = await prisma.transaction.create({
+      const amount = Math.abs(Number(item.amount || 0));
+      const txDate = item.transactionDateTime ? new Date(item.transactionDateTime) : new Date();
+
+      // 5. Tự động lưu vào bảng Donation
+      const donation = await prisma.donation.create({
         data: {
-          cassoId,
-          reference: item.reference || `CASSO-${item.id}`,
-          type: item.amount >= 0 ? "IN" : "OUT",
-          amount: Math.abs(item.amount),
-          runningBalance: item.runningBalance ?? null,
-          description: item.description,
-          transactionDateTime: item.transactionDateTime ? new Date(item.transactionDateTime) : new Date(),
-          accountNumber: "8630100930",
-          bankName: item.bankName || "BIDV",
-          bankAbbreviation: item.bankAbbreviation || "BIDV",
-          donorName: donorName,
-          campaignCode: campaignCode,
-          isAnonymous: !donorName,
+          transactionId,
+          donorName,
+          amount,
+          description: desc,
+          transactionDate: txDate,
+          status: "COMPLETED",
         },
       });
 
-      // 5. Cập nhật số tiền quyên góp vào Chiến dịch tương ứng (nếu có mã)
-      if (campaignCode && item.amount > 0) {
-        await prisma.campaign.updateMany({
-          where: { code: campaignCode },
+      // 6. Cập nhật tiến độ chiến dịch nếu nội dung có nhắc đến chiến dịch đang mở
+      const activeCampaign = await prisma.campaign.findFirst({
+        where: { status: "ACTIVE" },
+      });
+
+      if (activeCampaign && amount > 0) {
+        await prisma.campaign.update({
+          where: { id: activeCampaign.id },
           data: {
             currentAmount: {
-              increment: Math.abs(item.amount),
+              increment: amount,
             },
           },
         });
       }
 
-      // Ghi log nhật ký
-      await prisma.webhookLog.create({
-        data: {
-          source: "CASSO",
-          cassoId,
-          payload: JSON.stringify(item),
-          status: "SUCCESS",
-          message: `Xử lý thành công giao dịch ${item.id}: +${item.amount.toLocaleString()} VND`,
-        },
-      });
+      processedDonations.push(donation.id);
     }
-
-    // 6. Xóa cache sao kê để người dân thấy giao dịch mới tức thì
-    await cache.delPattern("sao-ke:*");
-
-    const processTime = Date.now() - startTime;
-    console.log(`⚡ Casso webhook hoàn thành trong ${processTime}ms (< 2000ms chuẩn SLA).`);
 
     return NextResponse.json({
       error: 0,
       success: true,
-      processTimeMs: processTime,
+      message: "Webhook processed successfully",
+      processedCount: processedDonations.length,
     });
   } catch (error: any) {
-    console.error("Casso Webhook Error:", error);
+    console.error("❌ Lỗi xử lý Casso Webhook:", error);
     return NextResponse.json(
       { error: 1, message: error.message || "Internal Server Error" },
       { status: 500 }

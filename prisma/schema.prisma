@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x", "debian-openssl-3.0.x"]
 }
 
@@ -8,109 +8,51 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Transaction {
-  id                  Int       @id @default(autoincrement())
-  cassoId             BigInt?   @unique
-  reference           String?
-  type                String    @default("IN") // IN (Ủng hộ vào), OUT (Giải ngân ra)
-  amount              Decimal   @db.Decimal(18, 2)
-  runningBalance      Decimal?  @db.Decimal(18, 2)
-  description         String
-  transactionDateTime DateTime  @default(now())
-  accountNumber       String    @default("8630100930")
-  bankName            String    @default("BIDV")
-  bankAbbreviation    String?   @default("BIDV")
-  donorName           String?
-  donorPhone          String?
-  isAnonymous         Boolean   @default(false)
-  campaignCode        String?
-  proofUrls           String[]
-  receiptNumber       String?   // Số phiếu thu / phiếu chi
-  verifiedBy          String?
-  note                String?
-  createdAt           DateTime  @default(now())
+// 1. Bảng lưu trữ các khoản ủng hộ từ nhà hảo tâm (Qua ngân hàng BIDV 8630100930 & Casso)
+model Donation {
+  id              Int       @id @default(autoincrement())
+  transactionId   String    @unique // Mã giao dịch định danh từ Casso / BIDV (chống trùng lặp)
+  donorName       String    // Tên người gửi / nhà hảo tâm
+  amount          Decimal   @db.Decimal(18, 2) // Số tiền ủng hộ (VNĐ)
+  description     String    // Nội dung chuyển khoản
+  transactionDate DateTime  @default(now()) // Ngày giờ giao dịch phát sinh
+  status          String    @default("COMPLETED") // COMPLETED, PENDING, CANCELLED
+  campaignId      Int?      // Khóa ngoại liên kết chiến dịch (nếu có)
+  campaign        Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  createdAt       DateTime  @default(now())
 
-  campaign            Campaign? @relation(fields: [campaignCode], references: [code])
-
-  @@index([transactionDateTime])
-  @@index([type])
-  @@index([campaignCode])
-}
-
-model Campaign {
-  id                Int           @id @default(autoincrement())
-  code              String        @unique // NDDK01, TET2026, SK01, CT01
-  slug              String        @unique
-  title             String
-  description       String
-  beneficiaryName   String?       // Chủ hộ thụ hưởng
-  village           String?       // 1 trong 20 thôn buôn Ea Súp
-  targetAmount      Decimal       @db.Decimal(18, 2)
-  currentAmount     Decimal       @default(0) @db.Decimal(18, 2)
-  category          String        // NHA_DAI_DOAN_KET, SUA_NHA, SINH_KE, CUU_TRO, TET
-  status            String        @default("ACTIVE") // ACTIVE, COMPLETED, CLOSED
-  imageUrl          String?
-  proofUrls         String[]
-  completionNotes   String?
-  startDate         DateTime      @default(now())
-  endDate           DateTime?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-
-  transactions      Transaction[]
-
-  @@index([category])
+  @@index([transactionDate])
   @@index([status])
+  @@index([donorName])
+}
+
+// 2. Bảng quản lý các chiến dịch vận động an sinh xã hội
+model Campaign {
+  id            Int        @id @default(autoincrement())
+  title         String     // Tên cuộc vận động (VD: Xây nhà Đại đoàn kết, Bò giống sinh kế)
+  targetAmount  Decimal    @db.Decimal(18, 2) // Mục tiêu vận động (VNĐ)
+  currentAmount Decimal    @default(0) @db.Decimal(18, 2) // Số tiền hiện có đã vận động
+  status        String     @default("ACTIVE") // ACTIVE, COMPLETED, CLOSED
+  description   String?    // Mô tả chi tiết chiến dịch
+  donations     Donation[] // Danh sách các khoản quyên góp vào chiến dịch này
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([status])
+}
+
+// 3. Bảng quản lý các đợt giải ngân cho hộ nghèo tại 20 thôn buôn xã Ea Súp
+model Disbursement {
+  id            Int      @id @default(autoincrement())
+  recipientName String   // Tên hộ nghèo / gia đình chính sách được thụ hưởng
+  village       String   // Thuộc 1 trong 20 thôn buôn xã Ea Súp
+  amount        Decimal  @db.Decimal(18, 2) // Số tiền hỗ trợ (VNĐ)
+  proofImageUrl String?  // Đường dẫn ảnh chứng từ scan mộc đỏ / hóa đơn VAT
+  date          DateTime @default(now()) // Ngày trao quà / chi hỗ trợ
+  notes         String?  // Ghi chú chi tiết (VD: Hỗ trợ đợt 1 khởi công, trao tiền mặt...)
+  createdAt     DateTime @default(now())
+
   @@index([village])
+  @@index([date])
 }
 
-model ScanDocument {
-  id          Int      @id @default(autoincrement())
-  title       String
-  docNumber   String?  // Số Quyết định / Số BC
-  category    String   // QUYET_DINH, BAO_CAO, BIEN_BAN
-  issuer      String   @default("UBND - UBMTTQ Việt Nam xã Ea Súp")
-  signer      String?  // Đ/c Lê Hồng Hạnh / Nguyễn Bá Bân
-  issueDate   DateTime
-  fileUrl     String
-  fileSize    String?
-  summary     String?
-  createdAt   DateTime @default(now())
-
-  @@index([category])
-}
-
-model User {
-  id           Int      @id @default(autoincrement())
-  username     String   @unique
-  passwordHash String
-  fullName     String
-  role         String   @default("MONITOR") // ADMIN, ACCOUNTANT, MONITOR
-  village      String?  // Thôn/buôn nếu là Trưởng ban CTMT
-  email        String?
-  phone        String?
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-}
-
-model WebhookLog {
-  id        Int      @id @default(autoincrement())
-  source    String   @default("CASSO")
-  cassoId   BigInt?
-  payload   String   @db.Text
-  status    String   // SUCCESS, DUPLICATE, ERROR
-  message   String?
-  ipAddress String?
-  createdAt DateTime @default(now())
-
-  @@index([createdAt])
-}
-
-model SystemSetting {
-  id          Int      @id @default(autoincrement())
-  key         String   @unique
-  value       String   @db.Text
-  description String?
-  updatedAt   DateTime @updatedAt
-}

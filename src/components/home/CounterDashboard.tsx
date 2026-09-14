@@ -2,44 +2,38 @@
 
 import { useEffect, useState } from "react";
 import { formatVND, formatNumber } from "@/lib/utils";
-import { ArrowUpRight, ArrowDownRight, Wallet, Home } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Wallet, Users } from "lucide-react";
 
 interface StatsData {
-  totalIn: number;
-  totalOut: number;
-  currentBalance: number;
-  totalDonationsCount: number;
-  totalDisbursementsCount: number;
-  beneficiaryCount?: number;
+  totalDonations: number;
+  totalDisbursed: number;
+  netBalance: number;
+  donationCount: number;
 }
 
 export default function CounterDashboard() {
   const [stats, setStats] = useState<StatsData>({
-    totalIn: 334000000,
-    totalOut: 33000000,
-    currentBalance: 301000000,
-    totalDonationsCount: 142,
-    totalDisbursementsCount: 5,
-    beneficiaryCount: 23,
+    totalDonations: 82000000,
+    totalDisbursed: 18000000,
+    netBalance: 64000000,
+    donationCount: 5,
   });
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        const res = await fetch("/api/v1/sao-ke?limit=1");
+        const res = await fetch("/api/stats");
         const json = await res.json();
-        if (json.success && json.summary) {
+        if (json.success && json.data) {
           setStats({
-            totalIn: json.summary.totalIn,
-            totalOut: json.summary.totalOut,
-            currentBalance: json.summary.currentBalance,
-            totalDonationsCount: json.summary.totalDonationsCount,
-            totalDisbursementsCount: json.summary.totalDisbursementsCount,
-            beneficiaryCount: 18 + json.summary.totalDisbursementsCount,
+            totalDonations: json.data.totalDonations,
+            totalDisbursed: json.data.totalDisbursed,
+            netBalance: json.data.netBalance,
+            donationCount: json.data.donationCount,
           });
         }
       } catch (err) {
-        console.error("Fetch stats error:", err);
+        console.error("Fetch /api/stats error:", err);
       }
     }
     fetchStats();
@@ -64,61 +58,61 @@ export default function CounterDashboard() {
           </div>
         </div>
 
-        {/* 4 Khối Thống Kê Chính */}
+        {/* 4 Khối Thống Kê Chuẩn */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Card 1: Tổng tiền ủng hộ */}
-          <div className="bg-emerald-50/70 rounded-xl p-4 border border-emerald-200/70">
+          {/* Card 1: Tổng vận động */}
+          <div className="bg-emerald-50/80 rounded-xl p-4 border border-emerald-200/80">
             <div className="flex items-center justify-between text-emerald-700 text-xs mb-1">
-              <span className="font-semibold uppercase">Tiền tiếp nhận (+)</span>
-              <ArrowUpRight className="w-4 h-4" />
+              <span className="font-bold uppercase tracking-wider">Tổng vận động (+)</span>
+              <ArrowUpRight className="w-4 h-4 text-emerald-600" />
             </div>
-            <div className="text-xl sm:text-2xl font-bold text-emerald-800 tracking-tight font-mono">
-              {formatVND(stats.totalIn)}
+            <div className="text-xl sm:text-2xl font-extrabold text-emerald-800 tracking-tight font-mono">
+              {formatVND(stats.totalDonations)}
             </div>
             <p className="text-[11px] text-emerald-700/80 mt-1 font-medium">
-              Từ {formatNumber(stats.totalDonationsCount)} lượt tổ chức & cá nhân
+              Tiếp nhận từ nhà hảo tâm & kiều bào
             </p>
           </div>
 
-          {/* Card 2: Tổng giải ngân */}
-          <div className="bg-rose-50 rounded-xl p-4 border border-rose-200">
+          {/* Card 2: Đã giải ngân */}
+          <div className="bg-rose-50/80 rounded-xl p-4 border border-rose-200/80">
             <div className="flex items-center justify-between text-rose-700 text-xs mb-1">
-              <span className="font-semibold uppercase">Đã giải ngân (-)</span>
-              <ArrowDownRight className="w-4 h-4" />
+              <span className="font-bold uppercase tracking-wider">Đã giải ngân (-)</span>
+              <ArrowDownRight className="w-4 h-4 text-rose-600" />
             </div>
-            <div className="text-xl sm:text-2xl font-bold text-rose-800 tracking-tight font-mono">
-              {formatVND(stats.totalOut)}
+            <div className="text-xl sm:text-2xl font-extrabold text-rose-800 tracking-tight font-mono">
+              {formatVND(stats.totalDisbursed)}
             </div>
             <p className="text-[11px] text-rose-700/80 mt-1 font-medium">
-              {stats.totalDisbursementsCount} đợt chi có biên bản mộc đỏ
+              Chi đúng đối tượng, có biên bản mộc đỏ
             </p>
           </div>
 
-          {/* Card 3: Số dư khả dụng BIDV 8630100930 */}
-          <div className="bg-pink-50/80 rounded-xl p-4 border border-pink-200">
+          {/* Card 3: Số dư quỹ */}
+          <div className="bg-pink-50/80 rounded-xl p-4 border border-pink-200/80">
             <div className="flex items-center justify-between text-pink-700 text-xs mb-1">
-              <span className="font-semibold uppercase">Dư khả dụng BIDV (=)</span>
-              <Wallet className="w-4 h-4" />
+              <span className="font-bold uppercase tracking-wider">Số dư quỹ (=)</span>
+              <Wallet className="w-4 h-4 text-pink-600" />
             </div>
-            <div className="text-xl sm:text-2xl font-bold text-pink-900 tracking-tight font-mono">
-              {formatVND(stats.currentBalance)}
+            <div className="text-xl sm:text-2xl font-extrabold text-pink-900 tracking-tight font-mono">
+              {formatVND(stats.netBalance)}
             </div>
             <p className="text-[11px] text-pink-700/80 mt-1 font-medium">
-              Tài khoản BIDV 8630100930
+              Số dư khả dụng BIDV 8630100930
             </p>
           </div>
 
-          {/* Card 4: Nhà ĐĐK & Ca hỗ trợ */}
-          <div className="bg-amber-50/80 rounded-xl p-4 border border-amber-200">
+          {/* Card 4: Lượt đóng góp */}
+          <div className="bg-amber-50/80 rounded-xl p-4 border border-amber-200/80">
             <div className="flex items-center justify-between text-amber-800 text-xs mb-1">
-              <span className="font-semibold uppercase">Mái ấm & Ca trợ giúp</span>
-              <Home className="w-4 h-4" />
+              <span className="font-bold uppercase tracking-wider">Lượt đóng góp</span>
+              <Users className="w-4 h-4 text-amber-700" />
             </div>
-            <div className="text-xl sm:text-2xl font-bold text-amber-900 tracking-tight">
-              {stats.beneficiaryCount} Hộ gia đình
+            <div className="text-xl sm:text-2xl font-extrabold text-amber-900 tracking-tight font-mono">
+              {formatNumber(stats.donationCount)} <span className="text-sm font-sans font-normal">lượt</span>
             </div>
             <p className="text-[11px] text-amber-700/80 mt-1 font-medium">
-              Phủ kín khắp 20 thôn buôn xã Ea Súp
+              Chung tay vì 20 thôn buôn xã Ea Súp
             </p>
           </div>
         </div>

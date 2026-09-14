@@ -25,13 +25,106 @@ const server = http.createServer((req, res) => {
     pathname = '/index.html';
   }
 
+  if (pathname === '/api/stats') {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify({
+      success: true,
+      data: {
+        totalDonations: 82000000,
+        totalDisbursed: 18000000,
+        netBalance: 64000000,
+        donationCount: 5,
+        disbursementCount: 3,
+        activeCampaigns: 2
+      }
+    }));
+    return;
+  }
+
+  if (pathname === '/api/donations') {
+    const search = (parsedUrl.searchParams.get('search') || '').toLowerCase().trim();
+    const village = parsedUrl.searchParams.get('village') || 'ALL';
+
+    const allDonations = [
+      {
+        id: 1,
+        transactionId: "BIDV_FT262391001",
+        donorName: "Đoàn Hoàng Phúc",
+        amount: 15000000,
+        description: "VNN NDDK UNG HO XAY NHA DAI DOAN KET",
+        transactionDate: "2026-09-10T08:30:00Z",
+        status: "COMPLETED"
+      },
+      {
+        id: 2,
+        transactionId: "BIDV_FT262391002",
+        donorName: "Nguyễn Thị Mai",
+        amount: 5000000,
+        description: "VNN SK UNG HO BO GIONG SINH KE",
+        transactionDate: "2026-09-11T09:15:00Z",
+        status: "COMPLETED"
+      },
+      {
+        id: 3,
+        transactionId: "BIDV_FT262391003",
+        donorName: "Công ty Cổ phần Ea Súp Xanh",
+        amount: 50000000,
+        description: "CONG TY EA SUP XANH UNG HO QUY VI NGUOI NGHEO",
+        transactionDate: "2026-09-11T14:20:00Z",
+        status: "COMPLETED"
+      },
+      {
+        id: 4,
+        transactionId: "BIDV_FT262391004",
+        donorName: "Lê Văn Tám (Kiều bào Úc)",
+        amount: 10000000,
+        description: "KIEU BAO UC UNG HO HO NGHEO BUON DRAI",
+        transactionDate: "2026-09-12T10:00:00Z",
+        status: "COMPLETED"
+      },
+      {
+        id: 5,
+        transactionId: "BIDV_FT262391005",
+        donorName: "Trần Minh Tú",
+        amount: 2000000,
+        description: "VNN UNG HO BA CON KHO KHAN",
+        transactionDate: "2026-09-13T16:45:00Z",
+        status: "COMPLETED"
+      }
+    ];
+
+    let filtered = allDonations;
+    if (search) {
+      filtered = filtered.filter(d => 
+        d.donorName.toLowerCase().includes(search) || 
+        d.description.toLowerCase().includes(search)
+      );
+    }
+    if (village && village !== 'ALL') {
+      filtered = filtered.filter(d => d.description.toLowerCase().includes(village.toLowerCase()));
+    }
+
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify({
+      success: true,
+      data: filtered,
+      pagination: {
+        total: filtered.length,
+        page: 1,
+        limit: 10,
+        totalPages: 1
+      }
+    }));
+    return;
+  }
+
   if (pathname.startsWith('/api/chat')) {
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', () => {
       try {
         const { message } = JSON.parse(body || '{}');
-        let reply = "Dạ, tôi là Gem Mặt Trận Ea Súp. Hiện tại số dư Quỹ Vì Người Nghèo xã Ea Súp trong tài khoản BIDV 8630100930 là 301.000.000 đ (Tổng thu: 334.000.000 đ, Đã giải ngân: 33.000.000 đ). Quý vị có thể chuyển khoản ủng hộ qua mã VietQR hoặc STK 8630100930 (BIDV Ea Súp)!";
+        let reply = "Dạ, tôi là Gem Mặt Trận Ea Súp. Hiện tại số dư Quỹ Vì Người Nghèo xã Ea Súp trong tài khoản BIDV 8630100930 là 64.000.000 đ (Tổng vận động: 82.000.000 đ, Đã giải ngân: 18.000.000 đ). Quý vị có thể chuyển khoản ủng hộ qua mã VietQR hoặc STK 8630100930 (BIDV Ea Súp)!";
         if (message && message.includes('thôn')) {
           reply = "Xã Ea Súp gồm 20 thôn, buôn (17 thôn từ Thôn 1 đến Thôn 17 và 03 buôn: Buôn A2, Buôn Drai, Buôn Cổng). Mọi hoạt động hỗ trợ đều có chữ ký xác nhận của Ban CTMT cơ sở!";
         } else if (message && message.includes('định mức')) {

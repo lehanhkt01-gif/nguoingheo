@@ -34,11 +34,11 @@ export default function Header() {
               className="w-11 h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
             />
             <div>
-              <div className="text-[11px] uppercase tracking-wider font-semibold text-rose-700">
-                UBMTTQ VIỆT NAM XÃ EA SÚP
+              <div className="text-[10px] sm:text-[11px] uppercase tracking-wider font-bold text-rose-700">
+                ỦY BAN MẶT TRẬN TỔ QUỐC VIỆT NAM XÃ EA SÚP
               </div>
-              <h1 className="text-base font-bold text-slate-900 tracking-tight group-hover:text-rose-600 transition-colors">
-                Quỹ Vì Người Nghèo Ea Súp
+              <h1 className="text-xs sm:text-base font-extrabold text-slate-900 tracking-tight group-hover:text-rose-600 transition-colors uppercase">
+                QUỸ VÌ NGƯỜI NGHÈO
               </h1>
             </div>
           </Link>
