@@ -20,6 +20,17 @@ export function formatNumber(num: number | string | bigint | null | undefined): 
   return new Intl.NumberFormat("vi-VN").format(Number(num));
 }
 
+export function formatDate(date: Date | string): string {
+  if (!date) return "";
+  const d = typeof date === "string" ? new Date(date) : date;
+  return new Intl.DateTimeFormat("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "Asia/Ho_Chi_Minh",
+  }).format(d);
+}
+
 export function formatDateTime(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
   return new Intl.DateTimeFormat("vi-VN", {
