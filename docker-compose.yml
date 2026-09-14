@@ -7,7 +7,7 @@ services:
     container_name: vinguoingheo_web
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3080:3000"
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-EaSupSecureDb2026}@db:5432/${DB_NAME:-vinguoingheo_db}?schema=public
