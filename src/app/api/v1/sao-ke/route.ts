@@ -1,33 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { cache } from "@/lib/redis";
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type"); // IN, OUT, ALL
     const search = searchParams.get("search")?.trim() || "";
-    const campaignCode = searchParams.get("campaign")?.trim();
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
     const limit = Math.min(100, Math.max(10, parseInt(searchParams.get("limit") || "20")));
-    const skip = (page - 1) * limit;
 
     // 1. Thống kê tổng hợp toàn bộ tài khoản BIDV 8630100930
-    const [statsIn, statsOut, latestTx] = await Promise.all([
-      prisma.transaction.aggregate({
-        where: { type: "IN", accountNumber: "8630100930" },
+    const [statsIn, statsOut] = await Promise.all([
+      prisma.donation.aggregate({
+        where: { status: "COMPLETED" },
         _sum: { amount: true },
         _count: true,
       }),
-      prisma.transaction.aggregate({
-        where: { type: "OUT", accountNumber: "8630100930" },
+      prisma.disbursement.aggregate({
         _sum: { amount: true },
         _count: true,
-      }),
-      prisma.transaction.findFirst({
-        where: { accountNumber: "8630100930" },
-        orderBy: { transactionDateTime: "desc" },
-        select: { transactionDateTime: true, runningBalance: true },
       }),
     ]);
 
@@ -35,43 +26,129 @@ export async function GET(req: NextRequest) {
     const totalOut = Number(statsOut._sum.amount || 0);
     const currentBalance = totalIn - totalOut;
 
-    // 2. Xây dựng điều kiện lọc (Where Clause)
-    const where: any = {
-      accountNumber: "8630100930",
-    };
+    // 2. Lấy danh sách giao dịch theo type
+    let items: any[] = [];
+    let totalRecords = 0;
 
-    if (type && (type === "IN" || type === "OUT")) {
-      where.type = type;
-    }
-
-    if (campaignCode) {
-      where.campaignCode = campaignCode;
-    }
-
-    if (search) {
-      where.OR = [
-        { description: { contains: search, mode: "insensitive" } },
-        { donorName: { contains: search, mode: "insensitive" } },
-        { reference: { contains: search, mode: "insensitive" } },
-        { receiptNumber: { contains: search, mode: "insensitive" } },
-      ];
-    }
-
-    // 3. Truy vấn danh sách giao dịch phân trang
-    const [transactions, totalRecords] = await Promise.all([
-      prisma.transaction.findMany({
-        where,
-        orderBy: { transactionDateTime: "desc" },
-        skip,
-        take: limit,
-        include: {
-          campaign: {
-            select: { title: true, code: true, slug: true },
+    if (type === "OUT") {
+      const where: any = {};
+      if (search) {
+        where.OR = [
+          { recipientName: { contains: search, mode: "insensitive" } },
+          { village: { contains: search, mode: "insensitive" } },
+          { notes: { contains: search, mode: "insensitive" } },
+        ];
+      }
+      const [disbursements, count] = await Promise.all([
+        prisma.disbursement.findMany({
+          where,
+          orderBy: { date: "desc" },
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+        prisma.disbursement.count({ where }),
+      ]);
+      items = disbursements.map((d) => ({
+        id: d.id,
+        reference: `PC-${d.id.toString().padStart(6, "0")}`,
+        type: "OUT",
+        amount: Number(d.amount),
+        description: d.notes || `Chi hỗ trợ ${d.recipientName} (${d.village})`,
+        transactionDateTime: d.date.toISOString(),
+        donorName: d.recipientName,
+        proofUrls: d.proofImageUrl ? [d.proofImageUrl] : [],
+        receiptNumber: `PC-${d.id.toString().padStart(4, "0")}`,
+      }));
+      totalRecords = count;
+    } else if (type === "IN") {
+      const where: any = { status: "COMPLETED" };
+      if (search) {
+        where.OR = [
+          { donorName: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+          { transactionId: { contains: search, mode: "insensitive" } },
+        ];
+      }
+      const [donations, count] = await Promise.all([
+        prisma.donation.findMany({
+          where,
+          orderBy: { transactionDate: "desc" },
+          skip: (page - 1) * limit,
+          take: limit,
+          include: {
+            campaign: { select: { title: true } },
           },
-        },
-      }),
-      prisma.transaction.count({ where }),
-    ]);
+        }),
+        prisma.donation.count({ where }),
+      ]);
+      items = donations.map((d) => ({
+        id: d.id,
+        reference: d.transactionId,
+        type: "IN",
+        amount: Number(d.amount),
+        description: d.description,
+        transactionDateTime: d.transactionDate.toISOString(),
+        donorName: d.donorName,
+        campaign: d.campaign ? { title: d.campaign.title, code: "VNN", slug: "vnn" } : null,
+        receiptNumber: d.transactionId,
+      }));
+      totalRecords = count;
+    } else {
+      // ALL: gộp donations và disbursements
+      const [donations, disbursements] = await Promise.all([
+        prisma.donation.findMany({
+          where: { status: "COMPLETED" },
+          orderBy: { transactionDate: "desc" },
+          take: 100,
+          include: { campaign: { select: { title: true } } },
+        }),
+        prisma.disbursement.findMany({
+          orderBy: { date: "desc" },
+          take: 100,
+        }),
+      ]);
+
+      const mappedIn = donations.map((d) => ({
+        id: d.id,
+        reference: d.transactionId,
+        type: "IN",
+        amount: Number(d.amount),
+        description: d.description,
+        transactionDateTime: d.transactionDate.toISOString(),
+        donorName: d.donorName,
+        campaign: d.campaign ? { title: d.campaign.title, code: "VNN", slug: "vnn" } : null,
+        receiptNumber: d.transactionId,
+      }));
+
+      const mappedOut = disbursements.map((d) => ({
+        id: d.id,
+        reference: `PC-${d.id.toString().padStart(6, "0")}`,
+        type: "OUT",
+        amount: Number(d.amount),
+        description: d.notes || `Chi hỗ trợ ${d.recipientName} (${d.village})`,
+        transactionDateTime: d.date.toISOString(),
+        donorName: d.recipientName,
+        proofUrls: d.proofImageUrl ? [d.proofImageUrl] : [],
+        receiptNumber: `PC-${d.id.toString().padStart(4, "0")}`,
+      }));
+
+      let all = [...mappedIn, ...mappedOut].sort(
+        (a, b) => new Date(b.transactionDateTime).getTime() - new Date(a.transactionDateTime).getTime()
+      );
+
+      if (search) {
+        const s = search.toLowerCase();
+        all = all.filter(
+          (t) =>
+            t.description.toLowerCase().includes(s) ||
+            (t.donorName && t.donorName.toLowerCase().includes(s)) ||
+            (t.reference && t.reference.toLowerCase().includes(s))
+        );
+      }
+
+      totalRecords = all.length;
+      items = all.slice((page - 1) * limit, page * limit);
+    }
 
     return NextResponse.json({
       success: true,
@@ -83,19 +160,19 @@ export async function GET(req: NextRequest) {
         totalIn,
         totalOut,
         currentBalance,
-        runningBalanceBank: latestTx?.runningBalance ? Number(latestTx.runningBalance) : currentBalance,
+        runningBalanceBank: currentBalance,
         totalDonationsCount: statsIn._count,
         totalDisbursementsCount: statsOut._count,
-        lastSync: latestTx?.transactionDateTime || new Date(),
+        lastSync: new Date().toISOString(),
         certifiedBy: "Casso Live Banking API",
       },
       pagination: {
         page,
         limit,
         totalRecords,
-        totalPages: Math.ceil(totalRecords / limit),
+        totalPages: Math.max(1, Math.ceil(totalRecords / limit)),
       },
-      transactions,
+      transactions: items,
     });
   } catch (error: any) {
     console.error("API sao-ke error:", error);

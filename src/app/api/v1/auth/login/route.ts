@@ -12,12 +12,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { username: username.toLowerCase().trim() },
-    });
+    const adminUser = process.env.ADMIN_USERNAME || "admin";
+    const adminPass = process.env.ADMIN_PASSWORD || "EaSup@2026";
 
-    // Mật khẩu mẫu ban đầu cho cán bộ: "EaSup@2026" hoặc khớp user
-    if (!user || (password !== "EaSup@2026" && password !== "admin123")) {
+    if (
+      username.toLowerCase().trim() !== adminUser.toLowerCase() ||
+      (password !== adminPass && password !== "admin123")
+    ) {
       return NextResponse.json(
         { success: false, message: "Tên đăng nhập hoặc mật khẩu không chính xác." },
         { status: 401 }
@@ -27,12 +28,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       user: {
-        id: user.id,
-        username: user.username,
-        fullName: user.fullName,
-        role: user.role,
-        village: user.village,
-        email: user.email,
+        id: 1,
+        username: adminUser,
+        fullName: "Lê Hồng Hạnh",
+        role: "ADMIN",
+        village: "Ea Súp",
+        email: "mttq.easup@gmail.com",
       },
     });
   } catch (error: any) {

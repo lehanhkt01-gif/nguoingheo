@@ -9,13 +9,12 @@ export async function GET(req: NextRequest) {
     const reportNumber = searchParams.get("reportNumber") || "15/BC-BVĐ";
 
     const [statsIn, statsOut, campaignCount] = await Promise.all([
-      prisma.transaction.aggregate({
-        where: { type: "IN", accountNumber: "8630100930" },
+      prisma.donation.aggregate({
+        where: { status: "COMPLETED" },
         _sum: { amount: true },
         _count: true,
       }),
-      prisma.transaction.aggregate({
-        where: { type: "OUT", accountNumber: "8630100930" },
+      prisma.disbursement.aggregate({
         _sum: { amount: true },
         _count: true,
       }),

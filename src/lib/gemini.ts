@@ -2,24 +2,17 @@ import { GoogleGenAI } from "@google/genai";
 import { prisma } from "./prisma";
 
 export async function askGeminiCharityAssistant(userMessage: string): Promise<string> {
-  // Lấy API Key từ Environment hoặc SystemSetting trong DB
-  let apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    const setting = await prisma.systemSetting.findUnique({
-      where: { key: "GEMINI_API_KEY" },
-    });
-    apiKey = setting?.value;
-  }
+  // Lấy API Key từ Environment
+  const apiKey = process.env.GEMINI_API_KEY;
 
   // Dữ liệu thời gian thực tóm tắt để AI nắm bắt
   const [totalIn, totalOut, activeCampaignsCount] = await Promise.all([
-    prisma.transaction.aggregate({
-      where: { type: "IN" },
+    prisma.donation.aggregate({
+      where: { status: "COMPLETED" },
       _sum: { amount: true },
       _count: true,
     }),
-    prisma.transaction.aggregate({
-      where: { type: "OUT" },
+    prisma.disbursement.aggregate({
       _sum: { amount: true },
       _count: true,
     }),

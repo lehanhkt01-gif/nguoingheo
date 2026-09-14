@@ -8,35 +8,54 @@ export async function GET(req: NextRequest) {
     const type = searchParams.get("type");
     const campaignCode = searchParams.get("campaign");
 
-    const where: any = { accountNumber: "8630100930" };
-    if (type === "IN" || type === "OUT") {
-      where.type = type;
-    }
-    if (campaignCode) {
-      where.campaignCode = campaignCode;
-    }
+    const [donations, disbursements] = await Promise.all([
+      prisma.donation.findMany({
+        where: { status: "COMPLETED" },
+        orderBy: { transactionDate: "desc" },
+        take: 1000,
+      }),
+      prisma.disbursement.findMany({
+        orderBy: { date: "desc" },
+        take: 1000,
+      }),
+    ]);
 
-    const transactions = await prisma.transaction.findMany({
-      where,
-      orderBy: { transactionDateTime: "desc" },
-      take: 2000, // Tối đa 2000 dòng sao kê mới nhất
-    });
+    const mappedIn = donations.map((d) => ({
+      id: d.id,
+      reference: d.transactionId,
+      type: "IN",
+      amount: Number(d.amount),
+      runningBalance: null,
+      description: d.description,
+      transactionDateTime: d.transactionDate,
+      campaignCode: "VNN",
+      donorName: d.donorName,
+      receiptNumber: d.transactionId,
+      note: null,
+    }));
 
-    const buffer = await generateTransactionsExcel(
-      transactions.map((t) => ({
-        id: t.id,
-        reference: t.reference,
-        type: t.type,
-        amount: Number(t.amount),
-        runningBalance: t.runningBalance ? Number(t.runningBalance) : null,
-        description: t.description,
-        transactionDateTime: t.transactionDateTime,
-        campaignCode: t.campaignCode,
-        donorName: t.donorName,
-        receiptNumber: t.receiptNumber,
-        note: t.note,
-      }))
+    const mappedOut = disbursements.map((d) => ({
+      id: d.id,
+      reference: `PC-${d.id.toString().padStart(6, "0")}`,
+      type: "OUT",
+      amount: Number(d.amount),
+      runningBalance: null,
+      description: d.notes || `Chi hỗ trợ ${d.recipientName} (${d.village})`,
+      transactionDateTime: d.date,
+      campaignCode: "VNN",
+      donorName: d.recipientName,
+      receiptNumber: `PC-${d.id.toString().padStart(4, "0")}`,
+      note: d.village,
+    }));
+
+    let all = [...mappedIn, ...mappedOut].sort(
+      (a, b) => new Date(b.transactionDateTime).getTime() - new Date(a.transactionDateTime).getTime()
     );
+
+    if (type === "IN") all = mappedIn;
+    if (type === "OUT") all = mappedOut;
+
+    const buffer = await generateTransactionsExcel(all);
 
     const filename = `Sao_Ke_BIDV_8630100930_Ea_Sup_${new Date().toISOString().slice(0, 10)}.xlsx`;
 

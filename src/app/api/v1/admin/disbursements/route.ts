@@ -23,24 +23,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const tx = await prisma.transaction.create({
+    const tx = await prisma.disbursement.create({
       data: {
-        type: "OUT",
+        recipientName: verifiedBy || "Hộ nghèo xã Ea Súp",
+        village: note || "Ea Súp",
         amount: Number(amount),
-        description,
-        campaignCode: campaignCode || null,
-        receiptNumber: receiptNumber || `PC-${Date.now().toString().slice(-6)}`,
-        verifiedBy: verifiedBy || "Lê Hồng Hạnh",
-        proofUrls: Array.isArray(proofUrls) ? proofUrls : [],
-        note,
-        transactionDateTime: transactionDateTime ? new Date(transactionDateTime) : new Date(),
-        accountNumber: "8630100930",
-        bankName: "BIDV",
+        notes: description,
+        proofImageUrl: Array.isArray(proofUrls) && proofUrls.length > 0 ? proofUrls[0] : null,
+        date: transactionDateTime ? new Date(transactionDateTime) : new Date(),
       },
     });
-
-    // Xóa cache
-    await cache.delPattern("sao-ke:*");
 
     return NextResponse.json({
       success: true,

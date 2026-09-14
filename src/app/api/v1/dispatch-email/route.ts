@@ -9,13 +9,12 @@ export async function POST(req: NextRequest) {
 
     // 1. Thống kê số liệu mới nhất
     const [statsIn, statsOut, campaignCount] = await Promise.all([
-      prisma.transaction.aggregate({
-        where: { type: "IN", accountNumber: "8630100930" },
+      prisma.donation.aggregate({
+        where: { status: "COMPLETED" },
         _sum: { amount: true },
         _count: true,
       }),
-      prisma.transaction.aggregate({
-        where: { type: "OUT", accountNumber: "8630100930" },
+      prisma.disbursement.aggregate({
         _sum: { amount: true },
         _count: true,
       }),
