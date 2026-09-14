@@ -24,7 +24,7 @@ function handleRequest(req, res) {
   }
 
   // Route: /admin/login
-  if (pathname === '/admin/login' || pathname === '/admin/login/') {
+  if (pathname === '/admin/login' || pathname === '/admin/login/' || pathname === '/admin/login/index.html' || pathname === '/admin-login.html') {
     const filePath = path.join(__dirname, 'admin-login.html');
     fs.readFile(filePath, (err, data) => {
       if (err) {
@@ -39,7 +39,7 @@ function handleRequest(req, res) {
   }
 
   // Route: /admin
-  if (pathname === '/admin' || pathname === '/admin/') {
+  if (pathname === '/admin' || pathname === '/admin/' || pathname === '/admin/index.html' || pathname === '/admin-dashboard.html') {
     const filePath = path.join(__dirname, 'admin-dashboard.html');
     fs.readFile(filePath, (err, data) => {
       if (err) {

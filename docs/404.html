@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Chuyển hướng...</title>
+  <script>
+    const pathname = window.location.pathname;
+    const isGitHubPages = pathname.includes('/nguoingheo');
+    const prefix = isGitHubPages ? '/nguoingheo/' : '/';
+
+    if (pathname.includes('admin/login') || pathname.includes('admin-login')) {
+      window.location.replace(prefix + 'admin/login/');
+    } else if (pathname.includes('admin') || pathname.includes('admin-dashboard')) {
+      window.location.replace(prefix + 'admin/');
+    } else {
+      window.location.replace(prefix);
+    }
+  </script>
+</head>
+<body style="font-family: sans-serif; text-align: center; padding: 50px;">
+  <h2>Đang chuyển tiếp hệ thống...</h2>
+  <p>Vui lòng đợi trong giây lát hoặc <a href="/nguoingheo/">bấm vào đây để về trang chủ</a>.</p>
+</body>
+</html>
