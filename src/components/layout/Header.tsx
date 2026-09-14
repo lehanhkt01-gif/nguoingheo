@@ -2,12 +2,47 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { Heart, ShieldCheck, Menu, X, User } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Heart, ShieldCheck, Menu, X, User, LogOut, LayoutDashboard, ChevronDown } from "lucide-react";
 
 export default function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [adminUser, setAdminUser] = useState<any>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    // Kiểm tra trạng thái đăng nhập
+    const checkAuth = () => {
+      const localLoggedIn = localStorage.getItem("admin_logged_in");
+      const localUser = localStorage.getItem("vinguoingheo_user");
+
+      if (localLoggedIn === "true" && localUser) {
+        setIsLoggedIn(true);
+        try {
+          setAdminUser(JSON.parse(localUser));
+        } catch {}
+      } else {
+        setIsLoggedIn(false);
+        setAdminUser(null);
+      }
+    };
+
+    checkAuth();
+  }, [pathname]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+    } catch {}
+    localStorage.removeItem("admin_logged_in");
+    localStorage.removeItem("vinguoingheo_user");
+    setIsLoggedIn(false);
+    setAdminUser(null);
+    setDropdownOpen(false);
+    window.location.href = "/";
+  };
 
   const navLinks = [
     { href: "/", label: "Trang chủ" },
@@ -81,17 +116,73 @@ export default function Header() {
               <span>Đóng góp ngay</span>
             </a>
 
-            <Link
-              href="/admin/login"
-              className="p-1.5 rounded-lg text-slate-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
-              title="Đăng nhập Cán bộ Quỹ"
-            >
-              <User className="w-4 h-4" />
-            </Link>
+            {/* Nút Quản Trị / Cán Bộ Đăng Nhập */}
+            {isLoggedIn ? (
+              <div className="relative">
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 hover:bg-rose-100 transition-colors text-xs font-semibold cursor-pointer"
+                >
+                  <div className="w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-[10px] font-bold">
+                    LH
+                  </div>
+                  <span>{adminUser?.fullName?.split(" ").slice(-2).join(" ") || "Cán bộ"}</span>
+                  <ChevronDown className="w-3 h-3 text-rose-600" />
+                </button>
+
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-1.5 w-48 bg-white rounded-xl shadow-xl border border-rose-100 py-1 z-50 animate-in fade-in">
+                    <div className="px-3 py-2 border-b border-rose-50">
+                      <div className="text-xs font-bold text-slate-900">{adminUser?.fullName || "Đ/c Lê Hồng Hạnh"}</div>
+                      <div className="text-[10px] text-rose-600 font-medium">{adminUser?.title || "Chủ tịch UBMTTQ xã"}</div>
+                    </div>
+                    <Link
+                      href="/admin"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 text-xs text-slate-700 hover:bg-rose-50 hover:text-rose-700 transition-colors"
+                    >
+                      <LayoutDashboard className="w-3.5 h-3.5 text-rose-600" />
+                      <span>Vào trang quản trị</span>
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-600 hover:bg-red-50 transition-colors text-left cursor-pointer"
+                    >
+                      <LogOut className="w-3.5 h-3.5 text-red-500" />
+                      <span>Đăng xuất</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/admin/login"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-rose-300 text-slate-600 hover:text-rose-700 hover:bg-rose-50/50 transition-colors text-xs font-semibold"
+                title="Đăng nhập Cán bộ Quỹ"
+              >
+                <User className="w-3.5 h-3.5 text-rose-600" />
+                <span>Quản trị</span>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center gap-2">
+            {isLoggedIn ? (
+              <Link
+                href="/admin"
+                className="px-2.5 py-1 rounded-md bg-rose-100 text-rose-800 text-xs font-bold"
+              >
+                Quản trị
+              </Link>
+            ) : (
+              <Link
+                href="/admin/login"
+                className="px-2 py-1 rounded-md border border-rose-200 text-rose-700 text-xs font-medium"
+              >
+                Đăng nhập
+              </Link>
+            )}
             <a
               href="#dong-gop"
               className="px-2.5 py-1 rounded-md bg-rose-600 text-white text-xs font-medium"
@@ -131,6 +222,23 @@ export default function Header() {
             >
               Xem sao kê BIDV 8630100930
             </Link>
+            {isLoggedIn ? (
+              <Link
+                href="/admin"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full text-center py-2 rounded-md bg-slate-900 text-white text-xs font-semibold"
+              >
+                Bảng điều khiển Quản trị
+              </Link>
+            ) : (
+              <Link
+                href="/admin/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full text-center py-2 rounded-md bg-rose-600 text-white text-xs font-semibold"
+              >
+                Đăng nhập Cán bộ Quản trị
+              </Link>
+            )}
           </div>
         </div>
       )}

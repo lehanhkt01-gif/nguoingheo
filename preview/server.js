@@ -2,8 +2,6 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = process.env.PORT || 3333;
-
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -17,7 +15,7 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon',
 };
 
-const server = http.createServer((req, res) => {
+function handleRequest(req, res) {
   const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let pathname = parsedUrl.pathname;
 
@@ -25,6 +23,108 @@ const server = http.createServer((req, res) => {
     pathname = '/index.html';
   }
 
+  // Route: /admin/login
+  if (pathname === '/admin/login' || pathname === '/admin/login/') {
+    const filePath = path.join(__dirname, 'admin-login.html');
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Không tìm thấy trang đăng nhập');
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(data);
+    });
+    return;
+  }
+
+  // Route: /admin
+  if (pathname === '/admin' || pathname === '/admin/') {
+    const filePath = path.join(__dirname, 'admin-dashboard.html');
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Không tìm thấy trang quản trị');
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(data);
+    });
+    return;
+  }
+
+  // API: /api/admin/login
+  if (pathname === '/api/admin/login' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const { username, password } = JSON.parse(body || '{}');
+        const validUser = process.env.ADMIN_USERNAME || 'admin_easup';
+        const validPass = process.env.ADMIN_PASSWORD || 'EaSup@Admin2026!';
+
+        if (username === validUser && password === validPass) {
+          res.writeHead(200, {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Set-Cookie': [
+              'admin_token=easup_session_valid; Path=/; HttpOnly; Max-Age=86400',
+              'admin_logged_in=true; Path=/; Max-Age=86400'
+            ]
+          });
+          res.end(JSON.stringify({
+            success: true,
+            message: 'Đăng nhập thành công',
+            user: {
+              username: validUser,
+              fullName: 'Đ/c Lê Hồng Hạnh',
+              title: 'Chủ tịch UBMTTQ Việt Nam xã Ea Súp',
+              role: 'ADMIN'
+            }
+          }));
+        } else {
+          res.writeHead(401, { 'Content-Type': 'application/json; charset=utf-8' });
+          res.end(JSON.stringify({
+            success: false,
+            message: 'Tên đăng nhập hoặc mật khẩu không chính xác.'
+          }));
+        }
+      } catch {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, message: 'Dữ liệu không hợp lệ.' }));
+      }
+    });
+    return;
+  }
+
+  // API: /api/admin/logout
+  if (pathname === '/api/admin/logout') {
+    res.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Set-Cookie': [
+        'admin_token=; Path=/; HttpOnly; Max-Age=0',
+        'admin_logged_in=; Path=/; Max-Age=0'
+      ]
+    });
+    res.end(JSON.stringify({ success: true, message: 'Đã đăng xuất' }));
+    return;
+  }
+
+  // API: /api/admin/me
+  if (pathname === '/api/admin/me') {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify({
+      authenticated: true,
+      user: {
+        username: 'admin_easup',
+        fullName: 'Đ/c Lê Hồng Hạnh',
+        title: 'Chủ tịch UBMTTQ Việt Nam xã Ea Súp',
+        role: 'ADMIN'
+      }
+    }));
+    return;
+  }
+
+  // API: /api/stats
   if (pathname === '/api/stats') {
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify({
@@ -41,6 +141,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // API: /api/donations
   if (pathname === '/api/donations') {
     const search = (parsedUrl.searchParams.get('search') || '').toLowerCase().trim();
     const village = parsedUrl.searchParams.get('village') || 'ALL';
@@ -118,6 +219,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // API: /api/chat
   if (pathname.startsWith('/api/chat')) {
     let body = '';
     req.on('data', chunk => body += chunk);
@@ -159,8 +261,16 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': contentType });
     res.end(data);
   });
+}
+
+// Khởi chạy server trên cổng 3000 (theo đúng yêu cầu người dùng)
+const server3000 = http.createServer(handleRequest);
+server3000.listen(3000, () => {
+  console.log('🚀 Máy chủ Quản trị đang phục vụ tại: http://localhost:3000/admin/login');
 });
 
-server.listen(PORT, () => {
-  console.log(`🚀 Máy chủ xem trước WebApp Quỹ vì người nghèo Ea Súp đang chạy tại: http://localhost:${PORT}`);
+// Khởi chạy đồng thời server trên cổng 3333 (để giữ phiên xem trước)
+const server3333 = http.createServer(handleRequest);
+server3333.listen(3333, () => {
+  console.log('🚀 Máy chủ xem trước đang phục vụ tại: http://localhost:3333/admin/login');
 });

@@ -79,6 +79,14 @@
             <svg class="w-3.5 h-3.5 fill-current text-white" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
             <span>Đóng góp ngay</span>
           </a>
+
+          <!-- Nút Quản Trị / Cán Bộ Đăng Nhập -->
+          <div id="adminHeaderContainer" class="inline-flex items-center">
+            <a href="/admin/login" id="adminHeaderBtn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-rose-300 text-slate-700 hover:text-rose-700 hover:bg-rose-50/50 transition-colors text-xs font-semibold shadow-xs" title="Đăng nhập Cán bộ Quản trị">
+              <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+              <span>Quản trị</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -1643,6 +1651,44 @@ graph TD
         securityLevel: 'loose'
       });
     }
+
+    // Kiểm tra trạng thái đăng nhập Cán bộ Quản trị
+    function checkAdminAuth() {
+      const container = document.getElementById('adminHeaderContainer');
+      if (!container) return;
+      const isLoggedIn = localStorage.getItem('admin_logged_in') === 'true';
+
+      if (isLoggedIn) {
+        container.innerHTML = `
+          <div class="relative group">
+            <button class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 hover:bg-rose-100 transition-colors text-xs font-semibold cursor-pointer">
+              <div class="w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-[10px] font-bold">LH</div>
+              <span>Đ/c Hạnh</span>
+              <svg class="w-3 h-3 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div class="hidden group-hover:block absolute right-0 mt-1 w-44 bg-white rounded-xl shadow-xl border border-rose-100 py-1 z-50">
+              <a href="/admin" class="flex items-center gap-2 px-3 py-2 text-xs text-slate-700 hover:bg-rose-50 hover:text-rose-700 font-medium">
+                <span>📊 Vào trang quản trị</span>
+              </a>
+              <button onclick="handleLogout()" class="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-600 hover:bg-red-50 text-left font-medium cursor-pointer">
+                <span>🚪 Đăng xuất</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        await fetch('/api/admin/logout', { method: 'POST' });
+      } catch {}
+      localStorage.removeItem('admin_logged_in');
+      localStorage.removeItem('vinguoingheo_user');
+      window.location.reload();
+    }
+
+    checkAdminAuth();
   </script>
 </body>
 </html>
