@@ -6,7 +6,7 @@ import LiveLedgerTable from "@/components/home/LiveLedgerTable";
 import SocialWelfareList from "@/components/home/SocialWelfareList";
 import { BookOpen, CheckCircle } from "lucide-react";
 
-export const revalidate = 60; // Revalidate mỗi 60 giây
+export const dynamic = "force-dynamic";
 
 export default function HomePage() {
   return (

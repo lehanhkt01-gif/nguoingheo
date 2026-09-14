@@ -27,7 +27,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV DATABASE_URL="postgresql://postgres:dummy@localhost:5432/vinguoingheo_db"
 
-# Chạy build ứng dụng dạng Standalone
+# Sinh Prisma Client trong Builder và chạy build Standalone
+RUN npx prisma generate
 RUN npm run build
 
 # Stage 3: Runner tối giản, an toàn
