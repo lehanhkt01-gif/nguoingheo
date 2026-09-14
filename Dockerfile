@@ -3,7 +3,7 @@
 # WebApp: Quỹ Vì Người Nghèo Ea Súp (nguoingheo.easupso.com)
 # ==============================================================================
 
-# Stage 1: Cài đặt Dependencies (Loại bỏ gcc/g++ để build cực nhanh trong 30s)
+# Stage 1: Cài đặt Dependencies (Siêu tốc và an toàn với --ignore-scripts)
 FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
@@ -12,8 +12,13 @@ WORKDIR /app
 COPY package.json ./
 COPY prisma ./prisma/
 
-# Cài đặt toàn bộ dependencies với --force (bỏ qua mọi cảnh báo, không nghẽn mạng)
-RUN npm install --no-audit --no-fund --force
+# Cấu hình timeout mạng và cài đặt bỏ qua postinstall scripts (tránh lỗi xung đột prisma postinstall)
+RUN npm config set fetch-retries 5 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm install --ignore-scripts --no-audit --no-fund --legacy-peer-deps || \
+    npm install --ignore-scripts --no-audit --no-fund --force
+
+# Sinh Prisma Client sau khi đã cài đặt xong toàn bộ gói
 RUN npx prisma generate
 
 # Stage 2: Build Source Code
