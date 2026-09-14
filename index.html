@@ -6,6 +6,7 @@
   <title>Quỹ Vì Người Nghèo Ea Súp | Cổng Thông Tin & Sao Kê Minh Bạch 100%</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -51,11 +52,11 @@
         <a href="#" class="flex items-center gap-3 group">
           <img src="logo-mttq.png" alt="Mặt trận Tổ quốc Việt Nam" class="w-11 h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform" />
           <div>
-            <div class="text-[11px] uppercase tracking-wider font-semibold text-rose-700">
-              UBMTTQ VIỆT NAM XÃ EA SÚP
+            <div class="text-[10px] sm:text-[11px] uppercase tracking-wider font-bold text-rose-700">
+              ỦY BAN MẶT TRẬN TỔ QUỐC VIỆT NAM XÃ EA SÚP
             </div>
-            <div class="text-base font-bold text-slate-900 tracking-tight group-hover:text-rose-600 transition-colors">
-              Quỹ Vì Người Nghèo
+            <div class="text-xs sm:text-base font-extrabold text-slate-900 tracking-tight group-hover:text-rose-600 transition-colors uppercase">
+              QUỸ VÌ NGƯỜI NGHÈO
             </div>
           </div>
         </a>
@@ -65,7 +66,6 @@
           <a href="#" class="px-3 py-1.5 rounded-md bg-rose-50 text-rose-700 font-semibold">Trang chủ</a>
           <a href="#sao-ke" class="px-3 py-1.5 rounded-md hover:text-rose-600 hover:bg-rose-50/50 transition-colors">Sao kê thời gian thực</a>
           <a href="#chien-dich" class="px-3 py-1.5 rounded-md hover:text-rose-600 hover:bg-rose-50/50 transition-colors">Nơi gieo hy vọng</a>
-          <a href="#nghiem-thu" class="px-3 py-1.5 rounded-md hover:text-rose-600 hover:bg-rose-50/50 transition-colors">Thư viện nghiệm thu</a>
           <a href="#phap-ly" class="px-3 py-1.5 rounded-md hover:text-rose-600 hover:bg-rose-50/50 transition-colors">Văn bản & Pháp lý</a>
         </nav>
 
@@ -162,52 +162,52 @@
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Card 1 -->
-        <div class="bg-emerald-50/70 rounded-xl p-4 border border-emerald-200/70">
+        <!-- Card 1: Tổng vận động -->
+        <div class="bg-emerald-50/80 rounded-xl p-4 border border-emerald-200/80">
           <div class="flex items-center justify-between text-emerald-700 text-xs mb-1">
-            <span class="font-semibold uppercase">Tiền tiếp nhận (+)</span>
+            <span class="font-bold uppercase tracking-wider">Tổng vận động (+)</span>
             <span>↗</span>
           </div>
-          <div class="text-xl sm:text-2xl font-bold text-emerald-800 tracking-tight font-mono">
-            334.000.000 đ
+          <div class="text-xl sm:text-2xl font-extrabold text-emerald-800 tracking-tight font-mono">
+            82.000.000 đ
           </div>
-          <span class="text-[11px] text-emerald-700/80 mt-1 block">Từ 142 lượt cá nhân & tổ chức</span>
+          <span class="text-[11px] text-emerald-700/80 mt-1 block font-medium">Tiếp nhận từ nhà hảo tâm & kiều bào</span>
         </div>
 
-        <!-- Card 2 -->
-        <div class="bg-rose-50 rounded-xl p-4 border border-rose-200">
+        <!-- Card 2: Đã giải ngân -->
+        <div class="bg-rose-50/80 rounded-xl p-4 border border-rose-200/80">
           <div class="flex items-center justify-between text-rose-700 text-xs mb-1">
-            <span class="font-semibold uppercase">Đã giải ngân (-)</span>
+            <span class="font-bold uppercase tracking-wider">Đã giải ngân (-)</span>
             <span>↘</span>
           </div>
-          <div class="text-xl sm:text-2xl font-bold text-rose-800 tracking-tight font-mono">
-            33.000.000 đ
+          <div class="text-xl sm:text-2xl font-extrabold text-rose-800 tracking-tight font-mono">
+            18.000.000 đ
           </div>
-          <span class="text-[11px] text-rose-700/80 mt-1 block">5 đợt chi có biên bản mộc đỏ</span>
+          <span class="text-[11px] text-rose-700/80 mt-1 block font-medium">Chi đúng đối tượng, có biên bản mộc đỏ</span>
         </div>
 
-        <!-- Card 3 -->
-        <div class="bg-pink-50/80 rounded-xl p-4 border border-pink-200">
+        <!-- Card 3: Số dư quỹ -->
+        <div class="bg-pink-50/80 rounded-xl p-4 border border-pink-200/80">
           <div class="flex items-center justify-between text-pink-700 text-xs mb-1">
-            <span class="font-semibold uppercase">Dư khả dụng BIDV (=)</span>
+            <span class="font-bold uppercase tracking-wider">Số dư quỹ (=)</span>
             <span>💳</span>
           </div>
-          <div class="text-xl sm:text-2xl font-bold text-pink-900 tracking-tight font-mono">
-            301.000.000 đ
+          <div class="text-xl sm:text-2xl font-extrabold text-pink-900 tracking-tight font-mono">
+            64.000.000 đ
           </div>
-          <span class="text-[11px] text-pink-700/80 mt-1 block">Tài khoản BIDV 8630100930</span>
+          <span class="text-[11px] text-pink-700/80 mt-1 block font-medium">Số dư khả dụng BIDV 8630100930</span>
         </div>
 
-        <!-- Card 4 -->
-        <div class="bg-amber-50/80 rounded-xl p-4 border border-amber-200">
+        <!-- Card 4: Lượt đóng góp -->
+        <div class="bg-amber-50/80 rounded-xl p-4 border border-amber-200/80">
           <div class="flex items-center justify-between text-amber-800 text-xs mb-1">
-            <span class="font-semibold uppercase">Mái ấm & Ca trợ giúp</span>
-            <span>🏠</span>
+            <span class="font-bold uppercase tracking-wider">Lượt đóng góp</span>
+            <span>👥</span>
           </div>
-          <div class="text-xl sm:text-2xl font-bold text-amber-900 tracking-tight">
-            23 Hộ gia đình
+          <div class="text-xl sm:text-2xl font-extrabold text-amber-900 tracking-tight font-mono">
+            5 <span class="text-sm font-sans font-normal">lượt</span>
           </div>
-          <span class="text-[11px] text-amber-700/80 mt-1 block">Phủ kín khắp 20 thôn buôn</span>
+          <span class="text-[11px] text-amber-700/80 mt-1 block font-medium">Chung tay vì 20 thôn buôn xã Ea Súp</span>
         </div>
       </div>
     </div>
@@ -370,7 +370,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="inline-flex rounded-lg bg-rose-100/70 p-1">
             <button onclick="filterTable('ALL')" id="tabAll" class="px-3 py-1.5 rounded-md text-xs font-semibold bg-rose-600 text-white shadow-sm">
-              Tất cả (5)
+              Tất cả (8)
             </button>
             <button onclick="filterTable('IN')" id="tabIn" class="px-3 py-1.5 rounded-md text-xs font-medium text-emerald-700 hover:bg-emerald-50">
               Tiền vào (+)
@@ -380,9 +380,34 @@
             </button>
           </div>
 
-          <div class="relative min-w-[240px]">
-            <input type="text" id="searchInput" placeholder="Tìm tên, nội dung, mã TID..." oninput="searchTable(this.value)" class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-rose-200 focus:border-rose-500 bg-white">
-            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="relative min-w-[220px]">
+              <input type="text" id="searchInput" placeholder="Tìm tên nhà hảo tâm, nội dung..." oninput="searchTable(this.value)" class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-rose-200 focus:border-rose-500 bg-white">
+              <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <select id="villageFilter" onchange="filterByVillage(this.value)" class="py-1.5 px-3 text-xs rounded-lg border border-rose-200 bg-white focus:border-rose-500 text-slate-700 font-medium">
+              <option value="ALL">Toàn bộ 20 thôn, buôn</option>
+              <option value="Thôn 1">Thôn 1</option>
+              <option value="Thôn 2">Thôn 2</option>
+              <option value="Thôn 3">Thôn 3</option>
+              <option value="Thôn 4">Thôn 4</option>
+              <option value="Thôn 5">Thôn 5</option>
+              <option value="Thôn 6">Thôn 6</option>
+              <option value="Thôn 7">Thôn 7</option>
+              <option value="Thôn 8">Thôn 8</option>
+              <option value="Thôn 9">Thôn 9</option>
+              <option value="Thôn 10">Thôn 10</option>
+              <option value="Thôn 11">Thôn 11</option>
+              <option value="Thôn 12">Thôn 12</option>
+              <option value="Thôn 13">Thôn 13</option>
+              <option value="Thôn 14">Thôn 14</option>
+              <option value="Thôn 15">Thôn 15</option>
+              <option value="Thôn 16">Thôn 16</option>
+              <option value="Thôn 17">Thôn 17</option>
+              <option value="Buôn A2">Buôn A2</option>
+              <option value="Buôn Drai">Buôn Drai</option>
+              <option value="Buôn Cổng">Buôn Cổng</option>
+            </select>
           </div>
         </div>
 
@@ -392,133 +417,193 @@
             <thead>
               <tr class="bg-rose-50/70 text-rose-950 font-semibold border-b border-rose-200">
                 <th class="p-3 whitespace-nowrap">Thời gian</th>
-                <th class="p-3 whitespace-nowrap">Mã TID Ngân hàng</th>
-                <th class="p-3 min-w-[260px]">Nội dung & Chiến dịch</th>
+                <th class="p-3 whitespace-nowrap">Mã giao dịch BIDV</th>
+                <th class="p-3 min-w-[260px]">Nội dung & Người gửi</th>
                 <th class="p-3 text-right whitespace-nowrap">Số tiền (VNĐ)</th>
-                <th class="p-3 text-center whitespace-nowrap">Minh chứng</th>
+                <th class="p-3 text-center whitespace-nowrap">Trạng thái / Minh chứng</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-              <!-- Row 1 -->
+              <!-- Donation 5 -->
               <tr data-type="IN" class="hover:bg-rose-50/30">
                 <td class="p-3 whitespace-nowrap">
-                  <div class="font-medium text-slate-900">Vừa xong</div>
-                  <div class="text-[10px] text-slate-400">10/09/2026 11:05</div>
+                  <div class="font-medium text-slate-900">13/09/2026</div>
+                  <div class="text-[10px] text-slate-400">16:45</div>
+                </td>
+                <td class="p-3 whitespace-nowrap">
+                  <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-[11px]">BIDV_FT262391005</span>
+                </td>
+                <td class="p-3">
+                  <div class="font-medium text-slate-800">VNN UNG HO BA CON KHO KHAN</div>
+                  <div class="text-[11px] text-slate-500 mt-0.5">Nhà hảo tâm: <strong class="text-slate-800">Trần Minh Tú</strong></div>
+                </td>
+                <td class="p-3 text-right whitespace-nowrap font-mono font-bold text-emerald-600 text-sm">
+                  +2.000.000 đ
+                </td>
+                <td class="p-3 text-center whitespace-nowrap">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Thành công
+                  </span>
+                </td>
+              </tr>
+
+              <!-- Donation 4 -->
+              <tr data-type="IN" class="hover:bg-rose-50/30">
+                <td class="p-3 whitespace-nowrap">
+                  <div class="font-medium text-slate-900">12/09/2026</div>
+                  <div class="text-[10px] text-slate-400">10:00</div>
+                </td>
+                <td class="p-3 whitespace-nowrap">
+                  <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-[11px]">BIDV_FT262391004</span>
+                </td>
+                <td class="p-3">
+                  <div class="font-medium text-slate-800">KIEU BAO UC UNG HO HO NGHEO BUON DRAI</div>
+                  <div class="text-[11px] text-slate-500 mt-0.5">Nhà hảo tâm: <strong class="text-slate-800">Lê Văn Tám (Kiều bào Úc)</strong> • <span class="text-rose-600 font-medium">Buôn Drai</span></div>
+                </td>
+                <td class="p-3 text-right whitespace-nowrap font-mono font-bold text-emerald-600 text-sm">
+                  +10.000.000 đ
+                </td>
+                <td class="p-3 text-center whitespace-nowrap">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Thành công
+                  </span>
+                </td>
+              </tr>
+
+              <!-- Donation 3 -->
+              <tr data-type="IN" class="hover:bg-rose-50/30">
+                <td class="p-3 whitespace-nowrap">
+                  <div class="font-medium text-slate-900">11/09/2026</div>
+                  <div class="text-[10px] text-slate-400">14:20</div>
                 </td>
                 <td class="p-3 whitespace-nowrap">
                   <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-[11px]">BIDV_FT262391003</span>
                 </td>
                 <td class="p-3">
-                  <div class="font-medium text-slate-800">VNN CT MOT NHA HAO TAM AN DANH UNG HO PHAU THUAT TIM</div>
-                  <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="px-1 py-0.2 rounded text-[10px] bg-rose-100 text-rose-800 font-mono font-medium">#CT01</span>
-                    <span class="text-[11px] text-slate-500">Người gửi: <strong>Nhà hảo tâm ẩn danh</strong></span>
-                  </div>
+                  <div class="font-medium text-slate-800">CONG TY EA SUP XANH UNG HO QUY VI NGUOI NGHEO</div>
+                  <div class="text-[11px] text-slate-500 mt-0.5">Doanh nghiệp: <strong class="text-slate-800">Công ty Cổ phần Ea Súp Xanh</strong></div>
                 </td>
-                <td class="p-3 text-right whitespace-nowrap font-mono font-semibold text-emerald-600">
-                  +500.000 đ
+                <td class="p-3 text-right whitespace-nowrap font-mono font-bold text-emerald-600 text-sm">
+                  +50.000.000 đ
                 </td>
-                <td class="p-3 text-center whitespace-nowrap text-emerald-600 text-[11px]">
-                  Ủng hộ trực tuyến
+                <td class="p-3 text-center whitespace-nowrap">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Thành công
+                  </span>
                 </td>
               </tr>
 
-              <!-- Row 2 -->
+              <!-- Donation 2 -->
               <tr data-type="IN" class="hover:bg-rose-50/30">
                 <td class="p-3 whitespace-nowrap">
-                  <div class="font-medium text-slate-900">1 giờ trước</div>
-                  <div class="text-[10px] text-slate-400">10/09/2026 10:20</div>
+                  <div class="font-medium text-slate-900">11/09/2026</div>
+                  <div class="text-[10px] text-slate-400">09:15</div>
                 </td>
                 <td class="p-3 whitespace-nowrap">
                   <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-[11px]">BIDV_FT262391002</span>
                 </td>
                 <td class="p-3">
-                  <div class="font-medium text-slate-800">VNN TET NGUYEN VAN AN UNG HO NGUOI NGHEO</div>
-                  <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="px-1 py-0.2 rounded text-[10px] bg-pink-100 text-pink-800 font-mono font-medium">#TET2026</span>
-                    <span class="text-[11px] text-slate-500">Người gửi: <strong>Nguyễn Văn An</strong></span>
-                  </div>
+                  <div class="font-medium text-slate-800">VNN SK UNG HO BO GIONG SINH KE</div>
+                  <div class="text-[11px] text-slate-500 mt-0.5">Nhà hảo tâm: <strong class="text-slate-800">Nguyễn Thị Mai</strong> • <span class="text-rose-600 font-medium">Thôn 12 & 14</span></div>
                 </td>
-                <td class="p-3 text-right whitespace-nowrap font-mono font-semibold text-emerald-600">
-                  +1.000.000 đ
+                <td class="p-3 text-right whitespace-nowrap font-mono font-bold text-emerald-600 text-sm">
+                  +5.000.000 đ
                 </td>
-                <td class="p-3 text-center whitespace-nowrap text-emerald-600 text-[11px]">
-                  Ủng hộ trực tuyến
+                <td class="p-3 text-center whitespace-nowrap">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Thành công
+                  </span>
                 </td>
               </tr>
 
-              <!-- Row 3 -->
+              <!-- Donation 1 -->
               <tr data-type="IN" class="hover:bg-rose-50/30">
                 <td class="p-3 whitespace-nowrap">
-                  <div class="font-medium text-slate-900">2 giờ trước</div>
-                  <div class="text-[10px] text-slate-400">10/09/2026 09:15</div>
+                  <div class="font-medium text-slate-900">10/09/2026</div>
+                  <div class="text-[10px] text-slate-400">08:30</div>
                 </td>
                 <td class="p-3 whitespace-nowrap">
                   <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-[11px]">BIDV_FT262391001</span>
                 </td>
                 <td class="p-3">
-                  <div class="font-medium text-slate-800">VNN NDDK01 CONG TY CP CAO SU DAK LAK UNG HO NHA DAI DOAN KET</div>
-                  <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="px-1 py-0.2 rounded text-[10px] bg-rose-100 text-rose-800 font-mono font-medium">#NDDK01</span>
-                    <span class="text-[11px] text-slate-500">Đơn vị: <strong>Công ty CP Cao Su Đắk Lắk</strong></span>
-                  </div>
+                  <div class="font-medium text-slate-800">VNN NDDK UNG HO XAY NHA DAI DOAN KET</div>
+                  <div class="text-[11px] text-slate-500 mt-0.5">Nhà hảo tâm: <strong class="text-slate-800">Đoàn Hoàng Phúc</strong> • <span class="text-rose-600 font-medium">Nhà Đại đoàn kết</span></div>
                 </td>
-                <td class="p-3 text-right whitespace-nowrap font-mono font-semibold text-emerald-600">
-                  +5.000.000 đ
+                <td class="p-3 text-right whitespace-nowrap font-mono font-bold text-emerald-600 text-sm">
+                  +15.000.000 đ
                 </td>
-                <td class="p-3 text-center whitespace-nowrap text-emerald-600 text-[11px]">
-                  Ủng hộ trực tuyến
+                <td class="p-3 text-center whitespace-nowrap">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Thành công
+                  </span>
                 </td>
               </tr>
 
-              <!-- Row 4 (Disbursement OUT) -->
+              <!-- Disbursement 1 -->
               <tr data-type="OUT" class="hover:bg-rose-50/40 bg-rose-50/20">
                 <td class="p-3 whitespace-nowrap">
-                  <div class="font-medium text-slate-900">Hôm qua</div>
-                  <div class="text-[10px] text-slate-400">09/09/2026 14:30</div>
+                  <div class="font-medium text-slate-900">10/09/2026</div>
+                  <div class="text-[10px] text-slate-400">10:15</div>
                 </td>
                 <td class="p-3 whitespace-nowrap">
-                  <span class="font-mono bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded text-[11px]">BIDV_FT262391004</span>
+                  <span class="font-mono bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded text-[11px]">DISB_2026_003</span>
                 </td>
                 <td class="p-3">
-                  <div class="font-medium text-slate-900">CHI GIAI NGAN HO TRO XAY NHA DAI DOAN KET HO BA Y THI BUON DRAI DOT 1</div>
-                  <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="px-1 py-0.2 rounded text-[10px] bg-rose-100 text-rose-800 font-mono font-medium">#NDDK01</span>
-                    <span class="text-[11px] text-rose-700 font-mono">Phiếu chi: PC-2026-0042</span>
-                  </div>
+                  <div class="font-medium text-slate-900">HỖ TRỢ SỬA MÁI NHÀ TRANH DỘT NÁT HỘ H'NGOAN H'ĐƠK</div>
+                  <div class="text-[11px] text-rose-700 font-medium mt-0.5">📍 Buôn Cổng • Trợ cấp bão lụt khẩn cấp</div>
                 </td>
-                <td class="p-3 text-right whitespace-nowrap font-mono font-semibold text-rose-600">
-                  -8.000.000 đ
+                <td class="p-3 text-right whitespace-nowrap font-mono font-bold text-rose-600 text-sm">
+                  -5.000.000 đ
                 </td>
                 <td class="p-3 text-center whitespace-nowrap">
-                  <button onclick="openProofModal('Phiếu Chi PC-2026-0042', 'Hỗ trợ xây nhà Đại đoàn kết bà Y Thị Buôn Drai', '8.000.000 đ', 'Hóa đơn VAT xi măng, tôn hoa sen kèm Biên bản khởi công có xác nhận của Trưởng ban CTMT Buôn Drai Y Krô Bkrông.')" class="px-2 py-0.5 rounded bg-rose-100 hover:bg-rose-200 text-rose-800 text-[11px] font-medium transition-colors">
-                    🔍 Xem hóa đơn scan
+                  <button onclick="openProofModal('Phiếu Chi PC-2026-0044', 'Sửa chữa nhà hộ H\'Ngoan H\'Đơk - Buôn Cổng', '5.000.000 đ', 'Biên bản nghiệm thu sửa chữa nhà dột nát có xác nhận của UBMTTQ xã Ea Súp và Ban CTMT Buôn Cổng.')" class="px-2 py-0.5 rounded bg-rose-100 hover:bg-rose-200 text-rose-800 text-[11px] font-medium transition-colors">
+                    🔍 Xem mộc đỏ
                   </button>
                 </td>
               </tr>
 
-              <!-- Row 5 (Disbursement OUT) -->
+              <!-- Disbursement 2 -->
               <tr data-type="OUT" class="hover:bg-rose-50/40 bg-rose-50/20">
                 <td class="p-3 whitespace-nowrap">
-                  <div class="font-medium text-slate-900">2 ngày trước</div>
-                  <div class="text-[10px] text-slate-400">08/09/2026 08:45</div>
+                  <div class="font-medium text-slate-900">09/09/2026</div>
+                  <div class="text-[10px] text-slate-400">14:30</div>
                 </td>
                 <td class="p-3 whitespace-nowrap">
-                  <span class="font-mono bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded text-[11px]">BIDV_FT262391005</span>
+                  <span class="font-mono bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded text-[11px]">DISB_2026_002</span>
                 </td>
                 <td class="p-3">
-                  <div class="font-medium text-slate-900">CHI HO TRO CHI PHI MO TIM CAP CUU CHAU H HEN MLO BUON A2</div>
-                  <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="px-1 py-0.2 rounded text-[10px] bg-rose-100 text-rose-800 font-mono font-medium">#CT01</span>
-                    <span class="text-[11px] text-rose-700 font-mono">Phiếu chi: PC-2026-0041</span>
-                  </div>
+                  <div class="font-medium text-slate-900">TRAO TẶNG BÒ GIỐNG SINH KẾ THOÁT NGHÈO HỘ TRIỆU VĂN DŨNG</div>
+                  <div class="text-[11px] text-rose-700 font-medium mt-0.5">📍 Thôn 14 • Hỗ trợ sinh kế bò sinh sản</div>
                 </td>
-                <td class="p-3 text-right whitespace-nowrap font-mono font-semibold text-rose-600">
-                  -25.000.000 đ
+                <td class="p-3 text-right whitespace-nowrap font-mono font-bold text-rose-600 text-sm">
+                  -5.000.000 đ
                 </td>
                 <td class="p-3 text-center whitespace-nowrap">
-                  <button onclick="openProofModal('Phiếu Chi PC-2026-0041', 'Cứu trợ chi phí phẫu thuật tim cháu H\'Hên Mlô', '25.000.000 đ', 'Biên nhận tạm ứng viện phí Bệnh viện Nhi Đồng 2 kèm đơn đề nghị khẩn cấp có xác nhận của UBND xã Ea Súp.')" class="px-2 py-0.5 rounded bg-rose-100 hover:bg-rose-200 text-rose-800 text-[11px] font-medium transition-colors">
-                    🔍 Xem hóa đơn scan
+                  <button onclick="openProofModal('Phiếu Chi PC-2026-0043', 'Bàn giao bò giống sinh sản hộ Triệu Văn Dũng', '5.000.000 đ', 'Hóa đơn VAT vật tư con giống và biên bản nghiệm thu bàn giao bò có xác nhận của Trưởng ban CTMT Thôn 14.')" class="px-2 py-0.5 rounded bg-rose-100 hover:bg-rose-200 text-rose-800 text-[11px] font-medium transition-colors">
+                    🔍 Xem mộc đỏ
+                  </button>
+                </td>
+              </tr>
+
+              <!-- Disbursement 3 -->
+              <tr data-type="OUT" class="hover:bg-rose-50/40 bg-rose-50/20">
+                <td class="p-3 whitespace-nowrap">
+                  <div class="font-medium text-slate-900">08/09/2026</div>
+                  <div class="text-[10px] text-slate-400">09:00</div>
+                </td>
+                <td class="p-3 whitespace-nowrap">
+                  <span class="font-mono bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded text-[11px]">DISB_2026_001</span>
+                </td>
+                <td class="p-3">
+                  <div class="font-medium text-slate-900">HỖ TRỢ XÂY NHÀ ĐẠI ĐOÀN KẾT ĐỢT 1 (ĐỔ MÓNG) HỘ BÀ Y THỊ</div>
+                  <div class="text-[11px] text-rose-700 font-medium mt-0.5">📍 Buôn Drai • Nhà Đại đoàn kết 2026</div>
+                </td>
+                <td class="p-3 text-right whitespace-nowrap font-mono font-bold text-rose-600 text-sm">
+                  -8.000.000 đ
+                </td>
+                <td class="p-3 text-center whitespace-nowrap">
+                  <button onclick="openProofModal('Phiếu Chi PC-2026-0042', 'Hỗ trợ xây nhà Đại đoàn kết bà Y Thị Buôn Drai', '8.000.000 đ', 'Hóa đơn VAT vật tư xi măng, sắt thép kèm Biên bản khởi công có xác nhận của Trưởng ban CTMT Buôn Drai.')" class="px-2 py-0.5 rounded bg-rose-100 hover:bg-rose-200 text-rose-800 text-[11px] font-medium transition-colors">
+                    🔍 Xem mộc đỏ
                   </button>
                 </td>
               </tr>
@@ -650,6 +735,417 @@
             <a href="#dong-gop" class="w-full text-center py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-sm shadow-rose-200 transition-colors">
               Chung tay tặng quà Tết
             </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SYSTEM ARCHITECTURE SECTION (KIẾN TRÚC HỆ THỐNG - ĐÃ ẨN KHỎI GIAO DIỆN WEB CHO NGƯỜI DÙNG) -->
+  <section id="kien-truc" class="hidden py-14 bg-gradient-to-b from-rose-50/40 via-white to-rose-50/20 border-t border-rose-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <!-- Section Header -->
+      <div class="text-center max-w-3xl mx-auto space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-semibold uppercase tracking-wider shadow-xs">
+          <span>🏛️ SƠ ĐỒ KIẾN TRÚC HỆ THỐNG & DÒNG CHẢY DỮ LIỆU</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          Kiến Trúc Vận Hành Dữ Liệu Chuẩn Hóa 100% Thực Tế
+        </h2>
+        <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+          Mô hình kết nối hoàn chỉnh từ Người dùng & Casso Webhook qua Cloudflare CDN, Nginx Reverse Proxy, hạ tầng Docker Container hóa trên VPS, dịch vụ đám mây ngoại vi và sao lưu dữ liệu độc lập.
+        </p>
+      </div>
+
+      <!-- 4 Highlight Cards theo 4 yêu cầu của Kiến trúc sư -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Card 1 -->
+        <div class="bg-white p-4 rounded-xl border border-rose-100 shadow-sm hover:shadow-md transition-all space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">1</span>
+            <h4 class="font-bold text-xs text-slate-900">Luồng Casso Banking Webhook</h4>
+          </div>
+          <p class="text-slate-600 text-xs leading-relaxed">
+            Đặt ngoài <strong>Internet</strong> ngang hàng người dùng. Dữ liệu đối soát BIDV đi qua <strong>Cloudflare CDN/WAF</strong> ➔ <strong>Nginx (:80/:443)</strong> ➔ chuyển tiếp an toàn vào <code>POST /api/v1/webhook/casso</code>.
+          </p>
+          <span class="inline-block px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-mono font-medium">HMAC-SHA512 + Idempotency</span>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="bg-white p-4 rounded-xl border border-rose-100 shadow-sm hover:shadow-md transition-all space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-pink-100 text-rose-800 flex items-center justify-center font-bold text-xs">2</span>
+            <h4 class="font-bold text-xs text-slate-900">External Cloud Services</h4>
+          </div>
+          <p class="text-slate-600 text-xs leading-relaxed">
+            <strong>Google Gemini 2.5 AI</strong> và <strong>Resend Email API</strong> được tách <strong>BÊN NGOÀI</strong> Docker. Next.js gọi một chiều ra Cloud qua API Key / HTTPS an toàn.
+          </p>
+          <span class="inline-block px-2 py-0.5 rounded bg-pink-50 text-rose-700 text-[10px] font-mono font-medium">Third-Party Cloud APIs</span>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="bg-white p-4 rounded-xl border border-rose-100 shadow-sm hover:shadow-md transition-all space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center font-bold text-xs">3</span>
+            <h4 class="font-bold text-xs text-slate-900">Giám Sát Dozzle & Volume</h4>
+          </div>
+          <p class="text-slate-600 text-xs leading-relaxed">
+            Thêm container <strong>Dozzle (:8888)</strong> kết nối <code>/var/run/docker.sock</code> theo dõi log container realtime. PostgreSQL 16 gắn <code>postgres_data</code> chống mất dữ liệu.
+          </p>
+          <span class="inline-block px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-[10px] font-mono font-medium">Persistent Volume: postgres_data</span>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="bg-white p-4 rounded-xl border border-rose-100 shadow-sm hover:shadow-md transition-all space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs">4</span>
+            <h4 class="font-bold text-xs text-slate-900">Host Storage Backup</h4>
+          </div>
+          <p class="text-slate-600 text-xs leading-relaxed">
+            Service <strong>Cron Backup (00:00 Daily)</strong> xuất file <code>pg_dump</code> nén <code>.sql.gz</code> lưu thẳng ra <strong>Host Storage: /var/backups/</strong> trên máy chủ VPS.
+          </p>
+          <span class="inline-block px-2 py-0.5 rounded bg-amber-50 text-amber-700 text-[10px] font-mono font-medium">Host Storage: /var/backups/</span>
+        </div>
+      </div>
+
+      <!-- Diagram Tabs & Viewport -->
+      <div class="bg-white rounded-2xl border border-rose-100 shadow-lg overflow-hidden">
+        <div class="flex flex-wrap items-center justify-between border-b border-rose-100 bg-rose-50/50 px-5 py-3 gap-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
+            <h3 class="font-bold text-xs sm:text-sm text-slate-900">Sơ Đồ Luồng Dữ Liệu Toàn Hệ Thống</h3>
+            <span class="text-[11px] text-slate-500 font-mono hidden sm:inline">• vinguoingheo.easupso.com</span>
+          </div>
+          <div class="inline-flex rounded-lg bg-white p-1 border border-rose-200 text-xs font-medium">
+            <button onclick="switchArchTab('interactive')" id="tabArchInteractive" class="px-3 py-1 rounded-md bg-rose-600 text-white font-semibold shadow-xs">
+              📊 Sơ đồ trực quan (Canvas)
+            </button>
+            <button onclick="switchArchTab('mermaid')" id="tabArchMermaid" class="px-3 py-1 rounded-md text-slate-700 hover:text-rose-600 hover:bg-rose-50">
+              📐 Sơ đồ Mermaid Live
+            </button>
+          </div>
+        </div>
+
+        <!-- VIEW 1: INTERACTIVE ARCHITECTURE CANVAS -->
+        <div id="viewArchInteractive" class="p-5 sm:p-7 space-y-6 overflow-x-auto">
+          <!-- LAYER 1: MÔI TRƯỜNG INTERNET & CLIENTS BÊN NGOÀI -->
+          <div class="p-4 rounded-xl bg-slate-50 border-2 border-dashed border-slate-300 relative space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-slate-800 text-white uppercase tracking-wider">
+                🌐 TẦNG 1: MÔI TRƯỜNG INTERNET BÊN NGOÀI (EXTERNAL CLIENTS & PARTNERS)
+              </span>
+              <span class="text-[11px] text-slate-500">Người dùng & Đối tác thanh toán ngân hàng</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Node User -->
+              <div class="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center text-lg font-bold shrink-0">👥</div>
+                <div>
+                  <h4 class="font-bold text-xs text-slate-900">Người Dân / Nhà Hảo Tâm</h4>
+                  <p class="text-[11px] text-slate-500">Xem sao kê trực tuyến, tra cứu AI, quét VietQR</p>
+                  <span class="text-[10px] font-mono text-rose-600 font-medium">HTTPS Client Request</span>
+                </div>
+              </div>
+
+              <!-- Node Casso Webhook (Yêu cầu 1: Ngang hàng người dân) -->
+              <div class="p-3.5 rounded-xl bg-emerald-50/80 border-2 border-emerald-300 shadow-xs flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-lg font-bold shrink-0">💳</div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <h4 class="font-bold text-xs text-emerald-900">Casso Banking Webhook V2</h4>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                  </div>
+                  <p class="text-[11px] text-emerald-800">Đối soát biến động số dư BIDV 8630100930 tức thời</p>
+                  <span class="text-[10px] font-mono bg-emerald-200/80 text-emerald-900 px-1 rounded font-semibold">POST /api/v1/webhook/casso</span>
+                </div>
+              </div>
+
+              <!-- Node Admin -->
+              <div class="p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-lg font-bold shrink-0">🛡️</div>
+                <div>
+                  <h4 class="font-bold text-xs text-slate-900">Cán Bộ Quỹ & Ban CTMT 20 Thôn</h4>
+                  <p class="text-[11px] text-slate-500">Đăng nhập Admin RBAC, duyệt hồ sơ chi, gửi email</p>
+                  <span class="text-[10px] font-mono text-amber-700 font-medium">Role: ADMIN | ACCOUNTANT | MONITOR</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MŨI TÊN CHUYỂN TIẾP XUỐNG CLOUDFLARE -->
+          <div class="flex flex-col items-center justify-center text-rose-600 py-1">
+            <span class="text-xs font-mono font-semibold bg-rose-50 px-3 py-1 rounded-full border border-rose-200 shadow-xs flex items-center gap-1.5">
+              <span>⬇ Mọi lưu lượng Web & Webhook đi qua Cổng Bảo Mật</span>
+              <span class="text-[10px] text-rose-700 font-bold">(SSL Full Strict & Anti-DDoS)</span>
+            </span>
+          </div>
+
+          <!-- LAYER 2: CLOUDFLARE CDN & WAF -->
+          <div class="p-4 rounded-xl bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 border-2 border-orange-300 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-orange-500 text-white flex items-center justify-center text-xl font-bold shrink-0 shadow-sm">
+                🛡️
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="font-bold text-sm text-slate-900">Cloudflare CDN & WAF Gateway</h4>
+                  <span class="px-2 py-0.2 rounded text-[10px] font-semibold bg-orange-200 text-orange-900 font-mono">Proxy Mode: On</span>
+                </div>
+                <p class="text-xs text-slate-600 mt-0.5">
+                  Tường lửa ứng dụng web (WAF), giảm tải CDN, chống tấn công DDoS, mã hóa SSL/TLS Full (Strict) cho <code>nguoingheo.easupso.com</code>
+                </p>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="text-[11px] text-orange-800 font-mono font-semibold block">DNS A Record ➔ VPS IP</span>
+              <span class="text-[10px] text-emerald-700 font-medium">Auto SSL Certificate 256-bit</span>
+            </div>
+          </div>
+
+          <!-- MŨI TÊN CHUYỂN TIẾP XUỐNG DOCKER -->
+          <div class="flex flex-col items-center justify-center text-slate-600 py-1">
+            <span class="text-xs font-mono font-semibold bg-slate-100 px-3 py-1 rounded-full border border-slate-300 shadow-xs flex items-center gap-1.5">
+              <span>⬇ Forward Traffic qua cổng :80 / :443 vào VPS Server</span>
+            </span>
+          </div>
+
+          <!-- LAYER 3: DOCKER INFRASTRUCTURE & EXTERNAL CLOUD SERVICES -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            <!-- CỘT TRÁI: DOCKER INFRASTRUCTURE TRÊN VPS (Chiếm 8 cột) -->
+            <div class="lg:col-span-8 p-5 rounded-2xl bg-slate-900 text-white border-2 border-slate-700 shadow-xl space-y-4">
+              <div class="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-slate-800 text-rose-300 uppercase tracking-wider font-mono">
+                    🐳 DOCKER INFRASTRUCTURE (VPS CLOUD SERVER)
+                  </span>
+                </div>
+                <span class="text-[11px] text-slate-400 font-mono">Network: vinguoingheo_net (Bridge)</span>
+              </div>
+
+              <!-- Nginx Reverse Proxy (Yêu cầu 4: Cổng :80 / :443 (HTTP/HTTPS)) -->
+              <div class="p-3.5 rounded-xl bg-slate-800/90 border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0">NG</div>
+                  <div>
+                    <h5 class="font-bold text-xs text-white flex items-center gap-2">
+                      <span>Nginx Reverse Proxy & SSL Gateway</span>
+                      <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 text-[10px] font-mono border border-emerald-800">:80 / :443 (HTTP/HTTPS)</span>
+                    </h5>
+                    <p class="text-[11px] text-slate-300">Nhận traffic từ Cloudflare, giải mã SSL, cấu hình upload file scan chứng từ 25MB</p>
+                  </div>
+                </div>
+                <div class="text-[10px] font-mono text-sky-300 bg-slate-950/70 p-2 rounded border border-slate-800">
+                  proxy_pass http://web:3000
+                </div>
+              </div>
+
+              <!-- Next.js 15 Web App -->
+              <div class="p-4 rounded-xl bg-gradient-to-r from-rose-950/70 via-slate-800 to-slate-800 border border-rose-500/40 space-y-2">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="text-sm font-bold text-white">🚀 Next.js 15 Standalone Web Application</span>
+                    <span class="px-2 py-0.5 rounded bg-rose-900/80 text-rose-200 text-[10px] font-mono">Container Port :3000</span>
+                  </div>
+                  <span class="text-[10px] text-emerald-400 font-mono">Prisma ORM • Next App Router</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Xử lý giao diện người dân, Live Counter, bảng kê sao kê, xác thực RBAC và tiếp nhận 
+                  <code class="text-emerald-300 font-mono bg-black/40 px-1 py-0.5 rounded">POST /api/v1/webhook/casso</code> (chống lặp Idempotency qua <code>data.id</code>).
+                </p>
+              </div>
+
+              <!-- Database & Cache & Giám sát -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <!-- PostgreSQL 16 (Yêu cầu 3: Persistent Volume postgres_data) -->
+                <div class="p-3.5 rounded-xl bg-slate-800/80 border border-blue-500/40 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="text-blue-400 font-bold">🐘</span>
+                      <h5 class="font-bold text-xs text-white">PostgreSQL 16 Database</h5>
+                    </div>
+                    <span class="px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 text-[10px] font-mono">:5432</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300">Lưu trữ giao dịch BIDV, danh mục 20 thôn buôn, minh chứng chi & logs</p>
+                  <div class="p-1.5 rounded bg-blue-950/80 border border-blue-800 text-[10px] text-blue-200 font-mono">
+                    💾 Persistent Volume: <strong>postgres_data</strong>
+                  </div>
+                </div>
+
+                <!-- Redis 7 -->
+                <div class="p-3.5 rounded-xl bg-slate-800/80 border border-rose-500/30 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="text-rose-400 font-bold">⚡</span>
+                      <h5 class="font-bold text-xs text-white">Redis 7 In-Memory Cache</h5>
+                    </div>
+                    <span class="px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 text-[10px] font-mono">:6379</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300">Cache số liệu Live Counter, giảm tải truy vấn DB và chống spam request</p>
+                  <div class="p-1.5 rounded bg-rose-950/80 border border-rose-800 text-[10px] text-rose-200 font-mono">
+                    💾 Volume: <strong>redis_data</strong>
+                  </div>
+                </div>
+
+                <!-- Dozzle Container (Yêu cầu 3: Log Viewer :8888) -->
+                <div class="p-3.5 rounded-xl bg-slate-800/80 border border-emerald-500/40 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="text-emerald-400 font-bold">📋</span>
+                      <h5 class="font-bold text-xs text-white">Dozzle Log Viewer</h5>
+                    </div>
+                    <span class="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 text-[10px] font-mono">:8888</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300">Giao diện xem nhật ký log container thời gian thực qua trình duyệt web</p>
+                  <div class="p-1.5 rounded bg-emerald-950/80 border border-emerald-800 text-[10px] text-emerald-200 font-mono">
+                    🐳 Socket: <strong>/var/run/docker.sock:ro</strong>
+                  </div>
+                </div>
+
+                <!-- Cron Backup Service (Yêu cầu 3: Host Storage /var/backups/) -->
+                <div class="p-3.5 rounded-xl bg-slate-800/80 border border-amber-500/40 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="text-amber-400 font-bold">⏰</span>
+                      <h5 class="font-bold text-xs text-white">Cron Backup Service</h5>
+                    </div>
+                    <span class="px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 text-[10px] font-mono">00:00 Daily</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300">Chạy <code>pg_dump</code> tự động nén snapshot cơ sở dữ liệu mỗi đêm</p>
+                  <div class="p-1.5 rounded bg-amber-950/80 border border-amber-800 text-[10px] text-amber-200 font-mono">
+                    💾 Host Storage: <strong>/var/backups/</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CỘT PHẢI: EXTERNAL CLOUD SERVICES & HOST STORAGE (Chiếm 4 cột - Tách biệt BÊN NGOÀI Docker) -->
+            <div class="lg:col-span-4 space-y-5">
+              <!-- KHỐI EXTERNAL CLOUD SERVICES (Yêu cầu 2: Nằm BÊN NGOÀI Docker) -->
+              <div class="p-5 rounded-2xl bg-gradient-to-br from-purple-50 via-indigo-50 to-pink-50 border-2 border-indigo-300 shadow-sm space-y-3">
+                <div class="flex items-center gap-2 border-b border-indigo-200 pb-2">
+                  <span class="w-3 h-3 rounded-full bg-indigo-600"></span>
+                  <h4 class="font-bold text-xs text-indigo-950 uppercase tracking-wider">
+                    ☁️ EXTERNAL CLOUD SERVICES (THIRD-PARTY APIS)
+                  </h4>
+                </div>
+                <p class="text-[11px] text-indigo-900 leading-relaxed">
+                  Các dịch vụ đám mây ngoại vi hoạt động <strong>hoàn toàn độc lập bên ngoài máy chủ VPS Docker</strong>, kết nối an toàn qua API Key & HTTPS:
+                </p>
+
+                <!-- Gemini AI -->
+                <div class="p-3 rounded-xl bg-white border border-indigo-200 shadow-xs space-y-1">
+                  <div class="flex items-center justify-between">
+                    <h5 class="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                      <span>🤖 Google Gemini 2.5/Flash AI</span>
+                    </h5>
+                    <span class="text-[10px] text-purple-700 font-mono font-semibold">Gemini API</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600">
+                    Vận hành Trợ lý <strong>Gem Mặt Trận Ea Súp</strong> giải đáp định mức hỗ trợ và tra cứu sao kê 24/7.
+                  </p>
+                  <span class="text-[10px] text-indigo-600 font-mono">⬅ Next.js gọi một chiều qua API Key</span>
+                </div>
+
+                <!-- Resend Email API -->
+                <div class="p-3 rounded-xl bg-white border border-indigo-200 shadow-xs space-y-1">
+                  <div class="flex items-center justify-between">
+                    <h5 class="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                      <span>📧 Resend Email API</span>
+                    </h5>
+                    <span class="text-[10px] text-emerald-700 font-mono font-semibold">SMTP Service</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600">
+                    Kích hoạt nút <strong>[ Gửi báo cáo toàn hệ thống ]</strong> phát tán email số liệu từ <code>noreply@easupso.com</code>.
+                  </p>
+                  <span class="text-[10px] text-indigo-600 font-mono">⬅ Next.js gọi một chiều qua HTTPS Token</span>
+                </div>
+              </div>
+
+              <!-- KHỐI HOST STORAGE TRÊN VPS (BÊN NGOÀI DOCKER) -->
+              <div class="p-4 rounded-2xl bg-amber-50/80 border-2 border-amber-300 shadow-xs space-y-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-amber-700 text-base">💾</span>
+                  <h4 class="font-bold text-xs text-amber-950 uppercase tracking-wider">
+                    HOST STORAGE (LƯU TRỮ TRÊN MÁY CHỦ VPS)
+                  </h4>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white border border-amber-200 text-xs space-y-1">
+                  <div class="font-mono font-bold text-amber-900 text-xs">/var/backups/</div>
+                  <p class="text-[11px] text-slate-600">
+                    Lưu trữ các bản sao lưu cơ sở dữ liệu định kỳ nén: <code>easup_charity_YYYYMMDD.sql.gz</code>. Độc lập hoàn toàn với vòng đời của container!
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 2: MERMAID LIVE RENDERER -->
+        <div id="viewArchMermaid" class="p-5 sm:p-7 hidden space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-rose-100">
+            <span class="text-xs font-semibold text-rose-700">Mã nguồn Mermaid chuẩn hóa 100% dòng chảy thực tế:</span>
+            <button onclick="copyMermaidCode()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-3 py-1 rounded-md border border-rose-200 transition-colors">
+              Sao chép mã Mermaid
+            </button>
+          </div>
+
+          <!-- Mermaid Container -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 overflow-x-auto flex justify-center">
+            <pre class="mermaid text-xs font-mono">
+graph TD
+    %% 1. Môi trường Internet & Clients bên ngoài
+    subgraph Internet_Layer ["🌐 MÔI TRƯỜNG INTERNET & CLIENT BÊN NGOÀI"]
+        User(["👥 Người Dân / Nhà Hảo Tâm<br/>(nguoingheo.easupso.com)"])
+        Casso(["💳 Casso Banking Webhook<br/>(Ngân hàng BIDV 8630100930)"])
+        AdminUser(["🛡️ Ban Vận Động / Kế Toán / 20 Thôn Buôn<br/>(Cổng Quản Trị RBAC)"])
+    end
+
+    %% Edge Security Gateway
+    Cloudflare["🛡️ Cloudflare CDN & WAF<br/>(SSL/TLS Full Strict & DDoS Protection)"]
+
+    %% 2. External Cloud Services (BÊN NGOÀI Docker)
+    subgraph External_APIs ["☁️ External Cloud Services / Third-Party APIs"]
+        Gemini["🤖 Google Gemini 2.5/Flash AI<br/>(Trợ Lý Gem Mặt Trận 24/7)"]
+        Resend["📧 Resend Email API<br/>(One-Click Dispatcher SMTP: noreply@easupso.com)"]
+    end
+
+    %% 3. VPS Host Storage (BÊN NGOÀI Docker)
+    Host_Storage[("💾 Host Storage: /var/backups/<br/>(Lưu trữ file pg_dump .sql.gz)")]
+    Docker_Socket[("🐳 Docker Socket: /var/run/docker.sock")]
+
+    %% 4. Docker Infrastructure trên VPS Server
+    subgraph Docker_Infra ["🐳 DOCKER INFRASTRUCTURE (VPS CLOUD SERVER GDATA)"]
+        Nginx["🌐 Nginx Reverse Proxy<br/>(:80 / :443 (HTTP/HTTPS))"]
+        Web["🚀 Next.js 15 Standalone Web App<br/>(Port :3000 Node.js Alpine)"]
+        Postgres[("🐘 PostgreSQL 16: vinguoingheo_db<br/>[Persistent Volume: postgres_data]")]
+        Redis[("⚡ Redis 7 Cache & Rate Limit<br/>(Live Counter & Anti-spam)")]
+        Backup["⏰ Cron Backup Service<br/>(Tự động snapshot 00:00 hằng ngày)"]
+        Dozzle["📋 Dozzle (Log Viewer :8888)<br/>(Giám sát Container Logs Thời Gian Thực)"]
+    end
+
+    %% Dòng chảy dữ liệu thực tế
+    User -->|Truy cập Web / Tra cứu sao kê / Quyên góp| Cloudflare
+    Casso -->|POST Webhook qua HTTPS| Cloudflare
+    AdminUser -->|HTTPS / Đăng nhập Quản trị| Cloudflare
+
+    Cloudflare -->|Chuyển tiếp Traffic an toàn| Nginx
+
+    Nginx -->|Proxy Pass HTTP :3000| Web
+    Nginx -->|POST /api/v1/webhook/casso| Web
+
+    Web -->|Prisma ORM Queries| Postgres
+    Web -->|Bộ đếm Live Counter & Chống trùng lặp| Redis
+
+    Web -.->|API Key / HTTPS| Gemini
+    Web -.->|API Key / HTTPS| Resend
+
+    Backup -->|pg_dump snapshot| Postgres
+    Backup -->|Xuất file backup pg_dump| Host_Storage
+
+    Docker_Socket -.->|Kết nối đọc log realtime| Dozzle
+            </pre>
           </div>
         </div>
       </div>
@@ -956,27 +1452,42 @@
       copyText(memo);
     }
 
-    function filterTable(type) {
+    let currentFilterType = 'ALL';
+    let currentVillage = 'ALL';
+    let currentSearch = '';
+
+    function applyFilters() {
       const rows = document.querySelectorAll('#ledgerTable tbody tr');
       rows.forEach(r => {
-        if (type === 'ALL' || r.getAttribute('data-type') === type) {
+        const typeMatch = currentFilterType === 'ALL' || r.getAttribute('data-type') === currentFilterType;
+        const text = r.innerText.toLowerCase();
+        const searchMatch = !currentSearch || text.includes(currentSearch);
+        const villageMatch = currentVillage === 'ALL' || text.includes(currentVillage.toLowerCase());
+
+        if (typeMatch && searchMatch && villageMatch) {
           r.style.display = '';
         } else {
           r.style.display = 'none';
         }
       });
+    }
+
+    function filterTable(type) {
+      currentFilterType = type;
       document.getElementById('tabAll').className = type === 'ALL' ? "px-3 py-1.5 rounded-md text-xs font-semibold bg-rose-600 text-white shadow-sm" : "px-3 py-1.5 rounded-md text-xs font-medium text-slate-700 hover:bg-rose-50";
       document.getElementById('tabIn').className = type === 'IN' ? "px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-600 text-white shadow-sm" : "px-3 py-1.5 rounded-md text-xs font-medium text-emerald-700 hover:bg-emerald-50";
       document.getElementById('tabOut').className = type === 'OUT' ? "px-3 py-1.5 rounded-md text-xs font-semibold bg-rose-600 text-white shadow-sm" : "px-3 py-1.5 rounded-md text-xs font-medium text-rose-700 hover:bg-rose-50";
+      applyFilters();
     }
 
     function searchTable(val) {
-      const q = val.toLowerCase().trim();
-      const rows = document.querySelectorAll('#ledgerTable tbody tr');
-      rows.forEach(r => {
-        const text = r.innerText.toLowerCase();
-        r.style.display = text.includes(q) ? '' : 'none';
-      });
+      currentSearch = val.toLowerCase().trim();
+      applyFilters();
+    }
+
+    function filterByVillage(village) {
+      currentVillage = village;
+      applyFilters();
     }
 
     function openProofModal(title, desc, amount, note) {
@@ -1040,6 +1551,97 @@
     function sendQuickPrompt(prompt) {
       document.getElementById('chatInput').value = prompt;
       handleChatSubmit(new Event('submit'));
+    }
+
+    function switchArchTab(tab) {
+      const viewInteractive = document.getElementById('viewArchInteractive');
+      const viewMermaid = document.getElementById('viewArchMermaid');
+      const btnInteractive = document.getElementById('tabArchInteractive');
+      const btnMermaid = document.getElementById('tabArchMermaid');
+
+      if (tab === 'interactive') {
+        viewInteractive.classList.remove('hidden');
+        viewMermaid.classList.add('hidden');
+        btnInteractive.className = "px-3 py-1 rounded-md bg-rose-600 text-white font-semibold shadow-xs";
+        btnMermaid.className = "px-3 py-1 rounded-md text-slate-700 hover:text-rose-600 hover:bg-rose-50";
+      } else {
+        viewInteractive.classList.add('hidden');
+        viewMermaid.classList.remove('hidden');
+        btnMermaid.className = "px-3 py-1 rounded-md bg-rose-600 text-white font-semibold shadow-xs";
+        btnInteractive.className = "px-3 py-1 rounded-md text-slate-700 hover:text-rose-600 hover:bg-rose-50";
+        if (window.mermaid) {
+          try {
+            mermaid.run();
+          } catch (e) {
+            console.log('Mermaid run error:', e);
+          }
+        }
+      }
+    }
+
+    function copyMermaidCode() {
+      const code = `graph TD
+    %% 1. Môi trường Internet & Clients bên ngoài
+    subgraph Internet_Layer ["🌐 MÔI TRƯỜNG INTERNET & CLIENT BÊN NGOÀI"]
+        User(["👥 Người Dân / Nhà Hảo Tâm<br/>(nguoingheo.easupso.com)"])
+        Casso(["💳 Casso Banking Webhook<br/>(Ngân hàng BIDV 8630100930)"])
+        AdminUser(["🛡️ Ban Vận Động / Kế Toán / 20 Thôn Buôn<br/>(Cổng Quản Trị RBAC)"])
+    end
+
+    %% Edge Security Gateway
+    Cloudflare["🛡️ Cloudflare CDN & WAF<br/>(SSL/TLS Full Strict & DDoS Protection)"]
+
+    %% 2. External Cloud Services (BÊN NGOÀI Docker)
+    subgraph External_APIs ["☁️ External Cloud Services / Third-Party APIs"]
+        Gemini["🤖 Google Gemini 2.5/Flash AI<br/>(Trợ Lý Gem Mặt Trận 24/7)"]
+        Resend["📧 Resend Email API<br/>(One-Click Dispatcher SMTP: noreply@easupso.com)"]
+    end
+
+    %% 3. VPS Host Storage (BÊN NGOÀI Docker)
+    Host_Storage[("💾 Host Storage: /var/backups/<br/>(Lưu trữ file pg_dump .sql.gz)")]
+    Docker_Socket[("🐳 Docker Socket: /var/run/docker.sock")]
+
+    %% 4. Docker Infrastructure trên VPS Server
+    subgraph Docker_Infra ["🐳 DOCKER INFRASTRUCTURE (VPS CLOUD SERVER GDATA)"]
+        Nginx["🌐 Nginx Reverse Proxy<br/>(:80 / :443 (HTTP/HTTPS))"]
+        Web["🚀 Next.js 15 Standalone Web App<br/>(Port :3000 Node.js Alpine)"]
+        Postgres[("🐘 PostgreSQL 16: vinguoingheo_db<br/>[Persistent Volume: postgres_data]")]
+        Redis[("⚡ Redis 7 Cache & Rate Limit<br/>(Live Counter & Anti-spam)")]
+        Backup["⏰ Cron Backup Service<br/>(Tự động snapshot 00:00 hằng ngày)"]
+        Dozzle["📋 Dozzle (Log Viewer :8888)<br/>(Giám sát Container Logs Thời Gian Thực)"]
+    end
+
+    %% Dòng chảy dữ liệu thực tế
+    User -->|Truy cập Web / Tra cứu sao kê / Quyên góp| Cloudflare
+    Casso -->|POST Webhook qua HTTPS| Cloudflare
+    AdminUser -->|HTTPS / Đăng nhập Quản trị| Cloudflare
+
+    Cloudflare -->|Chuyển tiếp Traffic an toàn| Nginx
+
+    Nginx -->|Proxy Pass HTTP :3000| Web
+    Nginx -->|POST /api/v1/webhook/casso| Web
+
+    Web -->|Prisma ORM Queries| Postgres
+    Web -->|Bộ đếm Live Counter & Chống trùng lặp| Redis
+
+    Web -.->|API Key / HTTPS| Gemini
+    Web -.->|API Key / HTTPS| Resend
+
+    Backup -->|pg_dump snapshot| Postgres
+    Backup -->|Xuất file backup pg_dump| Host_Storage
+
+    Docker_Socket -.->|Kết nối đọc log realtime| Dozzle`;
+      navigator.clipboard.writeText(code);
+      alert("Đã sao chép mã nguồn Mermaid Kiến trúc Hệ thống!");
+    }
+
+    // Khởi tạo Mermaid nếu có
+    if (window.mermaid) {
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'neutral',
+        securityLevel: 'loose'
+      });
     }
   </script>
 </body>
