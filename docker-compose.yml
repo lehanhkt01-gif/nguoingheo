@@ -18,7 +18,7 @@ services:
       - NEXT_PUBLIC_BIDV_ACCOUNT=8630100930
       - NEXT_PUBLIC_BIDV_BIN=970418
       - NEXT_PUBLIC_ACCOUNT_NAME=UY BAN MTTQ VN XA EA SUP
-      - NEXT_PUBLIC_SITE_URL=https://vinguoingheo.easupso.com
+      - NEXT_PUBLIC_SITE_URL=https://nguoingheo.easupso.com
     depends_on:
       db:
         condition: service_healthy
@@ -44,7 +44,7 @@ services:
     networks:
       - internal_net
 
-  # 3. Nginx Reverse Proxy đón tên miền vinguoingheo.easupso.com tại cổng 80
+  # 3. Nginx Reverse Proxy đón tên miền nguoingheo.easupso.com tại cổng 80
   nginx:
     image: nginx:alpine
     container_name: vinguoingheo_nginx
