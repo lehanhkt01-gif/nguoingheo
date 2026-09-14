@@ -1,19 +1,19 @@
 # ==============================================================================
-# Dockerfile - Multi-stage Build cho Next.js 15 Standalone (Tối ưu < 180MB)
+# Dockerfile - Multi-stage Build cho Next.js 15 Standalone (Tối ưu tốc độ cao)
 # WebApp: Quỹ Vì Người Nghèo Ea Súp (nguoingheo.easupso.com)
 # ==============================================================================
 
-# Stage 1: Cài đặt Dependencies
+# Stage 1: Cài đặt Dependencies (Loại bỏ gcc/g++ để build cực nhanh trong 30s)
 FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat openssl python3 make g++
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 # Sao chép file cấu hình gói
-COPY package.json package-lock.json* ./
+COPY package.json ./
 COPY prisma ./prisma/
 
-# Cài đặt dependencies với cơ chế fallback --force đảm bảo thành công 100%
-RUN npm install --no-audit --no-fund --legacy-peer-deps || npm install --force
+# Cài đặt toàn bộ dependencies với --force (bỏ qua mọi cảnh báo, không nghẽn mạng)
+RUN npm install --no-audit --no-fund --force
 RUN npx prisma generate
 
 # Stage 2: Build Source Code

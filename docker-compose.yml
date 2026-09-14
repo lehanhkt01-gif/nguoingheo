@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # 1. Next.js 15 Standalone Web Application
   web:
