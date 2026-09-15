@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import ChatWidget from "@/components/ai/ChatWidget";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://nguoingheo.easupso.com"),
   title: "Quỹ Vì Người Nghèo Ea Súp | Cổng Thông Tin & Sao Kê Minh Bạch 100%",
   description:
     "Cổng thông tin & Sao kê minh bạch thời gian thực tài khoản tiếp nhận duy nhất BIDV 8630100930 của Ban Thường trực UBMTTQ Việt Nam xã Ea Súp, tỉnh Đắk Lắk. Đối soát tự động qua Casso Banking.",
@@ -21,13 +22,32 @@ export const metadata: Metadata = {
     title: "Quỹ Vì Người Nghèo Ea Súp - Minh Bạch Dòng Tiền An Sinh Cấp Xã",
     description: "Toàn bộ dòng tiền tiếp nhận và giải ngân 20 thôn buôn công khai 100% trên tài khoản BIDV 8630100930.",
     url: "https://nguoingheo.easupso.com",
-    siteName: "Quỹ Vì Người Nghèo Ea Súp",
+    siteName: "Quỹ Vì Người Nghèo Xã Ea Súp",
+    images: [
+      {
+        url: "/images/og-review.png",
+        width: 1200,
+        height: 630,
+        alt: "Cổng Thông Tin & Sao Kê Quỹ Vì Người Nghèo Xã Ea Súp",
+      },
+    ],
     locale: "vi_VN",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Quỹ Vì Người Nghèo Ea Súp - Minh Bạch Dòng Tiền An Sinh Cấp Xã",
+    description: "Toàn bộ dòng tiền tiếp nhận và giải ngân 20 thôn buôn công khai 100% trên tài khoản BIDV 8630100930.",
+    images: ["/images/og-review.png"],
+  },
   icons: {
-    icon: "/favicon.png",
-    apple: "/favicon.png",
+    icon: [
+      { url: "/images/logo-mttq.png", type: "image/png" },
+      { url: "/favicon.ico" },
+      { url: "/favicon.png", type: "image/png" },
+    ],
+    shortcut: "/images/logo-mttq.png",
+    apple: "/images/logo-mttq.png",
   },
 };
 
@@ -39,6 +59,9 @@ export default function RootLayout({
   return (
     <html lang="vi" className="scroll-smooth">
       <head>
+        <link rel="icon" href="/images/logo-mttq.png" type="image/png" />
+        <link rel="shortcut icon" href="/images/logo-mttq.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/images/logo-mttq.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
