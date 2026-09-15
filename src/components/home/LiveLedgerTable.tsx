@@ -108,6 +108,18 @@ export default function LiveLedgerTable() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(DEFAULT_TRANSACTIONS.length);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Kiểm tra quyền admin
+  useEffect(() => {
+    const checkAuth = () => {
+      const loggedIn = typeof window !== "undefined" && localStorage.getItem("admin_logged_in") === "true";
+      setIsAdmin(loggedIn);
+    };
+    checkAuth();
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
+  }, []);
 
   // Thống kê tổng hợp
   const [stats, setStats] = useState({
@@ -247,15 +259,17 @@ export default function LiveLedgerTable() {
                 <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin text-rose-600" : ""}`} />
               </button>
 
-              <a
-                href="/api/v1/export/excel"
-                target="_blank"
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold shadow-2xs transition-colors"
-                title="Tải toàn bộ file Excel sao kê"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Xuất Excel</span>
-              </a>
+              {isAdmin && (
+                <a
+                  href="/api/v1/export/excel"
+                  target="_blank"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold shadow-2xs transition-colors"
+                  title="Tải toàn bộ file Excel sao kê"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Xuất Excel</span>
+                </a>
+              )}
             </div>
           </div>
         </div>

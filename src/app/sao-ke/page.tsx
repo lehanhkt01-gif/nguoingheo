@@ -62,6 +62,17 @@ export default function SaoKePage() {
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const loggedIn = typeof window !== "undefined" && localStorage.getItem("admin_logged_in") === "true";
+      setIsAdmin(loggedIn);
+    };
+    checkAuth();
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
+  }, []);
 
   // Modal xem chứng từ
   const [viewingProof, setViewingProof] = useState<TransactionItem | null>(null);
@@ -114,16 +125,18 @@ export default function SaoKePage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <a
-              href="/api/v1/export/excel"
-              target="_blank"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold shadow-sm transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              <span>Xuất Excel Sao Kê BIDV</span>
-            </a>
-          </div>
+          {isAdmin && (
+            <div className="flex items-center gap-3">
+              <a
+                href="/api/v1/export/excel"
+                target="_blank"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold shadow-sm transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                <span>Xuất Excel Sao Kê BIDV</span>
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Thẻ Thống Kê Tài Khoản BIDV 8630100930 */}
