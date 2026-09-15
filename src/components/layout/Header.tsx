@@ -183,15 +183,9 @@ export default function Header() {
                 Đăng nhập
               </Link>
             )}
-            <a
-              href="#dong-gop"
-              className="px-2.5 py-1 rounded-md bg-rose-600 text-white text-xs font-medium"
-            >
-              Ủng hộ
-            </a>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-md text-slate-600 hover:bg-rose-50"
+              className="p-1.5 rounded-md text-slate-600 hover:bg-rose-50 cursor-pointer"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
