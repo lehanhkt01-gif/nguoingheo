@@ -73,7 +73,7 @@ export default function AdminLoginPage() {
                 HỆ THỐNG QUẢN TRỊ AN SINH XÃ HỘI EA SÚP
               </h1>
               <p className="text-[11px] text-rose-100/90 font-medium">
-                Ủy ban Mặt trận Tổ quốc Việt Nam xã Ea Súp - Tỉnh Đắk Lắk
+                Ủy ban MTTQ xã Ea Súp - Tỉnh Đắk Lắk
               </p>
             </div>
           </div>

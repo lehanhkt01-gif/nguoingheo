@@ -142,25 +142,18 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-16">
-      {/* Admin Top Navbar */}
-      <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2 group">
-              <img
-                src="/images/logo-mttq.png"
-                alt="Mặt trận Tổ quốc Việt Nam"
-                className="w-10 h-10 object-contain drop-shadow-sm"
-              />
-              <div>
-                <span className="text-[10px] uppercase font-bold text-rose-700 tracking-wider block">
-                  BẢNG ĐIỀU KHIỂN QUẢN TRỊ
-                </span>
-                <span className="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight">
-                  QUỸ VÌ NGƯỜI NGHÈO XÃ EA SÚP
-                </span>
-              </div>
-            </Link>
+      {/* Thanh công cụ quản trị (Gọn gàng, không lặp lại Logo và Tên quỹ của Header chính) */}
+      <div className="bg-white border-b border-slate-200 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold uppercase tracking-wide">
+              <ShieldCheck className="w-4 h-4 text-rose-600" />
+              <span>Bảng điều khiển Quản trị</span>
+            </span>
+            <span className="text-xs text-slate-300 hidden md:inline">|</span>
+            <span className="text-xs text-slate-500 font-medium hidden md:inline">
+              Hệ thống đối soát &amp; an sinh xã hội 20 thôn buôn
+            </span>
           </div>
 
           <div className="flex items-center gap-3">
@@ -175,7 +168,7 @@ export default function AdminDashboardPage() {
 
             {/* Thông tin Cán bộ */}
             <div className="flex items-center gap-2.5 pl-3 border-l border-slate-200">
-              <div className="w-8 h-8 rounded-full bg-rose-100 border border-rose-200 text-rose-800 font-bold flex items-center justify-center text-xs">
+              <div className="w-7 h-7 rounded-full bg-rose-100 border border-rose-200 text-rose-800 font-bold flex items-center justify-center text-xs">
                 LH
               </div>
               <div className="hidden md:block text-left">
@@ -199,7 +192,7 @@ export default function AdminDashboardPage() {
             </button>
           </div>
         </div>
-      </header>
+      </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         {/* Banner thông báo trạng thái đồng bộ */}

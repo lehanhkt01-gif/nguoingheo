@@ -70,7 +70,7 @@ export default function Header() {
             />
             <div>
               <div className="text-[10px] sm:text-[11px] uppercase tracking-wider font-bold text-rose-700">
-                ỦY BAN MẶT TRẬN TỔ QUỐC VIỆT NAM XÃ EA SÚP
+                ỦY BAN MTTQ XÃ EA SÚP
               </div>
               <h1 className="text-xs sm:text-base font-extrabold text-slate-900 tracking-tight group-hover:text-rose-600 transition-colors uppercase">
                 QUỸ VÌ NGƯỜI NGHÈO
