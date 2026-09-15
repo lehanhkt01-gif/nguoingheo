@@ -1,6 +1,5 @@
 import Link from "next/link";
 import HeroBanner from "@/components/home/HeroBanner";
-import CounterDashboard from "@/components/home/CounterDashboard";
 import VietQRWidget from "@/components/home/VietQRWidget";
 import LiveLedgerTable from "@/components/home/LiveLedgerTable";
 import SocialWelfareList from "@/components/home/SocialWelfareList";
@@ -14,10 +13,7 @@ export default function HomePage() {
       {/* 1. Hero Banner văn hóa Tây Nguyên Ea Súp tông hồng tươi sáng */}
       <HeroBanner />
 
-      {/* 2. Khối thống kê: 4 thẻ số liệu to rõ, trang nhã */}
-      <CounterDashboard />
-
-      {/* 3. Widget Đóng góp VietQR NAPAS 247 cho tài khoản BIDV 8630100930 */}
+      {/* 2. Widget Đóng góp VietQR NAPAS 247 cho tài khoản BIDV 8630100930 */}
       <VietQRWidget />
 
       {/* 4. Bảng sao kê trực tuyến minh bạch: Tự động tải từ API, tìm kiếm tên, lọc 20 thôn buôn */}
