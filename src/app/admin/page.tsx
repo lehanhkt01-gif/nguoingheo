@@ -19,7 +19,13 @@ import {
   PlusCircle,
   ExternalLink,
   ArrowLeft,
-  Gift
+  Gift,
+  Bot,
+  Eye,
+  EyeOff,
+  Sparkles,
+  Save,
+  AlertCircle
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
@@ -28,6 +34,15 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState<string | null>(null);
+
+  // Cấu hình Gemini API cho Chatbot Gem
+  const [apiKeyInput, setApiKeyInput] = useState("");
+  const [showKey, setShowKey] = useState(false);
+  const [customPrompt, setCustomPrompt] = useState("");
+  const [hasApiKey, setHasApiKey] = useState(false);
+  const [testingKey, setTestingKey] = useState(false);
+  const [savingKey, setSavingKey] = useState(false);
+  const [keyStatusMsg, setKeyStatusMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const [stats, setStats] = useState({
     totalDonations: 82000000,
@@ -92,7 +107,77 @@ export default function AdminDashboardPage() {
         }
       })
       .catch(() => {});
+
+    // Tải cấu hình Gemini API hiện tại
+    fetch("/api/v1/admin/settings")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.settings) {
+          setHasApiKey(Boolean(d.settings.hasKey));
+          if (d.settings.geminiApiKey) {
+            setApiKeyInput(d.settings.geminiApiKey);
+          }
+          if (d.settings.systemPrompt) {
+            setCustomPrompt(d.settings.systemPrompt);
+          }
+        }
+      })
+      .catch(() => {});
   }, [router]);
+
+  const handleTestGeminiKey = async () => {
+    if (!apiKeyInput.trim()) {
+      setKeyStatusMsg({ type: "error", text: "Vui lòng nhập Google Gemini API Key trước khi kiểm tra!" });
+      return;
+    }
+    setTestingKey(true);
+    setKeyStatusMsg(null);
+    try {
+      const res = await fetch("/api/v1/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "test", geminiApiKey: apiKeyInput }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setKeyStatusMsg({ type: "success", text: data.message });
+      } else {
+        setKeyStatusMsg({ type: "error", text: data.message });
+      }
+    } catch (err: any) {
+      setKeyStatusMsg({ type: "error", text: "Không thể kết nối đến máy chủ kiểm tra API!" });
+    } finally {
+      setTestingKey(false);
+    }
+  };
+
+  const handleSaveGeminiSettings = async () => {
+    setSavingKey(true);
+    setKeyStatusMsg(null);
+    try {
+      const res = await fetch("/api/v1/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "save",
+          geminiApiKey: apiKeyInput,
+          systemPrompt: customPrompt,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setHasApiKey(data.settings?.hasKey);
+        setKeyStatusMsg({ type: "success", text: data.message });
+        setTimeout(() => setKeyStatusMsg(null), 5000);
+      } else {
+        setKeyStatusMsg({ type: "error", text: data.message });
+      }
+    } catch (err: any) {
+      setKeyStatusMsg({ type: "error", text: "Lỗi lưu cấu hình vào hệ thống!" });
+    } finally {
+      setSavingKey(false);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -317,6 +402,131 @@ export default function AdminDashboardPage() {
             </div>
             <div className="text-[11px] text-slate-500 pt-1 border-t border-slate-100">
               {stats.activeCampaigns} chiến dịch trọng điểm đang mở
+            </div>
+          </div>
+        {/* Khối Cấu Hình Kết Nối Gemini API cho Chatbot Gem */}
+        <div className="bg-white rounded-2xl border border-rose-200/80 shadow-xs overflow-hidden">
+          <div className="p-4 sm:p-5 bg-gradient-to-r from-rose-50/60 via-pink-50/40 to-white border-b border-rose-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-600 to-pink-600 text-white flex items-center justify-center shadow-xs">
+                <Bot className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-sm text-slate-900">
+                    Cấu Hình Kết Nối Trợ Lý AI Gem Mặt Trận (Google Gemini 2.5)
+                  </h3>
+                  {hasApiKey ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Đã kết nối API
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                      <AlertCircle className="w-3 h-3 text-amber-600" />
+                      Chưa nạp API Key
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Nhập mã khóa Google Gemini API để trợ lý AI tự động giải đáp về sao kê, thu/chi, số dư quỹ và thông tin 20 thôn buôn 24/7.
+                </p>
+              </div>
+            </div>
+
+            <a
+              href="https://aistudio.google.com/app/apikey"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 hover:text-rose-800 hover:underline shrink-0"
+            >
+              <span>Lấy API Key miễn phí tại Google AI Studio</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+
+          <div className="p-4 sm:p-5 space-y-4">
+            {keyStatusMsg && (
+              <div
+                className={`p-3.5 rounded-xl text-xs flex items-center gap-2.5 animate-in fade-in ${
+                  keyStatusMsg.type === "success"
+                    ? "bg-emerald-50 text-emerald-900 border border-emerald-200"
+                    : "bg-red-50 text-red-900 border border-red-200"
+                }`}
+              >
+                {keyStatusMsg.type === "success" ? (
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                )}
+                <span>{keyStatusMsg.text}</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Cột 1: Nhập API Key */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-700">
+                  Google Gemini API Key (Bắt buộc)
+                </label>
+                <div className="relative">
+                  <input
+                    type={showKey ? "text" : "password"}
+                    value={apiKeyInput}
+                    onChange={(e) => setApiKeyInput(e.target.value)}
+                    placeholder="Dán mã API Key của bạn (VD: AIzaSy...)"
+                    className="w-full pl-3 pr-10 py-2 text-xs rounded-xl border border-slate-200 font-mono focus:border-rose-600 focus:ring-1 focus:ring-rose-600 bg-slate-50/50"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowKey(!showKey)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                    title={showKey ? "Ẩn khóa" : "Hiện khóa"}
+                  >
+                    {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Khóa API được mã hóa và lưu trữ an toàn trên máy chủ VPS, phục vụ riêng cho Chatbot Gem.
+                </p>
+              </div>
+
+              {/* Cột 2: Ghi chú / Chỉ đạo bổ sung cho AI Prompt (Tùy chọn) */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-700">
+                  Chỉ đạo bổ sung cho AI Prompt (Tùy chọn)
+                </label>
+                <textarea
+                  rows={2}
+                  value={customPrompt}
+                  onChange={(e) => setCustomPrompt(e.target.value)}
+                  placeholder="Ghi chú thêm thông tin chỉ đạo cho AI (VD: Nhấn mạnh chiến dịch Tết Bính Ngọ đang diễn ra...)"
+                  className="w-full p-2.5 text-xs rounded-xl border border-slate-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600 bg-slate-50/50"
+                />
+              </div>
+            </div>
+
+            {/* Các nút hành động */}
+            <div className="flex flex-wrap items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={handleTestGeminiKey}
+                disabled={testingKey || !apiKeyInput.trim()}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer"
+              >
+                <Sparkles className={`w-3.5 h-3.5 text-amber-500 ${testingKey ? "animate-spin" : ""}`} />
+                <span>{testingKey ? "Đang kiểm tra kết nối..." : "Kiểm tra kết nối (Test API Key)"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSaveGeminiSettings}
+                disabled={savingKey}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-sm transition-all disabled:opacity-60 cursor-pointer"
+              >
+                <Save className="w-3.5 h-3.5" />
+                <span>{savingKey ? "Đang lưu..." : "Lưu cấu hình Gemini"}</span>
+              </button>
             </div>
           </div>
         </div>
