@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShieldCheck, Mail, MapPin, Landmark, Award } from "lucide-react";
+import { ShieldCheck, Mail, MapPin, Landmark, Award, Phone } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -82,14 +82,20 @@ export default function Footer() {
             <p className="text-slate-400 leading-relaxed text-xs">
               Quản lý và hỗ trợ toàn diện <strong>17 thôn</strong> và <strong>03 buôn</strong> (Buôn A, Buôn B, Buôn C).
             </p>
-            <div className="space-y-1 pt-1 text-slate-300 text-xs">
+            <div className="space-y-1.5 pt-1 text-slate-300 text-xs">
               <div className="flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                 <span>Trụ sở UBMTTQ Việt Nam xã Ea Súp, Đắk Lắk</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                <span>ubmttq.easup@gmail.com</span>
+                <a href="mailto:easupsohoa@gmail.com" className="hover:text-rose-400 transition-colors">
+                  easupsohoa@gmail.com
+                </a>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                <span>Hotline / Zalo: <a href="tel:0888023023" className="hover:text-rose-400 font-bold text-white transition-colors">0888.023.023</a></span>
               </div>
             </div>
           </div>
