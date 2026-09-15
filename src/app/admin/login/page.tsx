@@ -7,8 +7,8 @@ import { Lock, User, ShieldCheck, ArrowRight, ArrowLeft, Eye, EyeOff } from "luc
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("admin_easup");
-  const [password, setPassword] = useState("EaSup@Admin2026!");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -49,16 +49,16 @@ export default function AdminLoginPage() {
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 hover:text-rose-800 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Về trang chủ Quỹ Vì Người Nghèo</span>
+          <span>Quay lại trang chủ</span>
         </Link>
-        <span className="text-[11px] font-mono text-slate-400">Ea Súp Số 2026</span>
+        <span className="text-[11px] text-slate-500 font-medium">Bảo mật SSL 256-bit</span>
       </div>
 
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl shadow-rose-100/50 border border-rose-100 overflow-hidden">
-        {/* Header có logo MTTQ */}
-        <div className="bg-gradient-to-r from-rose-700 via-rose-600 to-pink-600 p-6 sm:p-7 text-white text-center relative overflow-hidden">
-          <div className="relative z-10 space-y-2">
-            <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-2 flex items-center justify-center mx-auto shadow-inner">
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-rose-100/50 border border-rose-100 overflow-hidden">
+        {/* Header Form màu Hồng Đỏ Mặt Trận sang trọng */}
+        <div className="bg-gradient-to-r from-rose-600 via-pink-600 to-rose-700 p-6 sm:p-8 text-white text-center relative overflow-hidden">
+          <div className="relative z-10 flex flex-col items-center gap-3">
+            <div className="w-16 h-16 rounded-2xl bg-white p-2.5 shadow-md flex items-center justify-center">
               <img
                 src="/images/logo-mttq.png"
                 alt="Mặt trận Tổ quốc Việt Nam"
@@ -83,7 +83,7 @@ export default function AdminLoginPage() {
           <div className="absolute -left-6 -top-6 w-28 h-28 bg-white/5 rounded-full pointer-events-none" />
         </div>
 
-        {/* Form đăng nhập chuẩn Bitwarden */}
+        {/* Form đăng nhập */}
         <form
           id="admin-login-form"
           method="POST"
@@ -97,7 +97,7 @@ export default function AdminLoginPage() {
             </div>
           )}
 
-          {/* Ô TÀI KHOẢN CHUẨN BITWARDEN */}
+          {/* Ô TÀI KHOẢN */}
           <div className="space-y-1.5">
             <label
               htmlFor="username"
@@ -116,12 +116,12 @@ export default function AdminLoginPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl border border-slate-300 focus:border-rose-600 focus:ring-2 focus:ring-rose-500/20 bg-slate-50/50 focus:bg-white transition-all text-slate-900 font-medium"
-                placeholder="Nhập tên tài khoản quản trị (vd: admin_easup)..."
+                placeholder="Nhập tên tài khoản quản trị..."
               />
             </div>
           </div>
 
-          {/* Ô MẬT KHẨU CHUẨN BITWARDEN */}
+          {/* Ô MẬT KHẨU */}
           <div className="space-y-1.5">
             <div className="flex justify-between items-center">
               <label
@@ -160,20 +160,6 @@ export default function AdminLoginPage() {
                 className="w-full pl-9 pr-10 py-2.5 text-xs rounded-xl border border-slate-300 focus:border-rose-600 focus:ring-2 focus:ring-rose-500/20 bg-slate-50/50 focus:bg-white transition-all text-slate-900 font-medium font-mono"
                 placeholder="••••••••••••"
               />
-            </div>
-          </div>
-
-          {/* Gợi ý thông tin kiểm thử */}
-          <div className="bg-rose-50/60 p-3 rounded-xl border border-rose-100 text-[11px] text-slate-600 space-y-1">
-            <div className="font-semibold text-rose-900 flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-rose-600" />
-              <span>Tài khoản Quản trị mặc định (Bitwarden Autofill):</span>
-            </div>
-            <div className="text-slate-700 pl-5">
-              • Tài khoản: <code className="font-bold text-rose-700 bg-white px-1.5 py-0.5 rounded border border-rose-200">admin_easup</code>
-            </div>
-            <div className="text-slate-700 pl-5">
-              • Mật khẩu: <code className="font-bold text-rose-700 bg-white px-1.5 py-0.5 rounded border border-rose-200">EaSup@Admin2026!</code>
             </div>
           </div>
 
