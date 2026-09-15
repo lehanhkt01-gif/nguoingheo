@@ -1,8 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { formatVND, formatDate } from "@/lib/utils";
-import { Heart, Gift, CheckCircle2, FileText, MapPin, Eye } from "lucide-react";
+import {
+  Heart,
+  Gift,
+  CheckCircle2,
+  FileText,
+  MapPin,
+  Plus,
+  Edit3,
+  Trash2,
+  X,
+  ShieldCheck,
+  Save,
+  RotateCcw
+} from "lucide-react";
 
 interface WelfareCase {
   id: number;
@@ -24,7 +37,30 @@ interface GiftBatch {
   proofNote: string;
 }
 
-const SAMPLE_CASES: WelfareCase[] = [
+const VILLAGES = [
+  "Buôn Drai",
+  "Buôn Cổng",
+  "Buôn A2",
+  "Thôn 1",
+  "Thôn 2",
+  "Thôn 3",
+  "Thôn 4",
+  "Thôn 5",
+  "Thôn 6",
+  "Thôn 7",
+  "Thôn 8",
+  "Thôn 9",
+  "Thôn 10",
+  "Thôn 11",
+  "Thôn 12",
+  "Thôn 13",
+  "Thôn 14",
+  "Thôn 15",
+  "Thôn 16",
+  "Thôn 17",
+];
+
+const DEFAULT_CASES: WelfareCase[] = [
   {
     id: 1,
     recipientName: "Bà Y Thị",
@@ -54,7 +90,7 @@ const SAMPLE_CASES: WelfareCase[] = [
   },
 ];
 
-const SAMPLE_GIFT_BATCHES: GiftBatch[] = [
+const DEFAULT_GIFT_BATCHES: GiftBatch[] = [
   {
     id: 1,
     title: "Trao tặng hỗ trợ xây nhà Đại đoàn kết đợt 1 (Đổ móng kiên cố)",
@@ -86,6 +122,187 @@ const SAMPLE_GIFT_BATCHES: GiftBatch[] = [
 
 export default function SocialWelfareList() {
   const [activeTab, setActiveTab] = useState<"CASES" | "GIFTS">("CASES");
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Danh sách dữ liệu
+  const [cases, setCases] = useState<WelfareCase[]>(DEFAULT_CASES);
+  const [giftBatches, setGiftBatches] = useState<GiftBatch[]>(DEFAULT_GIFT_BATCHES);
+
+  // Modal Hoàn cảnh
+  const [isCaseModalOpen, setIsCaseModalOpen] = useState(false);
+  const [editingCaseId, setEditingCaseId] = useState<number | null>(null);
+  const [caseForm, setCaseForm] = useState<Omit<WelfareCase, "id">>({
+    recipientName: "",
+    village: "Buôn Drai",
+    situation: "",
+    targetAmount: 50000000,
+    currentAmount: 0,
+    imageUrl: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80",
+  });
+
+  // Modal Đợt trao quà
+  const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
+  const [editingGiftId, setEditingGiftId] = useState<number | null>(null);
+  const [giftForm, setGiftForm] = useState<Omit<GiftBatch, "id">>({
+    title: "",
+    village: "Buôn Drai",
+    recipientCount: 1,
+    amount: 5000000,
+    date: new Date().toISOString().split("T")[0],
+    proofNote: "Biên bản bàn giao có xác nhận của UBMTTQ xã Ea Súp",
+  });
+
+  // Kiểm tra quyền admin
+  useEffect(() => {
+    const checkAuth = () => {
+      const loggedIn = typeof window !== "undefined" && localStorage.getItem("admin_logged_in") === "true";
+      setIsAdmin(loggedIn);
+    };
+    checkAuth();
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
+  }, []);
+
+  // Đọc dữ liệu từ localStorage khi tải trang
+  useEffect(() => {
+    try {
+      const storedCases = localStorage.getItem("vinguoingheo_cases");
+      if (storedCases) setCases(JSON.parse(storedCases));
+      const storedGifts = localStorage.getItem("vinguoingheo_gifts");
+      if (storedGifts) setGiftBatches(JSON.parse(storedGifts));
+    } catch {}
+  }, []);
+
+  // Lưu dữ liệu vào localStorage
+  const updateCases = (newCases: WelfareCase[]) => {
+    setCases(newCases);
+    try {
+      localStorage.setItem("vinguoingheo_cases", JSON.stringify(newCases));
+    } catch {}
+  };
+
+  const updateGifts = (newGifts: GiftBatch[]) => {
+    setGiftBatches(newGifts);
+    try {
+      localStorage.setItem("vinguoingheo_gifts", JSON.stringify(newGifts));
+    } catch {}
+  };
+
+  // --- Xử lý Hoàn cảnh ---
+  const handleOpenAddCase = () => {
+    setEditingCaseId(null);
+    setCaseForm({
+      recipientName: "",
+      village: "Buôn Drai",
+      situation: "",
+      targetAmount: 50000000,
+      currentAmount: 0,
+      imageUrl: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80",
+    });
+    setIsCaseModalOpen(true);
+  };
+
+  const handleOpenEditCase = (item: WelfareCase) => {
+    setEditingCaseId(item.id);
+    setCaseForm({
+      recipientName: item.recipientName,
+      village: item.village,
+      situation: item.situation,
+      targetAmount: item.targetAmount,
+      currentAmount: item.currentAmount,
+      imageUrl: item.imageUrl,
+    });
+    setIsCaseModalOpen(true);
+  };
+
+  const handleSaveCase = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!caseForm.recipientName.trim()) return;
+
+    if (editingCaseId !== null) {
+      // Cập nhật
+      const updated = cases.map((c) =>
+        c.id === editingCaseId ? { ...c, ...caseForm } : c
+      );
+      updateCases(updated);
+    } else {
+      // Tạo mới
+      const newCase: WelfareCase = {
+        id: Date.now(),
+        ...caseForm,
+      };
+      updateCases([newCase, ...cases]);
+    }
+    setIsCaseModalOpen(false);
+  };
+
+  const handleDeleteCase = (id: number) => {
+    if (window.confirm("Quý vị có chắc chắn muốn xóa hoàn cảnh khó khăn này?")) {
+      const updated = cases.filter((c) => c.id !== id);
+      updateCases(updated);
+    }
+  };
+
+  // --- Xử lý Đợt trao quà ---
+  const handleOpenAddGift = () => {
+    setEditingGiftId(null);
+    setGiftForm({
+      title: "",
+      village: "Buôn Drai",
+      recipientCount: 1,
+      amount: 5000000,
+      date: new Date().toISOString().split("T")[0],
+      proofNote: "Biên bản bàn giao có xác nhận của UBMTTQ xã Ea Súp",
+    });
+    setIsGiftModalOpen(true);
+  };
+
+  const handleOpenEditGift = (item: GiftBatch) => {
+    setEditingGiftId(item.id);
+    setGiftForm({
+      title: item.title,
+      village: item.village,
+      recipientCount: item.recipientCount,
+      amount: item.amount,
+      date: item.date,
+      proofNote: item.proofNote,
+    });
+    setIsGiftModalOpen(true);
+  };
+
+  const handleSaveGift = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!giftForm.title.trim()) return;
+
+    if (editingGiftId !== null) {
+      const updated = giftBatches.map((g) =>
+        g.id === editingGiftId ? { ...g, ...giftForm } : g
+      );
+      updateGifts(updated);
+    } else {
+      const newGift: GiftBatch = {
+        id: Date.now(),
+        ...giftForm,
+      };
+      updateGifts([newGift, ...giftBatches]);
+    }
+    setIsGiftModalOpen(false);
+  };
+
+  const handleDeleteGift = (id: number) => {
+    if (window.confirm("Quý vị có chắc chắn muốn xóa đợt trao quà này?")) {
+      const updated = giftBatches.filter((g) => g.id !== id);
+      updateGifts(updated);
+    }
+  };
+
+  // Khôi phục mặc định
+  const handleResetDefaults = () => {
+    if (window.confirm("Khôi phục danh sách về dữ liệu mẫu ban đầu?")) {
+      updateCases(DEFAULT_CASES);
+      updateGifts(DEFAULT_GIFT_BATCHES);
+    }
+  };
 
   return (
     <section id="an-sinh" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -98,7 +315,7 @@ export default function SocialWelfareList() {
               <span>An Sinh Xã Hội 20 Thôn Buôn</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-              Hoàn Cảnh Khó Khăn & Các Đợt Trao Quà Thực Tế
+              Hoàn Cảnh Khó Khăn &amp; Các Đợt Trao Quà Thực Tế
             </h2>
             <p className="text-slate-600 text-xs sm:text-sm mt-1">
               Khảo sát trực tiếp từ 20 thôn buôn. Mọi khoản giải ngân đều có biên bản nghiệm thu và chứng từ mộc đỏ.
@@ -115,7 +332,7 @@ export default function SocialWelfareList() {
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Hoàn cảnh cần giúp đỡ
+              Hoàn cảnh cần giúp đỡ ({cases.length})
             </button>
             <button
               onClick={() => setActiveTab("GIFTS")}
@@ -125,20 +342,70 @@ export default function SocialWelfareList() {
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Đợt trao quà đã chi
+              Đợt trao quà đã chi ({giftBatches.length})
             </button>
           </div>
         </div>
 
+        {/* Thanh công cụ dành cho Cán bộ Quản trị khi ĐÃ ĐĂNG NHẬP ADMIN */}
+        {isAdmin && (
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-50 via-pink-50 to-rose-50 border border-rose-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-xs font-bold text-rose-900 block">
+                  Quyền Quản Trị Cán Bộ UBMTTQ Xã Ea Súp
+                </span>
+                <span className="text-[11px] text-slate-600">
+                  Bạn đang đăng nhập admin: có toàn quyền thêm mới, sửa và xóa thông tin.
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              {activeTab === "CASES" ? (
+                <button
+                  type="button"
+                  onClick={handleOpenAddCase}
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm shadow-rose-200 transition-all cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tạo hoàn cảnh mới</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleOpenAddGift}
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm shadow-rose-200 transition-all cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tạo đợt trao quà mới</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={handleResetDefaults}
+                title="Khôi phục dữ liệu mẫu ban đầu"
+                className="p-2 rounded-xl border border-rose-200 bg-white hover:bg-rose-100 text-slate-600 text-xs transition-colors"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Tab 1: Các Hoàn Cảnh Cần Giúp Đỡ */}
         {activeTab === "CASES" && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {SAMPLE_CASES.map((item) => {
+            {cases.map((item) => {
               const percent = Math.min(100, Math.round((item.currentAmount / item.targetAmount) * 100));
               return (
                 <div
                   key={item.id}
-                  className="bg-white rounded-2xl border border-rose-100 shadow-md hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between"
+                  className="bg-white rounded-2xl border border-rose-100 shadow-md hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group"
                 >
                   <div>
                     <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
@@ -151,12 +418,41 @@ export default function SocialWelfareList() {
                         <MapPin className="w-3 h-3" />
                         <span>{item.village}</span>
                       </div>
+
+                      {/* Nút Sửa / Xóa cho Admin trên từng thẻ */}
+                      {isAdmin && (
+                        <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm p-1 rounded-lg">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditCase(item)}
+                            className="p-1.5 rounded bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition-colors shadow-xs"
+                            title="Chỉnh sửa hoàn cảnh này"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteCase(item.id)}
+                            className="p-1.5 rounded bg-white hover:bg-red-50 text-slate-700 hover:text-red-600 transition-colors shadow-xs"
+                            title="Xóa hoàn cảnh này"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
                     </div>
 
                     <div className="p-5 space-y-3">
-                      <h3 className="font-bold text-sm text-slate-900 leading-snug">
-                        {item.recipientName}
-                      </h3>
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-bold text-sm text-slate-900 leading-snug">
+                          {item.recipientName}
+                        </h3>
+                        {isAdmin && (
+                          <span className="text-[10px] text-rose-600 bg-rose-50 px-2 py-0.5 rounded font-semibold border border-rose-200">
+                            Có thể sửa
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
                         {item.situation}
                       </p>
@@ -183,13 +479,22 @@ export default function SocialWelfareList() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-rose-50/40 border-t border-rose-100">
+                  <div className="p-4 bg-rose-50/40 border-t border-rose-100 flex items-center gap-2">
                     <a
                       href="#dong-gop"
-                      className="w-full block text-center py-2 px-3 rounded-xl bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-semibold text-xs shadow-xs transition-all"
+                      className="flex-1 text-center py-2 px-3 rounded-xl bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-semibold text-xs shadow-xs transition-all"
                     >
                       Ủng hộ hoàn cảnh này
                     </a>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditCase(item)}
+                        className="py-2 px-3 rounded-xl border border-rose-300 bg-white hover:bg-rose-50 text-rose-700 text-xs font-semibold transition-colors"
+                      >
+                        Sửa
+                      </button>
+                    )}
                   </div>
                 </div>
               );
@@ -200,7 +505,7 @@ export default function SocialWelfareList() {
         {/* Tab 2: Các Đợt Trao Quà An Sinh Đã Giải Ngân */}
         {activeTab === "GIFTS" && (
           <div className="space-y-3">
-            {SAMPLE_GIFT_BATCHES.map((gift) => (
+            {giftBatches.map((gift) => (
               <div
                 key={gift.id}
                 className="bg-white p-5 rounded-2xl border border-rose-100 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-rose-300 transition-colors"
@@ -215,6 +520,9 @@ export default function SocialWelfareList() {
                       <MapPin className="w-3 h-3 text-rose-500" />
                       <span>{gift.village}</span>
                     </span>
+                    <span className="text-[11px] text-slate-500 font-medium">
+                      ({gift.recipientCount} hộ thụ hưởng)
+                    </span>
                   </div>
                   <h4 className="text-sm font-bold text-slate-900">{gift.title}</h4>
                   <p className="text-xs text-slate-500 flex items-center gap-1">
@@ -223,20 +531,316 @@ export default function SocialWelfareList() {
                   </p>
                 </div>
 
-                <div className="text-left sm:text-right shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
-                  <div className="text-base sm:text-lg font-extrabold text-rose-700 font-mono">
-                    -{formatVND(gift.amount)}
+                <div className="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
+                  <div className="text-left sm:text-right shrink-0">
+                    <div className="text-base sm:text-lg font-extrabold text-rose-700 font-mono">
+                      -{formatVND(gift.amount)}
+                    </div>
+                    <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-medium">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>Chứng từ mộc đỏ đầy đủ</span>
+                    </span>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-medium">
-                    <CheckCircle2 className="w-3 h-3" />
-                    <span>Chứng từ mộc đỏ đầy đủ</span>
-                  </span>
+
+                  {/* Nút Sửa / Xóa đợt trao quà cho Admin */}
+                  {isAdmin && (
+                    <div className="flex items-center gap-1 pl-2 border-l border-slate-200">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditGift(gift)}
+                        className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors"
+                        title="Chỉnh sửa đợt trao quà"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteGift(gift.id)}
+                        className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 transition-colors"
+                        title="Xóa đợt trao quà"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* ================= MODAL CHỈNH SỬA / TẠO MỚI HOÀN CẢNH ================= */}
+      {isCaseModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95">
+            <div className="bg-gradient-to-r from-rose-600 to-pink-600 p-4 sm:p-5 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5" />
+                <h3 className="font-bold text-sm sm:text-base">
+                  {editingCaseId ? "Chỉnh Sửa Hoàn Cảnh Khó Khăn" : "Tạo Hoàn Cảnh Khó Khăn Mới"}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCaseModalOpen(false)}
+                className="p-1 rounded-full hover:bg-white/20 text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCase} className="p-5 sm:p-6 space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 uppercase mb-1">
+                  Tên đối tượng / Hộ gia đình: *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={caseForm.recipientName}
+                  onChange={(e) => setCaseForm({ ...caseForm, recipientName: e.target.value })}
+                  placeholder="Ví dụ: Hộ bà H'Nghê, Hộ ông Triệu Văn Long..."
+                  className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase mb-1">
+                    Thôn / Buôn: *
+                  </label>
+                  <select
+                    value={caseForm.village}
+                    onChange={(e) => setCaseForm({ ...caseForm, village: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 bg-white font-medium"
+                  >
+                    {VILLAGES.map((v) => (
+                      <option key={v} value={v}>
+                        {v}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase mb-1">
+                    Mục tiêu vận động (VNĐ): *
+                  </label>
+                  <input
+                    type="number"
+                    min="1000000"
+                    step="1000000"
+                    required
+                    value={caseForm.targetAmount}
+                    onChange={(e) =>
+                      setCaseForm({ ...caseForm, targetAmount: Number(e.target.value) })
+                    }
+                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 uppercase mb-1">
+                  Số tiền đã vận động được (VNĐ):
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="500000"
+                  value={caseForm.currentAmount}
+                  onChange={(e) =>
+                    setCaseForm({ ...caseForm, currentAmount: Number(e.target.value) })
+                  }
+                  className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 uppercase mb-1">
+                  Mô tả hoàn cảnh khó khăn: *
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  value={caseForm.situation}
+                  onChange={(e) => setCaseForm({ ...caseForm, situation: e.target.value })}
+                  placeholder="Ghi rõ hoàn cảnh gia đình, bệnh tật, nhà ở dột nát, con nhỏ..."
+                  className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 uppercase mb-1">
+                  Đường dẫn ảnh chụp thực tế (URL):
+                </label>
+                <input
+                  type="url"
+                  value={caseForm.imageUrl}
+                  onChange={(e) => setCaseForm({ ...caseForm, imageUrl: e.target.value })}
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-mono text-[11px]"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsCaseModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold flex items-center gap-1.5 shadow-sm shadow-rose-200"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{editingCaseId ? "Lưu thay đổi" : "Tạo hoàn cảnh"}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ================= MODAL CHỈNH SỬA / TẠO MỚI ĐỢT TRAO QUÀ ================= */}
+      {isGiftModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95">
+            <div className="bg-gradient-to-r from-rose-600 to-pink-600 p-4 sm:p-5 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Gift className="w-5 h-5" />
+                <h3 className="font-bold text-sm sm:text-base">
+                  {editingGiftId ? "Chỉnh Sửa Đợt Trao Quà Giải Ngân" : "Tạo Đợt Trao Quà Giải Ngân Mới"}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsGiftModalOpen(false)}
+                className="p-1 rounded-full hover:bg-white/20 text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveGift} className="p-5 sm:p-6 space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 uppercase mb-1">
+                  Tiêu đề đợt trao quà / giải ngân: *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={giftForm.title}
+                  onChange={(e) => setGiftForm({ ...giftForm, title: e.target.value })}
+                  placeholder="Ví dụ: Trao tặng bò giống sinh sản, Hỗ trợ xây nhà ĐĐK đợt 1..."
+                  className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase mb-1">
+                    Thôn / Buôn: *
+                  </label>
+                  <select
+                    value={giftForm.village}
+                    onChange={(e) => setGiftForm({ ...giftForm, village: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 bg-white font-medium"
+                  >
+                    {VILLAGES.map((v) => (
+                      <option key={v} value={v}>
+                        {v}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase mb-1">
+                    Số hộ / người thụ hưởng: *
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    required
+                    value={giftForm.recipientCount}
+                    onChange={(e) =>
+                      setGiftForm({ ...giftForm, recipientCount: Number(e.target.value) })
+                    }
+                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase mb-1">
+                    Số tiền giải ngân (VNĐ): *
+                  </label>
+                  <input
+                    type="number"
+                    min="100000"
+                    step="500000"
+                    required
+                    value={giftForm.amount}
+                    onChange={(e) =>
+                      setGiftForm({ ...giftForm, amount: Number(e.target.value) })
+                    }
+                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase mb-1">
+                    Ngày thực hiện: *
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={giftForm.date}
+                    onChange={(e) => setGiftForm({ ...giftForm, date: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 uppercase mb-1">
+                  Chứng từ / Biên bản nghiệm thu: *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={giftForm.proofNote}
+                  onChange={(e) => setGiftForm({ ...giftForm, proofNote: e.target.value })}
+                  placeholder="Ví dụ: Biên bản bàn giao có chữ ký Trưởng ban CTMT, Hóa đơn VAT..."
+                  className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsGiftModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold flex items-center gap-1.5 shadow-sm shadow-rose-200"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{editingGiftId ? "Lưu thay đổi" : "Tạo đợt trao quà"}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
