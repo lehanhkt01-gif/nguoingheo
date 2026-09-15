@@ -38,6 +38,14 @@ export default function AdminDashboardPage() {
   // Cấu hình Gemini API cho Chatbot Gem
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [showKey, setShowKey] = useState(false);
+  const [geminiModel, setGeminiModel] = useState("gemini-2.0-flash");
+  const [availableModels, setAvailableModels] = useState<any[]>([
+    { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash (Khuyên dùng - Siêu Nhanh, Thông Minh & Ổn Định Nhất)", default: true },
+    { id: "gemini-1.5-flash", name: "Gemini 1.5 Flash (Bản Chuẩn Quốc Tế - Tốc Độ Cao & Ổn Định)" },
+    { id: "gemini-1.5-flash-8b", name: "Gemini 1.5 Flash 8B (Bản Siêu Tiết Kiệm & Nhanh)" },
+    { id: "gemini-1.5-pro", name: "Gemini 1.5 Pro (Bản Chuyên Sâu - Phân Tích Dài)" },
+    { id: "gemini-2.0-flash-lite", name: "Gemini 2.0 Flash Lite (Tiết Kiệm Quota)" },
+  ]);
   const [customPrompt, setCustomPrompt] = useState("");
   const [hasApiKey, setHasApiKey] = useState(false);
   const [testingKey, setTestingKey] = useState(false);
@@ -112,13 +120,21 @@ export default function AdminDashboardPage() {
     fetch("/api/v1/admin/settings")
       .then((r) => r.json())
       .then((d) => {
-        if (d.success && d.settings) {
-          setHasApiKey(Boolean(d.settings.hasKey));
-          if (d.settings.geminiApiKey) {
-            setApiKeyInput(d.settings.geminiApiKey);
+        if (d.success) {
+          if (d.settings) {
+            setHasApiKey(Boolean(d.settings.hasKey));
+            if (d.settings.geminiApiKey) {
+              setApiKeyInput(d.settings.geminiApiKey);
+            }
+            if (d.settings.geminiModel) {
+              setGeminiModel(d.settings.geminiModel);
+            }
+            if (d.settings.systemPrompt) {
+              setCustomPrompt(d.settings.systemPrompt);
+            }
           }
-          if (d.settings.systemPrompt) {
-            setCustomPrompt(d.settings.systemPrompt);
+          if (d.availableModels && Array.isArray(d.availableModels)) {
+            setAvailableModels(d.availableModels);
           }
         }
       })
@@ -136,10 +152,17 @@ export default function AdminDashboardPage() {
       const res = await fetch("/api/v1/admin/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "test", geminiApiKey: apiKeyInput }),
+        body: JSON.stringify({
+          action: "test",
+          geminiApiKey: apiKeyInput,
+          geminiModel: geminiModel,
+        }),
       });
       const data = await res.json();
       if (data.success) {
+        if (data.activeModel && data.activeModel !== geminiModel) {
+          setGeminiModel(data.activeModel);
+        }
         setKeyStatusMsg({ type: "success", text: data.message });
       } else {
         setKeyStatusMsg({ type: "error", text: data.message });
@@ -161,12 +184,16 @@ export default function AdminDashboardPage() {
         body: JSON.stringify({
           action: "save",
           geminiApiKey: apiKeyInput,
+          geminiModel: geminiModel,
           systemPrompt: customPrompt,
         }),
       });
       const data = await res.json();
       if (data.success) {
         setHasApiKey(data.settings?.hasKey);
+        if (data.settings?.geminiModel) {
+          setGeminiModel(data.settings.geminiModel);
+        }
         setKeyStatusMsg({ type: "success", text: data.message });
         setTimeout(() => setKeyStatusMsg(null), 5000);
       } else {
@@ -416,12 +443,12 @@ export default function AdminDashboardPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="font-bold text-sm text-slate-900">
-                    Cấu Hình Kết Nối Trợ Lý AI Gem Mặt Trận (Google Gemini 2.5)
+                    Cấu Hình Kết Nối Trợ Lý AI Gem Mặt Trận (Google Gemini)
                   </h3>
                   {hasApiKey ? (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      Đã kết nối API
+                      Đã kết nối ({geminiModel})
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
@@ -431,7 +458,7 @@ export default function AdminDashboardPage() {
                   )}
                 </div>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Nhập mã khóa Google Gemini API để trợ lý AI tự động giải đáp về sao kê, thu/chi, số dư quỹ và thông tin 20 thôn buôn 24/7.
+                  Cấu hình mô hình Gemini và khóa API để trợ lý AI giải đáp thông tin tự động, tương tự hệ thống Lịch công tác Ea Súp.
                 </p>
               </div>
             </div>
@@ -465,7 +492,7 @@ export default function AdminDashboardPage() {
               </div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Cột 1: Nhập API Key */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold text-slate-700">
@@ -476,7 +503,7 @@ export default function AdminDashboardPage() {
                     type={showKey ? "text" : "password"}
                     value={apiKeyInput}
                     onChange={(e) => setApiKeyInput(e.target.value)}
-                    placeholder="Dán mã API Key của bạn (VD: AIzaSy...)"
+                    placeholder="Dán mã API Key của bạn (chuẩn AIzaSy... hoặc AQ.Ab8...)"
                     className="w-full pl-3 pr-10 py-2 text-xs rounded-xl border border-slate-200 font-mono focus:border-rose-600 focus:ring-1 focus:ring-rose-600 bg-slate-50/50"
                   />
                   <button
@@ -489,12 +516,34 @@ export default function AdminDashboardPage() {
                   </button>
                 </div>
                 <p className="text-[11px] text-slate-500">
-                  Khóa API được mã hóa và lưu trữ an toàn trên máy chủ VPS, phục vụ riêng cho Chatbot Gem.
+                  Hỗ trợ cả khóa chuẩn quốc tế Google AI Studio (AIzaSy...) và chuẩn mới (AQ.Ab8...).
                 </p>
               </div>
 
-              {/* Cột 2: Ghi chú / Chỉ đạo bổ sung cho AI Prompt (Tùy chọn) */}
+              {/* Cột 2: Chọn Mô hình AI (Gemini Model) */}
               <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-700 flex items-center justify-between">
+                  <span>Lựa chọn Mô hình AI (Gemini Model)</span>
+                  <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded">Tự động Fallback</span>
+                </label>
+                <select
+                  value={geminiModel}
+                  onChange={(e) => setGeminiModel(e.target.value)}
+                  className="w-full py-2 px-3 text-xs rounded-xl border border-slate-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600 bg-slate-50/50 font-medium text-slate-800 cursor-pointer"
+                >
+                  {availableModels.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name || m.id}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[11px] text-slate-500">
+                  Mô hình được tối ưu với thuật toán tự động chuyển đổi sang model phụ nếu quá tải (giống web Lịch công tác).
+                </p>
+              </div>
+
+              {/* Hàng 2: Ghi chú / Chỉ đạo bổ sung cho AI Prompt (Tùy chọn) */}
+              <div className="space-y-1.5 md:col-span-2">
                 <label className="block text-xs font-bold text-slate-700">
                   Chỉ đạo bổ sung cho AI Prompt (Tùy chọn)
                 </label>

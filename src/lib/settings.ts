@@ -3,6 +3,7 @@ import path from "path";
 
 export interface SystemSettings {
   geminiApiKey: string;
+  geminiModel?: string;
   systemPrompt?: string;
   updatedAt?: string;
 }
@@ -18,6 +19,7 @@ export function getSystemSettings(): SystemSettings {
 
   const defaultSettings: SystemSettings = {
     geminiApiKey: process.env.GEMINI_API_KEY || "",
+    geminiModel: "gemini-2.0-flash",
     systemPrompt: "",
     updatedAt: new Date().toISOString(),
   };
@@ -28,6 +30,7 @@ export function getSystemSettings(): SystemSettings {
       const parsed = JSON.parse(content);
       memoryCache = {
         geminiApiKey: parsed.geminiApiKey || process.env.GEMINI_API_KEY || "",
+        geminiModel: parsed.geminiModel || "gemini-2.0-flash",
         systemPrompt: parsed.systemPrompt || "",
         updatedAt: parsed.updatedAt || new Date().toISOString(),
       };
@@ -45,6 +48,7 @@ export function saveSystemSettings(settings: Partial<SystemSettings>): SystemSet
   const current = getSystemSettings();
   const updated: SystemSettings = {
     geminiApiKey: settings.geminiApiKey !== undefined ? settings.geminiApiKey.trim() : current.geminiApiKey,
+    geminiModel: settings.geminiModel !== undefined ? settings.geminiModel.trim() : (current.geminiModel || "gemini-2.0-flash"),
     systemPrompt: settings.systemPrompt !== undefined ? settings.systemPrompt.trim() : current.systemPrompt,
     updatedAt: new Date().toISOString(),
   };

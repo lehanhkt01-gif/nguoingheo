@@ -1,4 +1,3 @@
-import { GoogleGenAI } from "@google/genai";
 import { prisma } from "./prisma";
 import { getSystemSettings } from "./settings";
 
@@ -113,27 +112,81 @@ Hiện tại số liệu Quỹ Vì Người Nghèo xã Ea Súp như sau:
 Mọi thông tin liên hệ Ban chỉ đạo xin gọi Đ/c Lê Hồng Hạnh (Chủ tịch UBMTTQ xã): 0888.023.023. Quý vị có thể xem toàn bộ sao kê chi tiết tại tab "Sao kê thời gian thực" trên website!`;
   }
 
-  try {
-    const ai = new GoogleGenAI({ apiKey });
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+  const cleanKey = apiKey.replace(/^["']|["']$/g, "").trim();
+  const selectedModel = settings.geminiModel || "gemini-2.0-flash";
+
+  // Danh sách model ưu tiên dự phòng theo chuẩn lichcongtac.easupso.com
+  const candidateModels = [
+    selectedModel,
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-8b",
+    "gemini-1.5-pro",
+  ];
+  const uniqueModels = [...new Set(candidateModels.filter(Boolean))];
+
+  for (const m of uniqueModels) {
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(cleanKey)}`;
+    const payload = {
       contents: [
         {
           role: "user",
           parts: [{ text: `${systemContext}\n\nCâu hỏi của người dân / nhà hảo tâm: ${userMessage}` }],
         },
       ],
-    });
+      generationConfig: {
+        temperature: 0.3,
+        maxOutputTokens: 1000,
+      },
+    };
 
-    return (
-      response.text ||
-      "Dạ, tôi đã ghi nhận câu hỏi. Xin quý vị vui lòng liên hệ Ban Thường trực UBMTTQ Việt Nam xã Ea Súp qua SĐT 0888.023.023 để được hỗ trợ cụ thể nhất."
-    );
-  } catch (error: any) {
-    console.error("Gemini API Error:", error);
-    return `Kính chào quý vị! Trợ lý Gem Mặt Trận Ea Súp xin thông báo:
-• Số dư Quỹ Vì Người Nghèo hiện tại: ${balance.toLocaleString("vi-VN")} đ (BIDV 8630100930).
-• Tổng thu: ${inAmount.toLocaleString("vi-VN")} đ | Đã giải ngân: ${outAmount.toLocaleString("vi-VN")} đ.
-Mọi thắc mắc và ủng hộ xin liên hệ Đ/c Lê Hồng Hạnh (Chủ tịch UBMTTQ xã) qua SĐT 0888.023.023.`;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": cleanKey,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          const resData = await res.json().catch(() => ({}));
+          const reply = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (reply && reply.trim()) {
+            return reply.trim();
+          }
+        }
+
+        const errData = await res.json().catch(() => ({}));
+        const errMsg = errData.error?.message || `HTTP ${res.status}`;
+
+        // Nếu 404 (model không hỗ trợ): chuyển ngay sang candidate model tiếp theo
+        if (res.status === 404 || errMsg.includes("not found") || errMsg.includes("no longer available")) {
+          break;
+        }
+
+        // Quá tải (503/429): thử lại tối đa 3 lần
+        if ((res.status === 503 || res.status === 429 || res.status >= 500) && attempt < 3) {
+          await new Promise((r) => setTimeout(r, 1500 * attempt));
+          continue;
+        }
+
+        break;
+      } catch (netErr) {
+        if (attempt < 3) {
+          await new Promise((r) => setTimeout(r, 1500));
+          continue;
+        }
+        break;
+      }
+    }
   }
+
+  return `Kính chào quý vị! Trợ lý Gem Mặt Trận Ea Súp xin thông báo:
+• Số dư Quỹ Vì Người Nghèo hiện tại: ${balance.toLocaleString("vi-VN")} đ (Tài khoản BIDV 8630100930).
+• Tổng thu: ${inAmount.toLocaleString("vi-VN")} đ | Đã giải ngân: ${outAmount.toLocaleString("vi-VN")} đ.
+Mọi thắc mắc và đóng góp xin liên hệ Đ/c Lê Hồng Hạnh (Chủ tịch UBMTTQ xã) qua SĐT 0888.023.023 hoặc email easupsohoa@gmail.com.`;
 }
+
