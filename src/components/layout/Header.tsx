@@ -166,28 +166,14 @@ export default function Header() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="flex md:hidden items-center gap-2">
-            {isLoggedIn ? (
-              <Link
-                href="/admin"
-                className="px-2.5 py-1 rounded-md bg-rose-100 text-rose-800 text-xs font-bold"
-              >
-                Quản trị
-              </Link>
-            ) : (
-              <Link
-                href="/admin/login"
-                className="px-2 py-1 rounded-md border border-rose-200 text-rose-700 text-xs font-medium"
-              >
-                Đăng nhập
-              </Link>
-            )}
+          {/* Mobile Menu Button - Chỉ hiển thị nút 3 gạch ngang */}
+          <div className="flex md:hidden items-center">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-md text-slate-600 hover:bg-rose-50 cursor-pointer"
+              className="p-2 rounded-lg text-slate-700 hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer"
+              aria-label="Mở menu điều hướng"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
@@ -212,25 +198,43 @@ export default function Header() {
             <Link
               href="/sao-ke"
               onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-2 rounded-md bg-rose-50 text-rose-700 text-xs font-semibold border border-rose-200"
+              className="w-full text-center py-2.5 rounded-lg bg-rose-50 text-rose-700 text-xs font-semibold border border-rose-200 hover:bg-rose-100 transition-colors"
             >
               Xem sao kê BIDV 8630100930
             </Link>
             {isLoggedIn ? (
-              <Link
-                href="/admin"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-2 rounded-md bg-slate-900 text-white text-xs font-semibold"
-              >
-                Bảng điều khiển Quản trị
-              </Link>
+              <div className="flex flex-col gap-1.5">
+                <div className="px-3 py-1.5 bg-rose-50 rounded-md border border-rose-100 flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800">{adminUser?.fullName || "Đ/c Lê Hồng Hạnh"}</span>
+                  <span className="text-[10px] text-rose-600 font-semibold">{adminUser?.title || "Chủ tịch UBMTTQ"}</span>
+                </div>
+                <Link
+                  href="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span>Bảng điều khiển Quản trị</span>
+                </Link>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full text-center py-2 rounded-lg bg-slate-100 hover:bg-red-50 text-red-600 text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Đăng xuất</span>
+                </button>
+              </div>
             ) : (
               <Link
                 href="/admin/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-2 rounded-md bg-rose-600 text-white text-xs font-semibold"
+                className="w-full text-center py-2.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm"
               >
-                Đăng nhập Cán bộ Quản trị
+                <User className="w-4 h-4" />
+                <span>Đăng nhập Cán bộ Quản trị</span>
               </Link>
             )}
           </div>
