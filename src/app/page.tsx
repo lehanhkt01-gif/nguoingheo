@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default function HomePage() {
   return (
-    <div className="space-y-12 pb-16">
+    <div className="space-y-4 sm:space-y-6 pb-8 sm:pb-12">
       {/* 1. Hero Banner văn hóa Tây Nguyên Ea Súp tông hồng tươi sáng */}
       <HeroBanner />
 

@@ -77,14 +77,14 @@ export default function VietQRWidget() {
   };
 
   return (
-    <section id="dong-gop" className="py-12 bg-rose-50/40 mt-6">
+    <section id="dong-gop" className="py-4 sm:py-8 bg-rose-50/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-8 space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-xs font-semibold uppercase">
+        <div className="text-center max-w-2xl mx-auto mb-4 sm:mb-6 space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] sm:text-xs font-semibold uppercase">
             <Heart className="w-3.5 h-3.5 fill-current text-rose-600" />
             <span>TỰ ĐỘNG SINH MÃ VIETQR NAPAS 247</span>
           </div>
-          <h2 className="text-xl sm:text-3xl font-bold text-slate-900">
+          <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold text-slate-900">
             Đóng Góp Trực Tuyến Vì Người Nghèo Ea Súp
           </h2>
           <p className="text-slate-600 text-xs">
@@ -94,7 +94,7 @@ export default function VietQRWidget() {
 
         <div className="bg-white rounded-2xl shadow-xl shadow-rose-100/40 border border-rose-100 overflow-hidden max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-12">
           {/* Cột trái: Form nhập thông tin */}
-          <div className="lg:col-span-7 p-5 sm:p-6 space-y-4">
+          <div className="lg:col-span-7 p-4 sm:p-6 space-y-3.5 sm:space-y-4">
             {/* Dấu tích kích nổi tùy chọn thông số */}
             <div
               className={`p-3.5 rounded-xl border transition-all cursor-pointer select-none ${

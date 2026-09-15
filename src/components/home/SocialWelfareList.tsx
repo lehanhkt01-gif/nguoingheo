@@ -305,44 +305,44 @@ export default function SocialWelfareList() {
   };
 
   return (
-    <section id="an-sinh" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="space-y-6">
+    <section id="an-sinh" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Header Phân Hệ */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-rose-100 pb-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 sm:gap-4 border-b border-rose-100 pb-3 sm:pb-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-semibold mb-2">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[11px] sm:text-xs font-semibold mb-1 sm:mb-2">
               <Gift className="w-3.5 h-3.5 text-rose-600" />
               <span>An Sinh Xã Hội 20 Thôn Buôn</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">
               Hoàn Cảnh Khó Khăn &amp; Các Đợt Trao Quà Thực Tế
             </h2>
-            <p className="text-slate-600 text-xs sm:text-sm mt-1">
+            <p className="text-slate-600 text-xs sm:text-sm mt-0.5 sm:mt-1">
               Khảo sát trực tiếp từ 20 thôn buôn. Mọi khoản giải ngân đều có biên bản nghiệm thu và chứng từ mộc đỏ.
             </p>
           </div>
 
           {/* Tab Chuyển Đổi */}
-          <div className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 text-xs font-semibold self-start md:self-auto">
+          <div className="grid grid-cols-2 sm:inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 text-xs font-semibold w-full sm:w-auto">
             <button
               onClick={() => setActiveTab("CASES")}
-              className={`px-4 py-2 rounded-lg transition-all ${
+              className={`px-2 sm:px-4 py-2 rounded-lg transition-all text-center ${
                 activeTab === "CASES"
                   ? "bg-rose-600 text-white shadow-xs"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Hoàn cảnh cần giúp đỡ ({cases.length})
+              Hoàn cảnh cần giúp ({cases.length})
             </button>
             <button
               onClick={() => setActiveTab("GIFTS")}
-              className={`px-4 py-2 rounded-lg transition-all ${
+              className={`px-2 sm:px-4 py-2 rounded-lg transition-all text-center ${
                 activeTab === "GIFTS"
                   ? "bg-rose-600 text-white shadow-xs"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Đợt trao quà đã chi ({giftBatches.length})
+              Đợt trao quà ({giftBatches.length})
             </button>
           </div>
         </div>
@@ -399,7 +399,7 @@ export default function SocialWelfareList() {
 
         {/* Tab 1: Các Hoàn Cảnh Cần Giúp Đỡ */}
         {activeTab === "CASES" && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             {cases.map((item) => {
               const percent = Math.min(100, Math.round((item.currentAmount / item.targetAmount) * 100));
               return (

@@ -206,34 +206,34 @@ export default function LiveLedgerTable() {
   const netBalance = stats.totalIn - stats.totalOut;
 
   return (
-    <section id="sao-ke" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <section id="sao-ke" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
       <div className="bg-white rounded-2xl border border-rose-100 shadow-xl overflow-hidden">
         {/* Header Phân Hệ */}
-        <div className="p-6 border-b border-rose-100 bg-gradient-to-r from-rose-50/50 via-white to-rose-50/30">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="p-4 sm:p-6 border-b border-rose-100 bg-gradient-to-r from-rose-50/50 via-white to-rose-50/30">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-semibold mb-2">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[11px] sm:text-xs font-semibold mb-1 sm:mb-2">
                 <ShieldCheck className="w-3.5 h-3.5 text-rose-600" />
                 <span>Minh Bạch 100% Thu - Chi</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+              <h2 className="text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                 Sổ Sao Kê Đóng Góp Trực Tuyến
               </h2>
-              <p className="text-slate-600 text-xs sm:text-sm mt-1">
+              <p className="text-slate-600 text-xs sm:text-sm mt-0.5 sm:mt-1">
                 Dữ liệu ngân hàng BIDV STK <strong>8630100930</strong> tự động đối soát thời gian thực qua Casso Webhook.
               </p>
             </div>
 
             {/* Tìm kiếm & Xuất Excel */}
-            <div className="flex flex-wrap items-center gap-2.5 self-start md:self-auto">
-              <form onSubmit={handleSearchSubmit} className="relative">
+            <div className="flex flex-wrap items-center gap-2 self-stretch md:self-auto">
+              <form onSubmit={handleSearchSubmit} className="relative flex-1 sm:flex-initial">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Tìm tên, nội dung, mã GD..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-hidden focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 w-52 sm:w-64 shadow-2xs"
+                  className="pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 bg-white focus:outline-hidden focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 w-full sm:w-64 shadow-2xs"
                 />
               </form>
 
@@ -261,121 +261,121 @@ export default function LiveLedgerTable() {
         </div>
 
         {/* 4 Khối Thống Kê Tổng Hợp: Tổng số giao dịch, Tổng tiền vào, Tổng tiền ra, Số dư quỹ */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 p-4 sm:p-6 bg-slate-50/70 border-b border-rose-100">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 p-3 sm:p-5 bg-slate-50/70 border-b border-rose-100">
           {/* 1. Tổng số giao dịch */}
-          <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs">
+          <div className="bg-white p-2.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs">
             <div className="flex items-center justify-between text-slate-500 mb-1">
               <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600">
                 Tổng số giao dịch
               </span>
-              <FileSpreadsheet className="w-4 h-4 text-slate-400" />
+              <FileSpreadsheet className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" />
             </div>
-            <div className="text-base sm:text-xl font-extrabold text-slate-900 font-mono">
+            <div className="text-sm sm:text-xl font-extrabold text-slate-900 font-mono">
               {stats.totalTransactions}{" "}
-              <span className="text-xs font-normal text-slate-500">giao dịch</span>
+              <span className="text-[10px] sm:text-xs font-normal text-slate-500">giao dịch</span>
             </div>
-            <span className="text-[10px] text-slate-500 block mt-0.5">
+            <span className="text-[9px] sm:text-[10px] text-slate-500 block mt-0.5">
               ({stats.countIn} thu • {stats.countOut} chi)
             </span>
           </div>
 
           {/* 2. Tổng số tiền vào */}
-          <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-emerald-200 shadow-2xs">
+          <div className="bg-white p-2.5 sm:p-4 rounded-xl border border-emerald-200 shadow-2xs">
             <div className="flex items-center justify-between text-emerald-700 mb-1">
               <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
                 Tổng số tiền vào
               </span>
-              <ArrowDownLeft className="w-4 h-4 text-emerald-600" />
+              <ArrowDownLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
             </div>
-            <div className="text-base sm:text-xl font-extrabold text-emerald-700 font-mono">
+            <div className="text-sm sm:text-xl font-extrabold text-emerald-700 font-mono truncate">
               +{formatVND(stats.totalIn)}
             </div>
-            <span className="text-[10px] text-emerald-600 block mt-0.5">
+            <span className="text-[9px] sm:text-[10px] text-emerald-600 block mt-0.5 truncate">
               Tiền ủng hộ từ nhà hảo tâm
             </span>
           </div>
 
           {/* 3. Tổng số tiền ra */}
-          <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-rose-200 shadow-2xs">
+          <div className="bg-white p-2.5 sm:p-4 rounded-xl border border-rose-200 shadow-2xs">
             <div className="flex items-center justify-between text-rose-700 mb-1">
               <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
                 Tổng số tiền ra
               </span>
-              <ArrowUpRight className="w-4 h-4 text-rose-600" />
+              <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-600" />
             </div>
-            <div className="text-base sm:text-xl font-extrabold text-rose-700 font-mono">
+            <div className="text-sm sm:text-xl font-extrabold text-rose-700 font-mono truncate">
               -{formatVND(stats.totalOut)}
             </div>
-            <span className="text-[10px] text-rose-600 block mt-0.5">
+            <span className="text-[9px] sm:text-[10px] text-rose-600 block mt-0.5 truncate">
               Giải ngân hỗ trợ 20 thôn buôn
             </span>
           </div>
 
           {/* 4. Số dư quỹ hiện tại */}
-          <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-blue-200 shadow-2xs">
+          <div className="bg-white p-2.5 sm:p-4 rounded-xl border border-blue-200 shadow-2xs">
             <div className="flex items-center justify-between text-blue-700 mb-1">
               <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
                 Số dư quỹ hiện tại
               </span>
-              <Wallet className="w-4 h-4 text-blue-600" />
+              <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
             </div>
-            <div className="text-base sm:text-xl font-extrabold text-blue-700 font-mono">
+            <div className="text-sm sm:text-xl font-extrabold text-blue-700 font-mono truncate">
               {formatVND(netBalance)}
             </div>
-            <span className="text-[10px] text-blue-600 block mt-0.5">
+            <span className="text-[9px] sm:text-[10px] text-blue-600 block mt-0.5 truncate">
               BIDV STK 8630100930
             </span>
           </div>
         </div>
 
         {/* Tab Lọc: Tất cả / Tiền vào / Tiền ra */}
-        <div className="px-6 pt-4 pb-2 flex items-center justify-between flex-wrap gap-3">
-          <div className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 text-xs font-semibold">
+        <div className="px-4 sm:px-6 pt-3 pb-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+          <div className="flex rounded-xl bg-slate-100 p-1 border border-slate-200 text-xs font-semibold w-full sm:w-auto">
             <button
               onClick={() => {
                 setActiveTab("ALL");
                 setPage(1);
               }}
-              className={`px-3.5 py-1.5 rounded-lg transition-all ${
+              className={`flex-1 sm:flex-initial px-2.5 sm:px-3.5 py-1.5 rounded-lg transition-all text-center ${
                 activeTab === "ALL"
                   ? "bg-slate-900 text-white shadow-xs"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Tất cả giao dịch ({stats.totalTransactions})
+              Tất cả ({stats.totalTransactions})
             </button>
             <button
               onClick={() => {
                 setActiveTab("IN");
                 setPage(1);
               }}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all ${
+              className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg transition-all ${
                 activeTab === "IN"
                   ? "bg-emerald-600 text-white shadow-xs font-bold"
                   : "text-slate-600 hover:text-emerald-700"
               }`}
             >
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span>Tiền vào ({stats.countIn})</span>
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400" />
+              <span>Thu ({stats.countIn})</span>
             </button>
             <button
               onClick={() => {
                 setActiveTab("OUT");
                 setPage(1);
               }}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all ${
+              className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg transition-all ${
                 activeTab === "OUT"
                   ? "bg-rose-600 text-white shadow-xs font-bold"
                   : "text-slate-600 hover:text-rose-700"
               }`}
             >
-              <span className="w-2 h-2 rounded-full bg-rose-400" />
-              <span>Tiền ra ({stats.countOut})</span>
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-rose-400" />
+              <span>Chi ({stats.countOut})</span>
             </button>
           </div>
 
-          <span className="text-xs text-slate-500 font-medium">
-            Hiển thị <strong>{transactions.length}</strong> trên tổng số <strong>{totalCount}</strong> giao dịch
+          <span className="text-[11px] sm:text-xs text-slate-500 font-medium">
+            Hiển thị <strong>{transactions.length}</strong> / <strong>{totalCount}</strong> giao dịch
           </span>
         </div>
 
