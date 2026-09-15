@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { formatVND, formatDateTime, formatTimeAgo } from "@/lib/utils";
 import {
   ShieldCheck,
@@ -86,15 +86,22 @@ export default function SaoKePage() {
       if (campaignFilter) params.append("campaign", campaignFilter);
       params.append("page", page.toString());
       params.append("limit", "20");
+      params.append("_t", Date.now().toString());
 
-      const res = await fetch(`/api/v1/sao-ke?${params.toString()}`);
+      const res = await fetch(`/api/v1/sao-ke?${params.toString()}`, {
+        cache: "no-store",
+      });
       const data = await res.json();
 
       if (data.success) {
         setSummary(data.summary);
-        setTransactions(data.transactions || []);
+        let list: TransactionItem[] = data.transactions || [];
+        if (activeTab !== "ALL") {
+          list = list.filter((t) => t.type === activeTab);
+        }
+        setTransactions(list);
         setTotalPages(data.pagination.totalPages || 1);
-        setTotalRecords(data.pagination.totalRecords || 0);
+        setTotalRecords(activeTab === "ALL" ? (data.pagination.totalRecords || list.length) : list.length);
       }
     } catch (err) {
       console.error("Error loading sao-ke data:", err);
@@ -102,6 +109,12 @@ export default function SaoKePage() {
       setLoading(false);
     }
   }, [activeTab, searchTerm, campaignFilter, page]);
+
+  // Bảo đảm hiển thị chuẩn 100% không bao giờ lọt Tiền Vào khi xem tab Chi
+  const displayTransactions = useMemo(() => {
+    if (activeTab === "ALL") return transactions;
+    return transactions.filter((t) => t.type === activeTab);
+  }, [transactions, activeTab]);
 
   useEffect(() => {
     loadData();
@@ -335,14 +348,14 @@ export default function SaoKePage() {
                         Đang đồng bộ dữ liệu sao kê BIDV 8630100930...
                       </td>
                     </tr>
-                  ) : transactions.length === 0 ? (
+                  ) : displayTransactions.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="text-center py-12 text-slate-500">
                         Không tìm thấy giao dịch nào phù hợp với điều kiện tìm kiếm.
                       </td>
                     </tr>
                   ) : (
-                    transactions.map((tx) => {
+                    displayTransactions.map((tx) => {
                       const isIncome = tx.type === "IN";
                       return (
                         <tr key={tx.id} className="hover:bg-slate-50/80 transition-colors">

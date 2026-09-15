@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const type = searchParams.get("type"); // IN, OUT, ALL
+    const rawType = searchParams.get("type")?.trim().toUpperCase() || "ALL";
+    const isOut = rawType === "OUT" || rawType === "CHI";
+    const isIn = rawType === "IN" || rawType === "THU";
     const search = searchParams.get("search")?.trim() || "";
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
     const limit = Math.min(100, Math.max(10, parseInt(searchParams.get("limit") || "20")));
@@ -30,7 +35,7 @@ export async function GET(req: NextRequest) {
     let items: any[] = [];
     let totalRecords = 0;
 
-    if (type === "OUT") {
+    if (isOut) {
       const where: any = {};
       if (search) {
         where.OR = [
@@ -60,7 +65,7 @@ export async function GET(req: NextRequest) {
         receiptNumber: `PC-${d.id.toString().padStart(4, "0")}`,
       }));
       totalRecords = count;
-    } else if (type === "IN") {
+    } else if (isIn) {
       const where: any = { status: "COMPLETED" };
       if (search) {
         where.OR = [
@@ -150,30 +155,39 @@ export async function GET(req: NextRequest) {
       items = all.slice((page - 1) * limit, page * limit);
     }
 
-    return NextResponse.json({
-      success: true,
-      summary: {
-        accountNumber: "8630100930",
-        bankName: "BIDV",
-        bankAbbreviation: "BIDV",
-        accountName: "UY BAN MTTQ VN XA EA SUP",
-        totalIn,
-        totalOut,
-        currentBalance,
-        runningBalanceBank: currentBalance,
-        totalDonationsCount: statsIn._count,
-        totalDisbursementsCount: statsOut._count,
-        lastSync: new Date().toISOString(),
-        certifiedBy: "Casso Live Banking API",
+    return NextResponse.json(
+      {
+        success: true,
+        summary: {
+          accountNumber: "8630100930",
+          bankName: "BIDV",
+          bankAbbreviation: "BIDV",
+          accountName: "UY BAN MTTQ VN XA EA SUP",
+          totalIn,
+          totalOut,
+          currentBalance,
+          runningBalanceBank: currentBalance,
+          totalDonationsCount: statsIn._count,
+          totalDisbursementsCount: statsOut._count,
+          lastSync: new Date().toISOString(),
+          certifiedBy: "Casso Live Banking API",
+        },
+        pagination: {
+          page,
+          limit,
+          totalRecords,
+          totalPages: Math.max(1, Math.ceil(totalRecords / limit)),
+        },
+        transactions: items,
       },
-      pagination: {
-        page,
-        limit,
-        totalRecords,
-        totalPages: Math.max(1, Math.ceil(totalRecords / limit)),
-      },
-      transactions: items,
-    });
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
   } catch (error: any) {
     console.error("API sao-ke error:", error);
     return NextResponse.json(

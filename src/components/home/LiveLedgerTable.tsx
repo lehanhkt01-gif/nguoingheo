@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { formatVND, formatDate } from "@/lib/utils";
 import {
   Search,
@@ -139,34 +139,36 @@ export default function LiveLedgerTable() {
       });
       if (activeTab !== "ALL") params.append("type", activeTab);
       if (searchTerm.trim()) params.append("search", searchTerm.trim());
+      params.append("_t", Date.now().toString());
 
-      const res = await fetch(`/api/v1/sao-ke?${params.toString()}`);
+      const res = await fetch(`/api/v1/sao-ke?${params.toString()}`, {
+        cache: "no-store",
+      });
       const json = await res.json();
 
       if (json.success) {
-        if (json.transactions && json.transactions.length > 0) {
-          setTransactions(json.transactions);
-          setTotalPages(json.pagination.totalPages || 1);
-          setTotalCount(json.pagination.totalRecords || json.transactions.length);
-        } else {
-          // Lọc dữ liệu mẫu nếu API chưa có dữ liệu mới
-          let filtered = [...DEFAULT_TRANSACTIONS];
-          if (activeTab !== "ALL") {
-            filtered = filtered.filter((t) => t.type === activeTab);
-          }
-          if (searchTerm.trim()) {
-            const s = searchTerm.toLowerCase();
-            filtered = filtered.filter(
-              (t) =>
-                t.donorName.toLowerCase().includes(s) ||
-                t.description.toLowerCase().includes(s) ||
-                t.reference.toLowerCase().includes(s)
-            );
-          }
-          setTransactions(filtered);
-          setTotalCount(filtered.length);
-          setTotalPages(1);
+        let list: TransactionItem[] = json.transactions && json.transactions.length > 0
+          ? json.transactions
+          : [...DEFAULT_TRANSACTIONS];
+
+        // Lọc chuẩn xác theo activeTab (Tuyệt đối không để lọt Tiền Vào khi xem tab Chi)
+        if (activeTab !== "ALL") {
+          list = list.filter((t) => t.type === activeTab);
         }
+
+        if (searchTerm.trim()) {
+          const s = searchTerm.toLowerCase();
+          list = list.filter(
+            (t) =>
+              t.donorName.toLowerCase().includes(s) ||
+              t.description.toLowerCase().includes(s) ||
+              t.reference.toLowerCase().includes(s)
+          );
+        }
+
+        setTransactions(list);
+        setTotalCount(activeTab === "ALL" && json.pagination?.totalRecords ? json.pagination.totalRecords : list.length);
+        setTotalPages(Math.max(1, Math.ceil(list.length / 10)));
 
         if (json.summary) {
           const totalInVal = Number(json.summary.totalIn || 82000000);
@@ -200,6 +202,7 @@ export default function LiveLedgerTable() {
       }
       setTransactions(filtered);
       setTotalCount(filtered.length);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -214,6 +217,12 @@ export default function LiveLedgerTable() {
     setPage(1);
     fetchData();
   };
+
+  // Bảo đảm hiển thị chuẩn 100% không bao giờ lọt Tiền Vào khi xem tab Chi
+  const displayTransactions = useMemo(() => {
+    if (activeTab === "ALL") return transactions;
+    return transactions.filter((t) => t.type === activeTab);
+  }, [transactions, activeTab]);
 
   const netBalance = stats.totalIn - stats.totalOut;
 
@@ -389,7 +398,7 @@ export default function LiveLedgerTable() {
           </div>
 
           <span className="text-[11px] sm:text-xs text-slate-500 font-medium">
-            Hiển thị <strong>{transactions.length}</strong> / <strong>{totalCount}</strong> giao dịch
+            Hiển thị <strong>{displayTransactions.length}</strong> / <strong>{totalCount}</strong> giao dịch
           </span>
         </div>
 
@@ -408,8 +417,8 @@ export default function LiveLedgerTable() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
-              {transactions.length > 0 ? (
-                transactions.map((t) => {
+              {displayTransactions.length > 0 ? (
+                displayTransactions.map((t) => {
                   const isOut = t.type === "OUT";
                   return (
                     <tr key={t.id} className="hover:bg-rose-50/30 transition-colors">
