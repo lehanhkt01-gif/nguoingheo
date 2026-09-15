@@ -305,70 +305,53 @@ export default function LiveLedgerTable() {
           </div>
         </div>
 
-        {/* 4 Khối Thống Kê Tổng Hợp: Tổng số giao dịch, Tổng tiền vào, Tổng tiền ra, Số dư quỹ */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 p-3 sm:p-5 bg-slate-50/70 border-b border-rose-100">
-          {/* 1. Tổng số giao dịch */}
-          <div className="bg-white p-2.5 sm:p-4 rounded-xl border border-slate-200 shadow-2xs">
-            <div className="flex items-center justify-between text-slate-500 mb-1">
-              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-600">
-                Tổng số giao dịch
-              </span>
-              <FileSpreadsheet className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" />
-            </div>
-            <div className="text-sm sm:text-xl font-extrabold text-slate-900 font-mono">
-              {stats.totalTransactions}{" "}
-              <span className="text-[10px] sm:text-xs font-normal text-slate-500">giao dịch</span>
-            </div>
-            <span className="text-[9px] sm:text-[10px] text-slate-500 block mt-0.5">
-              ({stats.countIn} thu • {stats.countOut} chi)
-            </span>
-          </div>
-
-          {/* 2. Tổng số tiền vào */}
-          <div className="bg-white p-2.5 sm:p-4 rounded-xl border border-emerald-200 shadow-2xs">
+        {/* 3 Khối Thống Kê Dòng Tiền: Tổng tiền vào (+), Tổng tiền ra (-), Số dư quỹ (=) */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3.5 p-3 sm:p-5 bg-slate-50/70 border-b border-rose-100">
+          {/* 1. Tổng số tiền vào */}
+          <div className="bg-white p-3 sm:p-4 rounded-xl border border-emerald-200 shadow-2xs">
             <div className="flex items-center justify-between text-emerald-700 mb-1">
               <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
                 Tổng số tiền vào
               </span>
-              <ArrowDownLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
+              <ArrowDownLeft className="w-4 h-4 text-emerald-600" />
             </div>
-            <div className="text-sm sm:text-xl font-extrabold text-emerald-700 font-mono truncate">
+            <div className="text-base sm:text-xl font-extrabold text-emerald-700 font-mono truncate">
               +{formatVND(stats.totalIn)}
             </div>
-            <span className="text-[9px] sm:text-[10px] text-emerald-600 block mt-0.5 truncate">
-              Tiền ủng hộ từ nhà hảo tâm
+            <span className="text-[10px] text-emerald-600 block mt-0.5 truncate">
+              {stats.countIn} lượt ủng hộ từ nhà hảo tâm
             </span>
           </div>
 
-          {/* 3. Tổng số tiền ra */}
-          <div className="bg-white p-2.5 sm:p-4 rounded-xl border border-rose-200 shadow-2xs">
+          {/* 2. Tổng số tiền ra */}
+          <div className="bg-white p-3 sm:p-4 rounded-xl border border-rose-200 shadow-2xs">
             <div className="flex items-center justify-between text-rose-700 mb-1">
               <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
                 Tổng số tiền ra
               </span>
-              <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-600" />
+              <ArrowUpRight className="w-4 h-4 text-rose-600" />
             </div>
-            <div className="text-sm sm:text-xl font-extrabold text-rose-700 font-mono truncate">
+            <div className="text-base sm:text-xl font-extrabold text-rose-700 font-mono truncate">
               -{formatVND(stats.totalOut)}
             </div>
-            <span className="text-[9px] sm:text-[10px] text-rose-600 block mt-0.5 truncate">
-              Giải ngân hỗ trợ 20 thôn buôn
+            <span className="text-[10px] text-rose-600 block mt-0.5 truncate">
+              {stats.countOut} đợt giải ngân hỗ trợ thôn buôn
             </span>
           </div>
 
-          {/* 4. Số dư quỹ hiện tại */}
-          <div className="bg-white p-2.5 sm:p-4 rounded-xl border border-blue-200 shadow-2xs">
-            <div className="flex items-center justify-between text-blue-700 mb-1">
+          {/* 3. Số dư quỹ hiện tại */}
+          <div className="bg-white p-3 sm:p-4 rounded-xl border border-rose-200 shadow-2xs bg-gradient-to-br from-white to-rose-50/30">
+            <div className="flex items-center justify-between text-rose-900 mb-1">
               <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
-                Số dư quỹ hiện tại
+                Số dư quỹ thực tế
               </span>
-              <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
+              <Wallet className="w-4 h-4 text-rose-700" />
             </div>
-            <div className="text-sm sm:text-xl font-extrabold text-blue-700 font-mono truncate">
+            <div className="text-base sm:text-xl font-extrabold text-rose-700 font-mono truncate">
               {formatVND(netBalance)}
             </div>
-            <span className="text-[9px] sm:text-[10px] text-blue-600 block mt-0.5 truncate">
-              BIDV STK 8630100930
+            <span className="text-[10px] text-rose-800/80 block mt-0.5 truncate font-medium">
+              Đối soát khớp 100% BIDV 8630100930
             </span>
           </div>
         </div>

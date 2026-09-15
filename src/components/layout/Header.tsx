@@ -59,20 +59,20 @@ export default function Header() {
         <span>Tài khoản tiếp nhận duy nhất: <strong className="text-white font-semibold">BIDV 8630100930</strong> (UB MTTQ VN XA EA SUP) - Chi nhánh Ea Súp</span>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Platform Name */}
-          <Link href="/" className="flex items-center gap-3 group">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group min-w-0 shrink">
             <img
               src="/images/logo-mttq.png"
               alt="Mặt trận Tổ quốc Việt Nam"
-              className="w-11 h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+              className="w-9 h-9 sm:w-11 sm:h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform shrink-0"
             />
-            <div>
-              <div className="text-[10px] sm:text-[11px] uppercase tracking-wider font-bold text-rose-700">
+            <div className="min-w-0">
+              <div className="text-[9.5px] sm:text-[11px] uppercase tracking-wider font-bold text-rose-700 whitespace-nowrap leading-tight">
                 ỦY BAN MTTQ XÃ EA SÚP
               </div>
-              <h1 className="text-xs sm:text-base font-extrabold text-slate-900 tracking-tight group-hover:text-rose-600 transition-colors uppercase">
+              <h1 className="text-[11px] sm:text-base font-extrabold text-slate-900 tracking-tight group-hover:text-rose-600 transition-colors uppercase whitespace-nowrap leading-tight">
                 QUỸ VÌ NGƯỜI NGHÈO
               </h1>
             </div>
@@ -166,21 +166,22 @@ export default function Header() {
             )}
           </div>
 
-          {/* Mobile Actions: Nút Trang chủ & Nút 3 gạch ngang */}
-          <div className="flex md:hidden items-center gap-1.5">
+          {/* Mobile Actions: Nút Trang chủ thu nhỏ gọn gàng & Nút 3 gạch ngang */}
+          <div className="flex md:hidden items-center gap-1 shrink-0">
             <Link
               href="/"
-              className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-colors flex items-center gap-1 shadow-2xs"
+              className="px-2 py-1 rounded-md text-[10px] sm:text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-colors flex items-center gap-1 shadow-2xs shrink-0"
+              title="Về Trang chủ"
             >
-              <Home className="w-3.5 h-3.5 text-rose-600" />
+              <Home className="w-3 h-3 text-rose-600 shrink-0" />
               <span>Trang chủ</span>
             </Link>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-lg text-slate-700 hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer border border-transparent hover:border-rose-200"
+              className="p-1.5 rounded-md text-slate-700 hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer border border-transparent hover:border-rose-200 shrink-0"
               aria-label="Mở menu điều hướng"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
