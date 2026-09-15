@@ -35,23 +35,40 @@ export default function HeroBanner() {
             Minh bạch 100% từng đồng tiền ủng hộ của đồng bào và kiều bào hảo tâm dành cho các gia đình có hoàn cảnh khó khăn tại <strong>20 thôn, buôn</strong> trên địa bàn xã Ea Súp. Dữ liệu ngân hàng đối soát trực tiếp qua Casso.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 text-xs text-slate-800 max-w-md">
-            <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm p-2.5 rounded-lg border border-rose-200/80 shadow-xs">
-              <CheckCircle2 className="w-3.5 h-3.5 text-rose-600 shrink-0" />
-              <span className="font-medium">Quy chế QĐ 13/QĐ-MTTQ công khai</span>
+          {/* Thông tin pháp lý & Mã QR BIDV mặc định tự nhập tiền */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pt-1 max-w-lg">
+            {/* Cột trái: 2 tiêu chuẩn minh bạch */}
+            <div className="space-y-2 flex-1 w-full text-xs text-slate-800">
+              <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm p-2.5 rounded-lg border border-rose-200/80 shadow-xs">
+                <CheckCircle2 className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                <span className="font-medium">Quy chế QĐ 13/QĐ-MTTQ công khai</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm p-2.5 rounded-lg border border-rose-200/80 shadow-xs">
+                <CheckCircle2 className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                <span className="font-medium">Tài khoản BIDV 8630100930 đối soát 24/7</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm p-2.5 rounded-lg border border-rose-200/80 shadow-xs">
-              <CheckCircle2 className="w-3.5 h-3.5 text-rose-600 shrink-0" />
-              <span className="font-medium">Định mức xây nhà 8 triệu/nhà từ xã</span>
-            </div>
-            <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm p-2.5 rounded-lg border border-rose-200/80 shadow-xs">
-              <CheckCircle2 className="w-3.5 h-3.5 text-rose-600 shrink-0" />
-              <span className="font-medium">Tài khoản BIDV 8630100930 đối soát 24/7</span>
-            </div>
-            <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm p-2.5 rounded-lg border border-rose-200/80 shadow-xs">
-              <CheckCircle2 className="w-3.5 h-3.5 text-rose-600 shrink-0" />
-              <span className="font-medium">Biên bản nghiệm thu có chữ ký Ban CTMT</span>
-            </div>
+
+            {/* Cột phải: Mã QR BIDV duy nhất nhỏ gọn (tự chỉnh số tiền & nội dung) */}
+            <a
+              href="#dong-gop"
+              title="Quét mã QR BIDV để ủng hộ (Tự chỉnh số tiền và nội dung tùy tâm)"
+              className="bg-white/95 backdrop-blur-sm p-2 rounded-xl border border-rose-200/90 shadow-md hover:shadow-lg hover:border-rose-400 transition-all flex flex-col items-center text-center shrink-0 w-28 sm:w-32 group"
+            >
+              <div className="relative w-full aspect-square bg-white rounded-lg overflow-hidden border border-rose-100 p-0.5">
+                <img
+                  src="https://img.vietqr.io/image/bidv-8630100930-compact2.png?accountName=UY%20BAN%20MTTQ%20VN%20XA%20EA%20SUP"
+                  alt="Mã QR BIDV 8630100930"
+                  className="w-full h-full object-contain group-hover:scale-105 transition-transform"
+                />
+              </div>
+              <span className="text-[10px] font-bold text-rose-700 mt-1 leading-tight">
+                MÃ QR BIDV
+              </span>
+              <span className="text-[9px] text-slate-500 font-medium leading-tight">
+                Tự chỉnh số tiền &amp; nội dung
+              </span>
+            </a>
           </div>
 
           <div className="pt-3 flex flex-wrap items-center gap-3">
