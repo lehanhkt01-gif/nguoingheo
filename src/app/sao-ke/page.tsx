@@ -142,13 +142,13 @@ export default function SaoKePage() {
   }, [loadData]);
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <div className="min-h-screen bg-slate-50/70 py-6 sm:py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         {/* Header Tiêu đề & Chứng thực */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-rose-100">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold mb-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100/80 text-rose-800 text-xs font-semibold mb-2">
+              <ShieldCheck className="w-4 h-4 text-rose-600" />
               <span>CỔNG SAO KÊ THỜI GIAN THỰC (LIVE LEDGER)</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
@@ -173,66 +173,72 @@ export default function SaoKePage() {
           )}
         </div>
 
-        {/* Thẻ Thống Kê Tài Khoản BIDV 8630100930 */}
-        <div className="bg-gradient-to-br from-slate-900 via-slate-950 to-red-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-amber-500/30">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between pb-6 mb-6 border-b border-slate-800 gap-4">
+        {/* Thẻ Thống Kê Tài Khoản BIDV 8630100930 - Phong cách Hồng - Trắng Tinh Tế, Thân Thiện Mobile */}
+        <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-rose-200/90 shadow-sm shadow-rose-100/50">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between pb-4 sm:pb-5 mb-4 sm:mb-5 border-b border-rose-100 gap-3 sm:gap-4">
             <div>
-              <div className="text-amber-400 text-xs font-mono tracking-wider uppercase flex items-center gap-2">
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 text-[11px] sm:text-xs font-mono font-semibold tracking-wide border border-rose-200/70 mb-1.5">
                 <span>TÀI KHOẢN TIẾP NHẬN DUY NHẤT: BIDV EA SÚP</span>
                 <span>•</span>
                 <span>BIN: 970418</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold mt-1 text-white">
+              <h2 className="text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                 QUY VI NGUOI NGHEO XA EA SUP - 8630100930
               </h2>
-              <p className="text-slate-400 text-xs mt-0.5">
-                Chủ tài khoản: <strong>UY BAN MTTQ VN XA EA SUP</strong> (Ban Vận Động Quỹ)
+              <p className="text-slate-600 text-xs sm:text-sm mt-0.5">
+                Chủ tài khoản: <strong className="text-slate-800">UY BAN MTTQ VN XA EA SUP</strong> (Ban Vận Động Quỹ)
               </p>
             </div>
 
-            <div className="flex items-center gap-2 bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 px-3.5 py-2 rounded-xl text-xs font-medium self-start lg:self-auto">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1.5 rounded-xl text-xs font-medium self-start lg:self-center shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
               <span>NGUỒN DỮ LIỆU TỪ NGÂN HÀNG - Chứng nhận bởi Casso</span>
             </div>
           </div>
 
           {/* 3 Chỉ Số Nổi Bật: Vào (+), Ra (-), Dư (=) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-slate-900/80 p-5 rounded-2xl border border-slate-800">
-              <div className="flex items-center justify-between text-emerald-400 text-xs font-semibold mb-1">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            <div className="bg-gradient-to-br from-emerald-50/50 to-white p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-emerald-200/80 shadow-2xs">
+              <div className="flex items-center justify-between text-emerald-700 text-xs font-bold mb-1">
                 <span>SỐ TIỀN ĐƯỢC ỦNG HỘ (+)</span>
-                <ArrowUpRight className="w-4 h-4" />
+                <div className="w-6 h-6 rounded-full bg-emerald-100/70 flex items-center justify-center">
+                  <ArrowUpRight className="w-3.5 h-3.5 text-emerald-700" />
+                </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-emerald-700 font-mono tracking-tight">
                 {formatVND(summary?.totalIn || 0)}
               </div>
-              <span className="text-[11px] text-slate-400 mt-1 block">
+              <span className="text-[11px] sm:text-xs text-slate-500 mt-1 block font-medium">
                 {summary?.totalDonationsCount || 0} lượt đóng góp tiếp nhận
               </span>
             </div>
 
-            <div className="bg-slate-900/80 p-5 rounded-2xl border border-slate-800">
-              <div className="flex items-center justify-between text-red-400 text-xs font-semibold mb-1">
+            <div className="bg-gradient-to-br from-rose-50/50 to-white p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-rose-200/80 shadow-2xs">
+              <div className="flex items-center justify-between text-rose-700 text-xs font-bold mb-1">
                 <span>SỐ TIỀN ĐÃ GIẢI NGÂN (-)</span>
-                <ArrowDownRight className="w-4 h-4" />
+                <div className="w-6 h-6 rounded-full bg-rose-100/70 flex items-center justify-center">
+                  <ArrowDownRight className="w-3.5 h-3.5 text-rose-700" />
+                </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-red-400">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-rose-700 font-mono tracking-tight">
                 {formatVND(summary?.totalOut || 0)}
               </div>
-              <span className="text-[11px] text-slate-400 mt-1 block">
+              <span className="text-[11px] sm:text-xs text-slate-500 mt-1 block font-medium">
                 {summary?.totalDisbursementsCount || 0} phiếu chi có scan mộc đỏ
               </span>
             </div>
 
-            <div className="bg-slate-900/80 p-5 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-slate-900 to-amber-950/40">
-              <div className="flex items-center justify-between text-amber-300 text-xs font-semibold mb-1">
+            <div className="bg-gradient-to-br from-rose-50/60 to-pink-50/40 p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-rose-300/80 shadow-2xs">
+              <div className="flex items-center justify-between text-rose-900 text-xs font-bold mb-1">
                 <span>SỐ DƯ TÀI KHOẢN THỰC TẾ (=)</span>
-                <Wallet className="w-4 h-4" />
+                <div className="w-6 h-6 rounded-full bg-rose-100 flex items-center justify-center">
+                  <Wallet className="w-3.5 h-3.5 text-rose-700" />
+                </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-extrabold text-amber-300">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-rose-700 font-mono tracking-tight">
                 {formatVND(summary?.currentBalance || 0)}
               </div>
-              <span className="text-[11px] text-amber-200/70 mt-1 block">
+              <span className="text-[11px] sm:text-xs text-rose-900/80 mt-1 block font-medium">
                 Đối soát khớp 100% BIDV 8630100930
               </span>
             </div>
@@ -240,26 +246,26 @@ export default function SaoKePage() {
         </div>
 
         {/* Tab Chuyển Đổi: Bảng Sao Kê Trực Tuyến & File Chứng Từ Scan */}
-        <div className="flex border-b border-slate-200 gap-6">
+        <div className="flex border-b border-rose-200/80 gap-4 sm:gap-6 overflow-x-auto">
           <button
             onClick={() => setActiveMainTab("TRANSACTIONS")}
-            className={`pb-3 text-sm font-bold transition-colors flex items-center gap-2 border-b-2 ${
+            className={`pb-3 text-xs sm:text-sm font-bold transition-colors flex items-center gap-2 border-b-2 whitespace-nowrap ${
               activeMainTab === "TRANSACTIONS"
-                ? "border-red-700 text-red-700"
+                ? "border-rose-600 text-rose-600"
                 : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
             <span>Bảng Kê Chi Tiết Giao Dịch Trực Tuyến</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-semibold">
               {totalRecords}
             </span>
           </button>
 
           <button
             onClick={() => setActiveMainTab("SCANNED_DOCS")}
-            className={`pb-3 text-sm font-bold transition-colors flex items-center gap-2 border-b-2 ${
+            className={`pb-3 text-xs sm:text-sm font-bold transition-colors flex items-center gap-2 border-b-2 whitespace-nowrap ${
               activeMainTab === "SCANNED_DOCS"
-                ? "border-red-700 text-red-700"
+                ? "border-rose-600 text-rose-600"
                 : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
