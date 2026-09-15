@@ -59,30 +59,18 @@ export default function HeroBanner() {
             Minh bạch 100% từng đồng tiền ủng hộ của đồng bào và kiều bào hảo tâm dành cho các gia đình có hoàn cảnh khó khăn tại <strong>20 thôn, buôn</strong> trên địa bàn xã Ea Súp. Dữ liệu ngân hàng đối soát trực tiếp qua Casso.
           </p>
 
-          {/* Khu vực thông tin pháp lý, mã QR BIDV & nút hành động được sắp xếp gọn gàng */}
-          <div className="pt-1 max-w-xl">
-            <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2.5 sm:gap-3 items-stretch">
-              {/* 1. Tiêu chuẩn minh bạch */}
-              <div className="space-y-2 sm:col-start-1 sm:row-start-1">
-                <div className="flex items-center gap-2.5 bg-white/95 backdrop-blur-sm px-3.5 py-2.5 rounded-xl border border-rose-200/90 shadow-2xs">
-                  <CheckCircle2 className="w-4 h-4 text-rose-600 shrink-0" />
-                  <span className="font-medium text-[11px] sm:text-xs text-slate-800">Quy chế QĐ 13/QĐ-MTTQ công khai</span>
-                </div>
-                <div className="flex items-center gap-2.5 bg-white/95 backdrop-blur-sm px-3.5 py-2.5 rounded-xl border border-rose-200/90 shadow-2xs">
-                  <CheckCircle2 className="w-4 h-4 text-rose-600 shrink-0" />
-                  <span className="font-medium text-[11px] sm:text-xs text-slate-800">Tài khoản BIDV 8630100930 đối soát 24/7</span>
-                </div>
-              </div>
-
-              {/* 2. Thẻ mã QR BIDV - Bấm vào sẽ mở popup phóng to toàn màn hình */}
+          {/* Khu vực mã QR BIDV & nút hành động */}
+          <div className="pt-1.5 max-w-xl">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
+              {/* Thẻ mã QR BIDV - Bấm vào sẽ mở popup phóng to toàn màn hình */}
               <button
                 type="button"
                 onClick={() => setShowQrModal(true)}
                 title="Bấm để phóng to mã QR BIDV chuyển khoản"
-                className="order-2 sm:order-none sm:col-start-2 sm:row-span-2 bg-white/95 backdrop-blur-sm p-2.5 rounded-2xl border border-rose-200/90 shadow-md hover:shadow-lg hover:border-rose-400 transition-all flex flex-row sm:flex-col items-center justify-center gap-3 sm:gap-1.5 text-left sm:text-center shrink-0 sm:w-40 group cursor-pointer"
+                className="bg-white/95 backdrop-blur-sm p-2.5 sm:p-3 rounded-2xl border border-rose-200/90 shadow-md hover:shadow-lg hover:border-rose-400 transition-all flex items-center gap-3 sm:gap-3.5 text-left shrink-0 group cursor-pointer"
               >
-                {/* Khung ảnh QR kích thước lớn */}
-                <div className="relative w-24 h-24 sm:w-32 sm:h-32 bg-white rounded-xl overflow-hidden border border-rose-100 p-0.5 shrink-0 flex items-center justify-center shadow-2xs">
+                {/* Khung ảnh QR kích thước chuẩn */}
+                <div className="relative w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-xl overflow-hidden border border-rose-100 p-0.5 shrink-0 flex items-center justify-center shadow-2xs">
                   <img
                     src="https://img.vietqr.io/image/bidv-8630100930-compact2.png?accountName=UY%20BAN%20MTTQ%20VN%20XA%20EA%20SUP"
                     alt="Mã QR BIDV 8630100930"
@@ -90,34 +78,34 @@ export default function HeroBanner() {
                   />
                 </div>
                 <div>
-                  <span className="text-[11px] font-bold text-rose-700 block leading-tight">
-                    MÃ QR BIDV
+                  <span className="text-[11px] sm:text-xs font-bold text-rose-700 block leading-tight">
+                    MÃ QR BIDV 8630100930
                   </span>
-                  <span className="text-[10px] text-slate-500 font-medium block leading-tight">
-                    Tự chỉnh số tiền &amp; nội dung
+                  <span className="text-[10px] sm:text-[11px] text-slate-500 font-medium block mt-0.5 leading-tight">
+                    Tự chỉnh số tiền &amp; nội dung tùy tâm
                   </span>
-                  <span className="text-[9px] text-rose-600 font-bold underline mt-0.5 block">
+                  <span className="text-[10px] text-rose-600 font-bold underline mt-1.5 block">
                     Chạm để phóng to QR &rarr;
                   </span>
                 </div>
               </button>
 
-              {/* 3. Nút hành động */}
-              <div className="order-3 sm:order-none sm:col-start-1 sm:row-start-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-0.5">
+              {/* 2 Nút hành động */}
+              <div className="flex flex-col gap-2 flex-1 justify-center">
                 <button
                   type="button"
                   onClick={() => setShowQrModal(true)}
-                  className="flex-1 px-3.5 py-2.5 sm:py-2 rounded-lg bg-gradient-to-r from-pink-500 via-rose-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-semibold text-xs shadow-md shadow-rose-300/40 hover:scale-[1.02] transition-all flex items-center justify-center gap-1.5 text-center whitespace-nowrap cursor-pointer"
+                  className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-pink-500 via-rose-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-semibold text-xs sm:text-sm shadow-md shadow-rose-300/40 hover:scale-[1.01] transition-all flex items-center justify-center gap-1.5 text-center whitespace-nowrap cursor-pointer"
                 >
-                  <Heart className="w-3.5 h-3.5 fill-current text-white shrink-0" />
+                  <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current text-white shrink-0" />
                   <span>Đóng góp trực tuyến VietQR</span>
                 </button>
 
                 <Link
                   href="/sao-ke"
-                  className="px-3.5 py-2.5 sm:py-2 rounded-lg bg-white/95 hover:bg-white text-rose-700 font-semibold text-xs border border-rose-300 shadow-2xs backdrop-blur-sm transition-all inline-flex items-center justify-center gap-1.5 group text-center whitespace-nowrap"
+                  className="w-full px-3.5 py-2 sm:py-2.5 rounded-xl bg-white/95 hover:bg-white text-rose-700 font-semibold text-xs sm:text-sm border border-rose-300 shadow-2xs backdrop-blur-sm transition-all inline-flex items-center justify-center gap-1.5 group text-center whitespace-nowrap"
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                  <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-600 shrink-0" />
                   <span>Xem sao kê</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform shrink-0" />
                 </Link>

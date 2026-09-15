@@ -429,11 +429,11 @@ export default function LiveLedgerTable() {
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50/90 text-slate-500 font-semibold border-b border-slate-200/80 uppercase text-[11px] tracking-wider">
-                <th className="py-3.5 px-3 text-center w-14 whitespace-nowrap">STT</th>
-                <th className="py-3.5 px-4 whitespace-nowrap">Thời gian</th>
-                <th className="py-3.5 px-4 whitespace-nowrap">Loại GD</th>
-                <th className="py-3.5 px-4">Nhà hảo tâm / Nơi thụ hưởng</th>
-                <th className="py-3.5 px-4">Số tiền (VNĐ)</th>
+                <th className="py-3.5 px-3 text-center w-12 whitespace-nowrap">STT</th>
+                <th className="py-3.5 px-3 whitespace-nowrap">Thời gian</th>
+                <th className="py-3.5 px-1.5 text-center w-16 sm:w-20 whitespace-nowrap">Loại GD</th>
+                <th className="py-3.5 px-4 min-w-[220px] sm:min-w-[280px]">Nhà hảo tâm / Nơi thụ hưởng</th>
+                <th className="py-3.5 px-4 whitespace-nowrap">Số tiền (VNĐ)</th>
                 <th className="py-3.5 px-4">Nội dung chuyển khoản</th>
                 <th className="py-3.5 px-4">Mã GD / Phiếu chi</th>
                 <th className="py-3.5 px-4 text-center whitespace-nowrap">Trạng thái</th>
@@ -463,27 +463,27 @@ export default function LiveLedgerTable() {
                       </td>
 
                       {/* Thời gian */}
-                      <td className="py-3.5 px-4 whitespace-nowrap text-slate-500 font-mono">
+                      <td className="py-3.5 px-3 whitespace-nowrap text-slate-500 font-mono">
                         {formatDate(t.transactionDateTime)}
                       </td>
 
-                      {/* Phân loại: Tiền vào / Tiền ra */}
-                      <td className="py-3.5 px-4 whitespace-nowrap">
+                      {/* Phân loại: Tiền vào / Tiền ra - Thu gọn tối đa */}
+                      <td className="py-3.5 px-1.5 text-center whitespace-nowrap w-16 sm:w-20">
                         {isOut ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                          <span className="inline-flex items-center justify-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200" title="Tiền ra giải ngân">
                             <ArrowUpRight className="w-3 h-3 text-rose-600" />
                             <span>Tiền ra</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                          <span className="inline-flex items-center justify-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200" title="Tiền vào đóng góp">
                             <ArrowDownLeft className="w-3 h-3 text-emerald-600" />
                             <span>Tiền vào</span>
                           </span>
                         )}
                       </td>
 
-                      {/* Nhà hảo tâm / Nơi thụ hưởng */}
-                      <td className="py-3.5 px-4 font-bold text-slate-900">
+                      {/* Nhà hảo tâm / Nơi thụ hưởng - Dãn rộng gấp 2 lần giúp hiển thị đầy đủ tên */}
+                      <td className="py-3.5 px-4 min-w-[220px] sm:min-w-[280px] font-bold text-slate-900 leading-snug">
                         {t.donorName}
                       </td>
 

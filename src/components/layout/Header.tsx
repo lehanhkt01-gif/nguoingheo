@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Heart, ShieldCheck, Menu, X, User, LogOut, LayoutDashboard, ChevronDown } from "lucide-react";
+import { Heart, ShieldCheck, Menu, X, User, LogOut, LayoutDashboard, ChevronDown, Home } from "lucide-react";
 
 export default function Header() {
   const pathname = usePathname();
@@ -166,11 +166,18 @@ export default function Header() {
             )}
           </div>
 
-          {/* Mobile Menu Button - Chỉ hiển thị nút 3 gạch ngang */}
-          <div className="flex md:hidden items-center">
+          {/* Mobile Actions: Nút Trang chủ & Nút 3 gạch ngang */}
+          <div className="flex md:hidden items-center gap-1.5">
+            <Link
+              href="/"
+              className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-colors flex items-center gap-1 shadow-2xs"
+            >
+              <Home className="w-3.5 h-3.5 text-rose-600" />
+              <span>Trang chủ</span>
+            </Link>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-700 hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg text-slate-700 hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer border border-transparent hover:border-rose-200"
               aria-label="Mở menu điều hướng"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
