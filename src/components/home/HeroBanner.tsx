@@ -5,7 +5,7 @@ import { Heart, ShieldCheck, ArrowRight, CheckCircle2 } from "lucide-react";
 
 export default function HeroBanner() {
   return (
-    <section className="relative overflow-hidden bg-rose-50/60 pt-4 pb-6 sm:pt-6 sm:pb-8 lg:pt-8 lg:pb-10">
+    <section id="dong-gop" className="relative overflow-hidden bg-rose-50/60 pt-4 pb-6 sm:pt-6 sm:pb-8 lg:pt-8 lg:pb-10">
       {/* Ảnh nền buôn làng Tây Nguyên nắng ấm tươi sáng */}
       <div className="absolute inset-0 z-0">
         <img
