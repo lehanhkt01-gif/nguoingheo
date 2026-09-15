@@ -218,10 +218,32 @@ export default function LiveLedgerTable() {
     fetchData();
   };
 
-  // Bảo đảm hiển thị chuẩn 100% không bao giờ lọt Tiền Vào khi xem tab Chi
+  // Sắp xếp theo thời gian mới nhất lên đầu, khử trùng lặp và lọc theo tab
   const displayTransactions = useMemo(() => {
-    if (activeTab === "ALL") return transactions;
-    return transactions.filter((t) => t.type === activeTab);
+    let list = [...transactions];
+
+    // 1. Lọc theo tab hiện tại (ALL, IN, OUT)
+    if (activeTab !== "ALL") {
+      list = list.filter((t) => t.type === activeTab);
+    }
+
+    // 2. Khử trùng lặp (Deduplicate) theo reference / mã giao dịch hoặc id
+    const seen = new Set<string>();
+    list = list.filter((t) => {
+      const key = t.reference ? `${t.type}_${t.reference}` : `${t.type}_${t.id}_${t.transactionDateTime}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    // 3. Sắp xếp theo thời gian mới nhất lên đầu (descending: 13/09 -> 12/09 -> 11/09...)
+    list.sort((a, b) => {
+      const timeA = new Date(a.transactionDateTime).getTime();
+      const timeB = new Date(b.transactionDateTime).getTime();
+      return timeB - timeA;
+    });
+
+    return list;
   }, [transactions, activeTab]);
 
   const netBalance = stats.totalIn - stats.totalOut;
@@ -398,7 +420,7 @@ export default function LiveLedgerTable() {
           </div>
 
           <span className="text-[11px] sm:text-xs text-slate-500 font-medium">
-            Hiển thị <strong>{displayTransactions.length}</strong> / <strong>{totalCount}</strong> giao dịch
+            Hiển thị <strong>{displayTransactions.length}</strong> giao dịch ({activeTab === "ALL" ? "Tổng hợp" : activeTab === "IN" ? "Tiền vào" : "Tiền ra"})
           </span>
         </div>
 
@@ -407,21 +429,39 @@ export default function LiveLedgerTable() {
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50/90 text-slate-500 font-semibold border-b border-slate-200/80 uppercase text-[11px] tracking-wider">
-                <th className="py-3.5 px-4">Thời gian</th>
-                <th className="py-3.5 px-4">Loại GD</th>
+                <th className="py-3.5 px-3 text-center w-14 whitespace-nowrap">STT</th>
+                <th className="py-3.5 px-4 whitespace-nowrap">Thời gian</th>
+                <th className="py-3.5 px-4 whitespace-nowrap">Loại GD</th>
                 <th className="py-3.5 px-4">Nhà hảo tâm / Nơi thụ hưởng</th>
                 <th className="py-3.5 px-4">Số tiền (VNĐ)</th>
                 <th className="py-3.5 px-4">Nội dung chuyển khoản</th>
                 <th className="py-3.5 px-4">Mã GD / Phiếu chi</th>
-                <th className="py-3.5 px-4 text-center">Trạng thái</th>
+                <th className="py-3.5 px-4 text-center whitespace-nowrap">Trạng thái</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
               {displayTransactions.length > 0 ? (
-                displayTransactions.map((t) => {
+                displayTransactions.map((t, idx) => {
                   const isOut = t.type === "OUT";
+                  // Đánh số thứ tự ngược từ tổng số giao dịch về 1 cho mỗi phần
+                  const stt = displayTransactions.length - idx;
+                  const sttStr = String(stt).padStart(2, "0");
+
                   return (
-                    <tr key={t.id} className="hover:bg-rose-50/30 transition-colors">
+                    <tr key={t.reference ? `${t.type}_${t.reference}` : `${t.id}_${idx}`} className="hover:bg-rose-50/30 transition-colors">
+                      {/* STT đếm ngược */}
+                      <td className="py-3.5 px-3 text-center whitespace-nowrap">
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded font-mono text-[11px] font-bold ${
+                            isOut
+                              ? "bg-rose-50 text-rose-700 border border-rose-200/60"
+                              : "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
+                          }`}
+                        >
+                          #{sttStr}
+                        </span>
+                      </td>
+
                       {/* Thời gian */}
                       <td className="py-3.5 px-4 whitespace-nowrap text-slate-500 font-mono">
                         {formatDate(t.transactionDateTime)}
@@ -491,7 +531,7 @@ export default function LiveLedgerTable() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-400 text-xs">
+                  <td colSpan={8} className="py-12 text-center text-slate-400 text-xs">
                     {loading ? "Đang tải dữ liệu sao kê..." : "Không tìm thấy giao dịch nào phù hợp."}
                   </td>
                 </tr>

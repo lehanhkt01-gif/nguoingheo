@@ -110,10 +110,31 @@ export default function SaoKePage() {
     }
   }, [activeTab, searchTerm, campaignFilter, page]);
 
-  // Bảo đảm hiển thị chuẩn 100% không bao giờ lọt Tiền Vào khi xem tab Chi
+  // Bảo đảm hiển thị chuẩn 100%, sắp xếp thời gian mới nhất lên đầu, khử trùng lặp và đánh STT ngược
   const displayTransactions = useMemo(() => {
-    if (activeTab === "ALL") return transactions;
-    return transactions.filter((t) => t.type === activeTab);
+    let list = [...transactions];
+
+    if (activeTab !== "ALL") {
+      list = list.filter((t) => t.type === activeTab);
+    }
+
+    // Khử trùng lặp theo mã giao dịch / reference
+    const seen = new Set<string>();
+    list = list.filter((t) => {
+      const key = t.reference ? `${t.type}_${t.reference}` : `${t.type}_${t.id}_${t.transactionDateTime}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    // Sắp xếp thời gian giảm dần (mới nhất lên trước)
+    list.sort((a, b) => {
+      const timeA = new Date(a.transactionDateTime).getTime();
+      const timeB = new Date(b.transactionDateTime).getTime();
+      return timeB - timeA;
+    });
+
+    return list;
   }, [transactions, activeTab]);
 
   useEffect(() => {
@@ -334,6 +355,7 @@ export default function SaoKePage() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-100/80 text-slate-700 font-semibold border-b border-slate-200">
+                    <th className="p-3.5 text-center w-16 whitespace-nowrap">STT</th>
                     <th className="p-3.5 whitespace-nowrap">Thời gian</th>
                     <th className="p-3.5 whitespace-nowrap">Mã TID / Ngân hàng</th>
                     <th className="p-3.5 min-w-[260px]">Nội dung giao dịch & Tag chiến dịch</th>
@@ -344,21 +366,37 @@ export default function SaoKePage() {
                 <tbody className="divide-y divide-slate-100">
                   {loading ? (
                     <tr>
-                      <td colSpan={5} className="text-center py-12 text-slate-400">
+                      <td colSpan={6} className="text-center py-12 text-slate-400">
                         Đang đồng bộ dữ liệu sao kê BIDV 8630100930...
                       </td>
                     </tr>
                   ) : displayTransactions.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="text-center py-12 text-slate-500">
+                      <td colSpan={6} className="text-center py-12 text-slate-500">
                         Không tìm thấy giao dịch nào phù hợp với điều kiện tìm kiếm.
                       </td>
                     </tr>
                   ) : (
-                    displayTransactions.map((tx) => {
+                    displayTransactions.map((tx, idx) => {
                       const isIncome = tx.type === "IN";
+                      // Đánh số thứ tự ngược từ tổng số giao dịch về 1 cho mỗi phần
+                      const stt = displayTransactions.length - idx;
+                      const sttStr = String(stt).padStart(2, "0");
+
                       return (
-                        <tr key={tx.id} className="hover:bg-slate-50/80 transition-colors">
+                        <tr key={tx.reference ? `${tx.type}_${tx.reference}` : `${tx.id}_${idx}`} className="hover:bg-slate-50/80 transition-colors">
+                          {/* STT đếm ngược */}
+                          <td className="p-3.5 text-center whitespace-nowrap">
+                            <span
+                              className={`inline-block px-2 py-0.5 rounded font-mono text-[11px] font-bold ${
+                                !isIncome
+                                  ? "bg-rose-50 text-rose-700 border border-rose-200/60"
+                                  : "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
+                              }`}
+                            >
+                              #{sttStr}
+                            </span>
+                          </td>
                           {/* Thời gian */}
                           <td className="p-3.5 whitespace-nowrap">
                             <div className="font-medium text-slate-900" title={formatDateTime(tx.transactionDateTime)}>

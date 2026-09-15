@@ -53,18 +53,27 @@ export async function GET(req: NextRequest) {
         }),
         prisma.disbursement.count({ where }),
       ]);
-      items = disbursements.map((d) => ({
-        id: d.id,
-        reference: `PC-${d.id.toString().padStart(6, "0")}`,
-        type: "OUT",
-        amount: Number(d.amount),
-        description: d.notes || `Chi hỗ trợ ${d.recipientName} (${d.village})`,
-        transactionDateTime: d.date.toISOString(),
-        donorName: d.recipientName,
-        proofUrls: d.proofImageUrl ? [d.proofImageUrl] : [],
-        receiptNumber: `PC-${d.id.toString().padStart(4, "0")}`,
-      }));
-      totalRecords = count;
+      const seenOut = new Set<string>();
+      items = disbursements
+        .map((d) => ({
+          id: d.id,
+          reference: `PC-${d.id.toString().padStart(6, "0")}`,
+          type: "OUT",
+          amount: Number(d.amount),
+          description: d.notes || `Chi hỗ trợ ${d.recipientName} (${d.village})`,
+          transactionDateTime: d.date.toISOString(),
+          donorName: d.recipientName,
+          proofUrls: d.proofImageUrl ? [d.proofImageUrl] : [],
+          receiptNumber: `PC-${d.id.toString().padStart(4, "0")}`,
+        }))
+        .filter((t) => {
+          const key = t.reference || String(t.id);
+          if (seenOut.has(key)) return false;
+          seenOut.add(key);
+          return true;
+        })
+        .sort((a, b) => new Date(b.transactionDateTime).getTime() - new Date(a.transactionDateTime).getTime());
+      totalRecords = items.length;
     } else if (isIn) {
       const where: any = { status: "COMPLETED" };
       if (search) {
@@ -86,18 +95,27 @@ export async function GET(req: NextRequest) {
         }),
         prisma.donation.count({ where }),
       ]);
-      items = donations.map((d) => ({
-        id: d.id,
-        reference: d.transactionId,
-        type: "IN",
-        amount: Number(d.amount),
-        description: d.description,
-        transactionDateTime: d.transactionDate.toISOString(),
-        donorName: d.donorName,
-        campaign: d.campaign ? { title: d.campaign.title, code: "VNN", slug: "vnn" } : null,
-        receiptNumber: d.transactionId,
-      }));
-      totalRecords = count;
+      const seenIn = new Set<string>();
+      items = donations
+        .map((d) => ({
+          id: d.id,
+          reference: d.transactionId,
+          type: "IN",
+          amount: Number(d.amount),
+          description: d.description,
+          transactionDateTime: d.transactionDate.toISOString(),
+          donorName: d.donorName,
+          campaign: d.campaign ? { title: d.campaign.title, code: "VNN", slug: "vnn" } : null,
+          receiptNumber: d.transactionId,
+        }))
+        .filter((t) => {
+          const key = t.reference || String(t.id);
+          if (seenIn.has(key)) return false;
+          seenIn.add(key);
+          return true;
+        })
+        .sort((a, b) => new Date(b.transactionDateTime).getTime() - new Date(a.transactionDateTime).getTime());
+      totalRecords = items.length;
     } else {
       // ALL: gộp donations và disbursements
       const [donations, disbursements] = await Promise.all([
@@ -137,9 +155,17 @@ export async function GET(req: NextRequest) {
         receiptNumber: `PC-${d.id.toString().padStart(4, "0")}`,
       }));
 
-      let all = [...mappedIn, ...mappedOut].sort(
-        (a, b) => new Date(b.transactionDateTime).getTime() - new Date(a.transactionDateTime).getTime()
-      );
+      const seenAll = new Set<string>();
+      let all = [...mappedIn, ...mappedOut]
+        .filter((t) => {
+          const key = `${t.type}_${t.reference || t.id}`;
+          if (seenAll.has(key)) return false;
+          seenAll.add(key);
+          return true;
+        })
+        .sort(
+          (a, b) => new Date(b.transactionDateTime).getTime() - new Date(a.transactionDateTime).getTime()
+        );
 
       if (search) {
         const s = search.toLowerCase();
