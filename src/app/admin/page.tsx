@@ -404,6 +404,8 @@ export default function AdminDashboardPage() {
               {stats.activeCampaigns} chiến dịch trọng điểm đang mở
             </div>
           </div>
+        </div>
+
         {/* Khối Cấu Hình Kết Nối Gemini API cho Chatbot Gem */}
         <div className="bg-white rounded-2xl border border-rose-200/80 shadow-xs overflow-hidden">
           <div className="p-4 sm:p-5 bg-gradient-to-r from-rose-50/60 via-pink-50/40 to-white border-b border-rose-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
