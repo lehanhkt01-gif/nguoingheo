@@ -54,23 +54,23 @@ export function formatTimeAgo(date: Date | string): string {
 
 export interface VietQRParams {
   amount?: number;
-  memo: string;
+  memo?: string;
   accountNumber?: string;
   accountName?: string;
 }
 
 export function buildVietQRUrl({
   amount = 0,
-  memo,
+  memo = "",
   accountNumber = "8630100930",
   accountName = "UY BAN MTTQ VN XA EA SUP",
 }: VietQRParams): string {
   const encodedAccountName = encodeURIComponent(accountName);
-  const encodedAddInfo = encodeURIComponent(memo.trim());
-  const amountParam = amount > 0 ? `&amount=${amount}` : "";
+  const addInfoParam = memo && memo.trim() ? `&addInfo=${encodeURIComponent(memo.trim())}` : "";
+  const amountParam = amount && amount > 0 ? `&amount=${amount}` : "";
 
   // Template compact2 chuẩn NAPAS 247 BIDV
-  return `https://img.vietqr.io/image/bidv-${accountNumber}-compact2.png?addInfo=${encodedAddInfo}&accountName=${encodedAccountName}${amountParam}`;
+  return `https://img.vietqr.io/image/bidv-${accountNumber}-compact2.png?accountName=${encodedAccountName}${addInfoParam}${amountParam}`;
 }
 
 export function parseTransactionDescription(description: string): {
