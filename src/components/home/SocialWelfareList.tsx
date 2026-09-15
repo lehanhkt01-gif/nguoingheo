@@ -38,9 +38,9 @@ interface GiftBatch {
 }
 
 const VILLAGES = [
-  "Buôn Drai",
-  "Buôn Cổng",
-  "Buôn A2",
+  "Buôn A",
+  "Buôn B",
+  "Buôn C",
   "Thôn 1",
   "Thôn 2",
   "Thôn 3",
@@ -64,7 +64,7 @@ const DEFAULT_CASES: WelfareCase[] = [
   {
     id: 1,
     recipientName: "Bà Y Thị",
-    village: "Buôn Drai",
+    village: "Buôn A",
     situation: "Hộ nghèo đặc biệt khó khăn, neo đơn bệnh tật. Căn nhà vách nứa dột nát cần hỗ trợ xây nhà Đại đoàn kết.",
     targetAmount: 80000000,
     currentAmount: 48500000,
@@ -94,11 +94,11 @@ const DEFAULT_GIFT_BATCHES: GiftBatch[] = [
   {
     id: 1,
     title: "Trao tặng hỗ trợ xây nhà Đại đoàn kết đợt 1 (Đổ móng kiên cố)",
-    village: "Buôn Drai",
+    village: "Buôn A",
     recipientCount: 1,
     amount: 8000000,
     date: "2026-09-08",
-    proofNote: "Biên bản bàn giao kinh phí đợt 1 có chữ ký Trưởng ban CTMT Buôn Drai",
+    proofNote: "Biên bản bàn giao kinh phí đợt 1 có chữ ký Trưởng ban CTMT Buôn A",
   },
   {
     id: 2,
@@ -112,7 +112,7 @@ const DEFAULT_GIFT_BATCHES: GiftBatch[] = [
   {
     id: 3,
     title: "Cứu trợ sửa mái nhà dột nát trước mùa mưa bão Tây Nguyên",
-    village: "Buôn Cổng",
+    village: "Buôn B",
     recipientCount: 1,
     amount: 5000000,
     date: "2026-09-10",
@@ -133,7 +133,7 @@ export default function SocialWelfareList() {
   const [editingCaseId, setEditingCaseId] = useState<number | null>(null);
   const [caseForm, setCaseForm] = useState<Omit<WelfareCase, "id">>({
     recipientName: "",
-    village: "Buôn Drai",
+    village: "Buôn A",
     situation: "",
     targetAmount: 50000000,
     currentAmount: 0,
@@ -145,7 +145,7 @@ export default function SocialWelfareList() {
   const [editingGiftId, setEditingGiftId] = useState<number | null>(null);
   const [giftForm, setGiftForm] = useState<Omit<GiftBatch, "id">>({
     title: "",
-    village: "Buôn Drai",
+    village: "Buôn A",
     recipientCount: 1,
     amount: 5000000,
     date: new Date().toISOString().split("T")[0],
@@ -193,7 +193,7 @@ export default function SocialWelfareList() {
     setEditingCaseId(null);
     setCaseForm({
       recipientName: "",
-      village: "Buôn Drai",
+      village: "Buôn A",
       situation: "",
       targetAmount: 50000000,
       currentAmount: 0,
@@ -248,7 +248,7 @@ export default function SocialWelfareList() {
     setEditingGiftId(null);
     setGiftForm({
       title: "",
-      village: "Buôn Drai",
+      village: "Buôn A",
       recipientCount: 1,
       amount: 5000000,
       date: new Date().toISOString().split("T")[0],

@@ -352,8 +352,9 @@ export default function AdminDashboardPage() {
                 className="py-1.5 px-3 text-xs rounded-lg border border-slate-200 bg-white font-medium text-slate-700"
               >
                 <option value="ALL">Toàn bộ địa bàn</option>
-                <option value="Buôn Drai">Buôn Drai</option>
-                <option value="Buôn Cổng">Buôn Cổng</option>
+                <option value="Buôn A">Buôn A</option>
+                <option value="Buôn B">Buôn B</option>
+                <option value="Buôn C">Buôn C</option>
                 <option value="Thôn 14">Thôn 14</option>
                 <option value="Thôn 12">Thôn 12</option>
               </select>

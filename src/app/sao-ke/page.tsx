@@ -294,11 +294,11 @@ export default function SaoKePage() {
                   className="py-2 px-3 text-xs rounded-xl border border-slate-300 bg-white focus:border-red-600"
                 >
                   <option value="">-- Mọi chiến dịch --</option>
-                  <option value="NDDK01">Nhà ĐĐK bà Y Thị (Buôn Drai)</option>
+                  <option value="NDDK01">Nhà ĐĐK bà Y Thị (Buôn A)</option>
                   <option value="NDDK02">Nhà ĐĐK ông Sáng (Thôn 5)</option>
                   <option value="SK01">Bò giống sinh kế (Thôn 12 & 14)</option>
                   <option value="TET2026">Tết Bính Ngọ vì người nghèo</option>
-                  <option value="CT01">Cứu trợ mổ tim cháu H'Hên (Buôn A2)</option>
+                  <option value="CT01">Cứu trợ mổ tim cháu H'Hên (Buôn C)</option>
                 </select>
               </div>
             </div>

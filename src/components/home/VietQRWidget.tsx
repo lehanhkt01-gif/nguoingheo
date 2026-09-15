@@ -11,7 +11,7 @@ interface CampaignOption {
 
 const CAMPAIGNS: CampaignOption[] = [
   { code: "CHUNG", label: "Quỹ Vì người nghèo xã Ea Súp (Chung 20 thôn buôn)" },
-  { code: "NDDK01", label: "Hỗ trợ Xây nhà Đại đoàn kết bà Y Thị - Buôn Drai" },
+  { code: "NDDK01", label: "Hỗ trợ Xây nhà Đại đoàn kết bà Y Thị - Buôn A" },
   { code: "NDDK02", label: "Xóa nhà tạm dột nát hộ ông Nguyễn Văn Sáng - Thôn 5" },
   { code: "SK01", label: "Trao tặng Bò giống sinh kế - Thôn 12 & Thôn 14" },
   { code: "TET", label: "Quà Tết Bính Ngọ vì người nghèo (500 suất quà)" },

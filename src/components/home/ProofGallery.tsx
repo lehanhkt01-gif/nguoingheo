@@ -18,12 +18,12 @@ const SAMPLE_PROOFS: ProofItem[] = [
   {
     id: 1,
     title: "Khởi công xây nhà Đại đoàn kết hộ bà Y Thị",
-    village: "Buôn Drai",
+    village: "Buôn A",
     category: "Nhà Đại đoàn kết",
     date: "09/09/2026",
     imageUrl: "https://images.unsplash.com/photo-1590674899484-d5640e854abe?w=800&auto=format&fit=crop&q=80",
     signer: "Trưởng ban CTMT Y Krô Bkrông",
-    description: "Đại diện UBMTTQ xã và Trưởng ban CTMT Buôn Drai bàn giao đợt 1 kinh phí 8 triệu đồng cùng vật tư xây dựng.",
+    description: "Đại diện UBMTTQ xã và Trưởng ban CTMT Buôn A bàn giao đợt 1 kinh phí 8 triệu đồng cùng vật tư xây dựng.",
   },
   {
     id: 2,
@@ -48,12 +48,12 @@ const SAMPLE_PROOFS: ProofItem[] = [
   {
     id: 4,
     title: "Trao tiền hỗ trợ phẫu thuật tim cho cháu H'Hên Mlô",
-    village: "Buôn A2",
+    village: "Buôn C",
     category: "Cứu trợ khẩn cấp",
     date: "08/09/2026",
     imageUrl: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&auto=format&fit=crop&q=80",
     signer: "Chủ tịch UBND xã Nguyễn Bá Bân",
-    description: "Trao tận tay viện phí 25 triệu đồng hỗ trợ cháu H'Hên nhập viện mổ tim theo đề nghị cấp bách của Buôn A2.",
+    description: "Trao tận tay viện phí 25 triệu đồng hỗ trợ cháu H'Hên nhập viện mổ tim theo đề nghị cấp bách của Buôn C.",
   },
 ];
 

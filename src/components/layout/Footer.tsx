@@ -80,7 +80,7 @@ export default function Footer() {
               Địa Bàn Quản Lý (20 Thôn Buôn)
             </h4>
             <p className="text-slate-400 leading-relaxed text-xs">
-              Quản lý và hỗ trợ toàn diện <strong>17 thôn</strong> và <strong>03 buôn</strong> (Buôn A2, Buôn Drai, Buôn Cổng).
+              Quản lý và hỗ trợ toàn diện <strong>17 thôn</strong> và <strong>03 buôn</strong> (Buôn A, Buôn B, Buôn C).
             </p>
             <div className="space-y-1 pt-1 text-slate-300 text-xs">
               <div className="flex items-center gap-1.5">
