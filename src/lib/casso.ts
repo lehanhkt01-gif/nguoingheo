@@ -86,11 +86,16 @@ function readEnvFileFallback(key: string): string {
 export function getCassoConfig(): CassoConfig {
   const settings = getSystemSettings();
 
+  const DEFAULT_CASSO_API_KEY =
+    "AK_CS.0e8da070b33411f1b16e75b6d158fd4f.eNGmt8RLY0IUPPL3ICO9wsI7k0HkZsluxTNfvIdfMDG8NNauwRxrFBDBYNShuDJqla4QZK3k";
+  const DEFAULT_CASSO_SECURE_TOKEN =
+    "Ho9x7hi5cHPvltlc4b6yBBcOv5yFU9yW7pKagBE1FJxWKtFWxprfrMzu8qM11tOt";
+
   const apiKey =
     cleanEnvString(process.env.CASSO_API_KEY) ||
     cleanEnvString(settings.cassoApiKey) ||
     readEnvFileFallback("CASSO_API_KEY") ||
-    "";
+    DEFAULT_CASSO_API_KEY;
 
   const secureToken =
     cleanEnvString(process.env.CASSO_SECURE_TOKEN) ||
@@ -98,7 +103,7 @@ export function getCassoConfig(): CassoConfig {
     cleanEnvString(process.env.CASSO_WEBHOOK_SECRET) ||
     readEnvFileFallback("CASSO_SECURE_TOKEN") ||
     readEnvFileFallback("CASSO_WEBHOOK_SECRET") ||
-    "EaSup_Charity_2026_Secure_Token_Secret";
+    DEFAULT_CASSO_SECURE_TOKEN;
 
   const accountNumber =
     cleanEnvString(process.env.CASSO_ACCOUNT_NUMBER) ||

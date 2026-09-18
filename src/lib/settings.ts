@@ -47,8 +47,13 @@ export function getSystemSettings(): SystemSettings {
     geminiApiKey: process.env.GEMINI_API_KEY || "",
     geminiModel: "gemini-2.0-flash",
     systemPrompt: "",
-    cassoApiKey: process.env.CASSO_API_KEY || "",
-    cassoSecureToken: process.env.CASSO_SECURE_TOKEN || process.env.CASSO_WEBHOOK_SECRET || "EaSup_Charity_2026_Secure_Token_Secret",
+    cassoApiKey:
+      process.env.CASSO_API_KEY ||
+      "AK_CS.0e8da070b33411f1b16e75b6d158fd4f.eNGmt8RLY0IUPPL3ICO9wsI7k0HkZsluxTNfvIdfMDG8NNauwRxrFBDBYNShuDJqla4QZK3k",
+    cassoSecureToken:
+      process.env.CASSO_SECURE_TOKEN ||
+      process.env.CASSO_WEBHOOK_SECRET ||
+      "Ho9x7hi5cHPvltlc4b6yBBcOv5yFU9yW7pKagBE1FJxWKtFWxprfrMzu8qM11tOt",
     cassoAccountNumber: process.env.CASSO_ACCOUNT_NUMBER || "8630100930",
     cassoApiUrl: process.env.CASSO_API_URL || "https://oauth.casso.vn/v2",
     updatedAt: new Date().toISOString(),
