@@ -37,6 +37,15 @@ export default function CounterDashboard() {
       }
     }
     fetchStats();
+
+    const interval = setInterval(fetchStats, 15000);
+    const onFocus = () => fetchStats();
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+    };
   }, []);
 
   return (

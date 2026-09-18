@@ -132,6 +132,21 @@ export default function LiveLedgerTable() {
 
   useEffect(() => {
     fetchData();
+
+    // Tự động đồng bộ thời gian thực mỗi 10 giây (ngay lập tức cập nhật khi có biến động)
+    const interval = setInterval(() => {
+      fetchData();
+    }, 10000);
+
+    const onFocus = () => {
+      fetchData();
+    };
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+    };
   }, [page, activeTab]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -177,9 +192,9 @@ export default function LiveLedgerTable() {
         <div className="p-4 sm:p-6 border-b border-rose-100 bg-gradient-to-r from-rose-50/50 via-white to-rose-50/30">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[11px] sm:text-xs font-semibold mb-1 sm:mb-2">
-                <ShieldCheck className="w-3.5 h-3.5 text-rose-600" />
-                <span>Minh Bạch 100% Thu - Chi</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] sm:text-xs font-semibold mb-1 sm:mb-2 border border-emerald-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                <span>Tự Động Cập Nhật Thời Gian Thực (Real-time)</span>
               </div>
               <h2 className="text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                 Sổ Sao Kê Đóng Góp Trực Tuyến

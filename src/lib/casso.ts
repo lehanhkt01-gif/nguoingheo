@@ -641,3 +641,31 @@ export async function getLiveAccountBalance(): Promise<number | null> {
   return cachedLiveBalance ? cachedLiveBalance.balance : null;
 }
 
+let lastAutoSyncTimestamp = 0;
+
+/**
+ * Tự động đồng bộ giao dịch từ Casso Open API ở chế độ ngầm (Background Auto Sync).
+ * Đảm bảo 100% tự động, không phụ thuộc vào thao tác thủ công của người dùng.
+ */
+export async function triggerBackgroundAutoSync(): Promise<void> {
+  const now = Date.now();
+  // Giãn cách tối thiểu 45s giữa các lần đồng bộ ngầm để tối ưu API
+  if (now - lastAutoSyncTimestamp < 45000) {
+    return;
+  }
+  lastAutoSyncTimestamp = now;
+
+  try {
+    const config = getCassoConfig();
+    if (!config.apiKey) return;
+
+    const res = await fetchCassoTransactions({ pageSize: 50, sort: "DESC" });
+    if (res.success && res.records && res.records.length > 0) {
+      await processCassoTransactions(res.records, config.accountNumber);
+    }
+  } catch (err) {
+    console.warn("[Casso Auto-Sync] Background sync check failed:", err);
+  }
+}
+
+
