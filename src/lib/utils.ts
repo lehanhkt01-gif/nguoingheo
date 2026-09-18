@@ -106,3 +106,38 @@ export function parseTransactionDescription(description: string): {
 
   return { campaignCode: null, donorName: null };
 }
+
+/**
+ * Lọc sạch nội dung chuyển khoản ngân hàng:
+ * Loại bỏ toàn bộ tiền tố tự sinh của ngân hàng (TKThe :..., tai .... BIDV;8630100930; hoặc IBFT;...)
+ * Loại bỏ mã trace số đuôi ngân hàng (-02009704050918173242202633B9040550)
+ * Chỉ giữ lại phần nội dung do chính người chuyển tự tay nhập.
+ */
+export function cleanTransferContent(desc?: string | null): string {
+  let s = String(desc || "").trim();
+  if (!s) return "Ủng hộ Quỹ Vì Người Nghèo";
+
+  // 1. Cắt bỏ cụm tiền tố ngân hàng tới sau số tài khoản thụ hưởng (8630100930) hoặc tiền tố thẻ/IBFT
+  if (/8630100930/i.test(s)) {
+    s = s.replace(/^.*?8630100930\s*[:;,-]?\s*/i, "");
+  } else if (/^(?:TKThe|TK The|IBFT|MBVCB|NAPAS|VBA|VCB)/i.test(s)) {
+    const parts = s.split(";");
+    if (parts.length >= 3) {
+      s = parts.slice(2).join(";");
+    } else {
+      s = s.replace(/^(?:TKThe|TK The|IBFT|MBVCB|NAPAS)[^;]*;+/i, "");
+    }
+  }
+
+  // 2. Cắt bỏ mã trace đuôi ngân hàng: -02009704050918173242202633B9040550
+  s = s.replace(/-\d{8,}[a-zA-Z0-9]*$/i, "");
+  s = s.replace(/(?:\.|;|-)\s*(?:Trace|Ref|FT|TraceNo)\s*[:.]?\s*\w+$/i, "");
+
+  s = s.trim();
+  // Xóa các ký tự phân cách ở đầu nếu còn sót
+  s = s.replace(/^[-;:,.\s]+/, "");
+
+  if (!s || /^[-.,;:_]+$/.test(s)) return "Ủng hộ Quỹ Vì Người Nghèo";
+  return s;
+}
+

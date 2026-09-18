@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { formatVND } from "@/lib/utils";
+import { formatVND, cleanTransferContent } from "@/lib/utils";
 import {
   Wallet,
   ArrowUpRight,
@@ -994,10 +994,10 @@ export default function AdminDashboardPage() {
                         })}
                       </td>
                       <td className="p-3.5 font-bold text-slate-900">
-                        {item.donorName}
+                        {cleanTransferContent(item.donorName)}
                       </td>
-                      <td className="p-3.5 text-slate-700 max-w-xs truncate">
-                        {item.description}
+                      <td className="p-3.5 text-slate-700 max-w-xs truncate" title={item.description}>
+                        {cleanTransferContent(item.description)}
                       </td>
                       <td className="p-3.5 text-right font-mono font-bold text-emerald-600 whitespace-nowrap">
                         +{formatVND(item.amount)}

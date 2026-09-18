@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { formatVND, formatDate } from "@/lib/utils";
+import { formatVND, formatDate, cleanTransferContent } from "@/lib/utils";
 import {
   Search,
   ShieldCheck,
@@ -334,9 +334,8 @@ export default function LiveLedgerTable() {
                 <th className="py-3.5 px-3 text-center w-12 whitespace-nowrap">STT</th>
                 <th className="py-3.5 px-3 whitespace-nowrap">Thời gian</th>
                 <th className="py-3.5 px-1.5 text-center w-16 sm:w-20 whitespace-nowrap">Loại GD</th>
-                <th className="py-3.5 px-4 min-w-[220px] sm:min-w-[280px]">Nhà hảo tâm / Nơi thụ hưởng</th>
+                <th className="py-3.5 px-4 min-w-[240px] sm:min-w-[320px]">NỘI DUNG CHUYỂN KHOẢN</th>
                 <th className="py-3.5 px-4 whitespace-nowrap">Số tiền (VNĐ)</th>
-                <th className="py-3.5 px-4">Nội dung chuyển khoản</th>
                 <th className="py-3.5 px-4">Mã GD / Phiếu chi</th>
                 <th className="py-3.5 px-4 text-center whitespace-nowrap">Trạng thái</th>
               </tr>
@@ -384,9 +383,11 @@ export default function LiveLedgerTable() {
                         )}
                       </td>
 
-                      {/* Nhà hảo tâm / Nơi thụ hưởng - Dãn rộng gấp 2 lần giúp hiển thị đầy đủ tên */}
-                      <td className="py-3.5 px-4 min-w-[220px] sm:min-w-[280px] font-bold text-slate-900 leading-snug">
-                        {t.donorName}
+                      {/* Nội dung chuyển khoản - Lọc sạch tiền tố tự sinh của ngân hàng và mã trace số đuôi */}
+                      <td className="py-3.5 px-4 min-w-[240px] sm:min-w-[320px] font-bold text-slate-900 leading-snug">
+                        {isOut
+                          ? (t.donorName || cleanTransferContent(t.description))
+                          : cleanTransferContent(t.description || t.donorName)}
                       </td>
 
                       {/* Số tiền */}
@@ -400,13 +401,6 @@ export default function LiveLedgerTable() {
                             +{formatVND(Number(t.amount))}
                           </span>
                         )}
-                      </td>
-
-                      {/* Nội dung chuyển khoản */}
-                      <td className="py-3.5 px-4 max-w-xs truncate" title={t.description}>
-                        <span className="bg-slate-100 px-2 py-0.5 rounded text-[11px] font-mono text-slate-800">
-                          {t.description}
-                        </span>
                       </td>
 
                       {/* Mã giao dịch */}
@@ -433,7 +427,7 @@ export default function LiveLedgerTable() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-slate-400 text-xs">
+                  <td colSpan={7} className="py-12 text-center text-slate-400 text-xs">
                     {loading ? "Đang tải dữ liệu sao kê..." : "Không tìm thấy giao dịch nào phù hợp."}
                   </td>
                 </tr>
