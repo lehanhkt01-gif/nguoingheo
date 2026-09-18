@@ -25,96 +25,31 @@ interface TransactionItem {
   donorName: string;
 }
 
-const DEFAULT_TRANSACTIONS: TransactionItem[] = [
-  {
-    id: 1,
-    reference: "BIDV_FT262391005",
-    type: "IN",
-    amount: 2000000,
-    description: "VNN UNG HO BA CON KHO KHAN",
-    transactionDateTime: "2026-09-13T08:30:00Z",
-    donorName: "Trần Minh Tú",
-  },
-  {
-    id: 2,
-    reference: "PC-2026-0045",
-    type: "OUT",
-    amount: 8000000,
-    description: "Chi hỗ trợ xây nhà Đại đoàn kết đợt 1 cho bà Y Thị (Buôn A)",
-    transactionDateTime: "2026-09-12T14:20:00Z",
-    donorName: "Hộ bà Y Thị (Buôn A)",
-  },
-  {
-    id: 3,
-    reference: "BIDV_FT262391004",
-    type: "IN",
-    amount: 10000000,
-    description: "KIEU BAO UC UNG HO HO NGHEO BUON A",
-    transactionDateTime: "2026-09-12T09:15:00Z",
-    donorName: "Lê Văn Tám (Kiều bào Úc)",
-  },
-  {
-    id: 4,
-    reference: "BIDV_FT262391003",
-    type: "IN",
-    amount: 50000000,
-    description: "CONG TY EA SUP XANH UNG HO QUY VI NGUOI NGHEO",
-    transactionDateTime: "2026-09-11T16:45:00Z",
-    donorName: "Công ty Cổ phần Ea Súp Xanh",
-  },
-  {
-    id: 5,
-    reference: "PC-2026-0044",
-    type: "OUT",
-    amount: 25000000,
-    description: "Bàn giao 05 con bò giống sinh sản cho 05 hộ nghèo Thôn 14",
-    transactionDateTime: "2026-09-11T10:00:00Z",
-    donorName: "05 Hộ nghèo Thôn 14",
-  },
-  {
-    id: 6,
-    reference: "BIDV_FT262391002",
-    type: "IN",
-    amount: 5000000,
-    description: "VNN SK UNG HO BO GIONG SINH KE",
-    transactionDateTime: "2026-09-11T08:10:00Z",
-    donorName: "Nguyễn Thị Mai",
-  },
-  {
-    id: 7,
-    reference: "PC-2026-0043",
-    type: "OUT",
-    amount: 5000000,
-    description: "Cứu trợ sửa mái nhà dột nát Buôn B",
-    transactionDateTime: "2026-09-10T15:30:00Z",
-    donorName: "Hộ A Hùng (Buôn B)",
-  },
-  {
-    id: 8,
-    reference: "BIDV_FT262391001",
-    type: "IN",
-    amount: 15000000,
-    description: "VNN NDDK UNG HO XAY NHA DAI DOAN KET",
-    transactionDateTime: "2026-09-10T09:00:00Z",
-    donorName: "Đoàn Hoàng Phúc",
-  },
-];
+const DEFAULT_TRANSACTIONS: TransactionItem[] = [];
 
 export default function LiveLedgerTable() {
   const [activeTab, setActiveTab] = useState<"ALL" | "IN" | "OUT">("ALL");
-  const [transactions, setTransactions] = useState<TransactionItem[]>(DEFAULT_TRANSACTIONS);
+  const [transactions, setTransactions] = useState<TransactionItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(DEFAULT_TRANSACTIONS.length);
+  const [totalCount, setTotalCount] = useState(0);
+
+  // Trạng thái modal tài liệu/biên lai nghiệm thu chi
+  const [selectedProof, setSelectedProof] = useState<{
+    urls: string[];
+    title: string;
+    receiptNumber?: string;
+  } | null>(null);
+
+  // Trạng thái đăng nhập admin
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // Kiểm tra quyền admin
   useEffect(() => {
     const checkAuth = () => {
-      const loggedIn = typeof window !== "undefined" && localStorage.getItem("admin_logged_in") === "true";
-      setIsAdmin(loggedIn);
+      const logged = localStorage.getItem("admin_logged_in") === "true";
+      setIsAdmin(logged);
     };
     checkAuth();
     window.addEventListener("storage", checkAuth);
@@ -123,11 +58,11 @@ export default function LiveLedgerTable() {
 
   // Thống kê tổng hợp
   const [stats, setStats] = useState({
-    totalIn: 82000000,
-    totalOut: 38000000,
-    totalTransactions: 8,
-    countIn: 5,
-    countOut: 3,
+    totalIn: 0,
+    totalOut: 0,
+    totalTransactions: 0,
+    countIn: 0,
+    countOut: 0,
   });
 
   const fetchData = async () => {
@@ -147,9 +82,7 @@ export default function LiveLedgerTable() {
       const json = await res.json();
 
       if (json.success) {
-        let list: TransactionItem[] = json.transactions && json.transactions.length > 0
-          ? json.transactions
-          : [...DEFAULT_TRANSACTIONS];
+        let list: TransactionItem[] = Array.isArray(json.transactions) ? json.transactions : [];
 
         // Lọc chuẩn xác theo activeTab (Tuyệt đối không để lọt Tiền Vào khi xem tab Chi)
         if (activeTab !== "ALL") {
@@ -171,10 +104,10 @@ export default function LiveLedgerTable() {
         setTotalPages(Math.max(1, Math.ceil(list.length / 10)));
 
         if (json.summary) {
-          const totalInVal = Number(json.summary.totalIn || 82000000);
-          const totalOutVal = Number(json.summary.totalOut || 38000000);
-          const cIn = Number(json.summary.totalDonationsCount || 5);
-          const cOut = Number(json.summary.totalDisbursementsCount || 3);
+          const totalInVal = Number(json.summary.totalIn || 0);
+          const totalOutVal = Number(json.summary.totalOut || 0);
+          const cIn = Number(json.summary.totalDonationsCount || 0);
+          const cOut = Number(json.summary.totalDisbursementsCount || 0);
           setStats({
             totalIn: totalInVal,
             totalOut: totalOutVal,
@@ -186,22 +119,8 @@ export default function LiveLedgerTable() {
       }
     } catch (error) {
       console.error("Lỗi tải sao kê:", error);
-      // Fallback
-      let filtered = [...DEFAULT_TRANSACTIONS];
-      if (activeTab !== "ALL") {
-        filtered = filtered.filter((t) => t.type === activeTab);
-      }
-      if (searchTerm.trim()) {
-        const s = searchTerm.toLowerCase();
-        filtered = filtered.filter(
-          (t) =>
-            t.donorName.toLowerCase().includes(s) ||
-            t.description.toLowerCase().includes(s) ||
-            t.reference.toLowerCase().includes(s)
-        );
-      }
-      setTransactions(filtered);
-      setTotalCount(filtered.length);
+      setTransactions([]);
+      setTotalCount(0);
       setTotalPages(1);
     } finally {
       setLoading(false);

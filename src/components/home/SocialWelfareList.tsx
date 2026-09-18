@@ -67,7 +67,7 @@ const DEFAULT_CASES: WelfareCase[] = [
     village: "Buôn A",
     situation: "Hộ nghèo đặc biệt khó khăn, neo đơn bệnh tật. Căn nhà vách nứa dột nát cần hỗ trợ xây nhà Đại đoàn kết.",
     targetAmount: 80000000,
-    currentAmount: 48500000,
+    currentAmount: 0,
     imageUrl: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80",
   },
   {
@@ -76,7 +76,7 @@ const DEFAULT_CASES: WelfareCase[] = [
     village: "Thôn 5",
     situation: "Gia đình có 2 con nhỏ, mẹ già ốm đau, thiếu tư liệu sản xuất và nhà ở kiên cố.",
     targetAmount: 60000000,
-    currentAmount: 35000000,
+    currentAmount: 0,
     imageUrl: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=80",
   },
   {
@@ -85,40 +85,12 @@ const DEFAULT_CASES: WelfareCase[] = [
     village: "Thôn 14 & Thôn 12",
     situation: "Hỗ trợ bò cái giống sinh sản địa phương nhằm tạo sinh kế thoát nghèo bền vững lâu dài.",
     targetAmount: 50000000,
-    currentAmount: 32000000,
+    currentAmount: 0,
     imageUrl: "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=800&auto=format&fit=crop&q=80",
   },
 ];
 
-const DEFAULT_GIFT_BATCHES: GiftBatch[] = [
-  {
-    id: 1,
-    title: "Trao tặng hỗ trợ xây nhà Đại đoàn kết đợt 1 (Đổ móng kiên cố)",
-    village: "Buôn A",
-    recipientCount: 1,
-    amount: 8000000,
-    date: "2026-09-08",
-    proofNote: "Biên bản bàn giao kinh phí đợt 1 có chữ ký Trưởng ban CTMT Buôn A",
-  },
-  {
-    id: 2,
-    title: "Bàn giao 05 con bò giống sinh sản cho hộ nghèo vươn lên",
-    village: "Thôn 14",
-    recipientCount: 5,
-    amount: 25000000,
-    date: "2026-09-09",
-    proofNote: "Hóa đơn VAT vật tư con giống và biên bản nhận bò của 05 hộ dân",
-  },
-  {
-    id: 3,
-    title: "Cứu trợ sửa mái nhà dột nát trước mùa mưa bão Tây Nguyên",
-    village: "Buôn B",
-    recipientCount: 1,
-    amount: 5000000,
-    date: "2026-09-10",
-    proofNote: "Phiếu chi số PC-2026-0044 xác nhận của UBMTTQ xã Ea Súp",
-  },
-];
+const DEFAULT_GIFT_BATCHES: GiftBatch[] = [];
 
 export default function SocialWelfareList() {
   const [activeTab, setActiveTab] = useState<"CASES" | "GIFTS">("CASES");
@@ -504,69 +476,79 @@ export default function SocialWelfareList() {
 
         {/* Tab 2: Các Đợt Trao Quà An Sinh Đã Giải Ngân */}
         {activeTab === "GIFTS" && (
-          <div className="space-y-3">
-            {giftBatches.map((gift) => (
-              <div
-                key={gift.id}
-                className="bg-white p-5 rounded-2xl border border-rose-100 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-rose-300 transition-colors"
-              >
-                <div className="space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                      Đã giải ngân
-                    </span>
-                    <span className="text-slate-400 text-xs font-mono">• {formatDate(gift.date)}</span>
-                    <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[11px] font-medium flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-rose-500" />
-                      <span>{gift.village}</span>
-                    </span>
-                    <span className="text-[11px] text-slate-500 font-medium">
-                      ({gift.recipientCount} hộ thụ hưởng)
-                    </span>
-                  </div>
-                  <h4 className="text-sm font-bold text-slate-900">{gift.title}</h4>
-                  <p className="text-xs text-slate-500 flex items-center gap-1">
-                    <FileText className="w-3.5 h-3.5 text-slate-400" />
-                    <span>{gift.proofNote}</span>
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
-                  <div className="text-left sm:text-right shrink-0">
-                    <div className="text-base sm:text-lg font-extrabold text-rose-700 font-mono">
-                      -{formatVND(gift.amount)}
+          giftBatches.length === 0 ? (
+            <div className="bg-white p-8 rounded-2xl border border-rose-100 text-center space-y-2">
+              <Gift className="w-8 h-8 text-slate-300 mx-auto" />
+              <p className="text-sm font-semibold text-slate-700">Chưa ghi nhận đợt giải ngân nào</p>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                Mọi khoản chi cứu trợ thực tế kèm biên bản nghiệm thu và chứng từ mộc đỏ sẽ được công khai minh bạch tại đây.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {giftBatches.map((gift) => (
+                <div
+                  key={gift.id}
+                  className="bg-white p-5 rounded-2xl border border-rose-100 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-rose-300 transition-colors"
+                >
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                        Đã giải ngân
+                      </span>
+                      <span className="text-slate-400 text-xs font-mono">• {formatDate(gift.date)}</span>
+                      <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[11px] font-medium flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-rose-500" />
+                        <span>{gift.village}</span>
+                      </span>
+                      <span className="text-[11px] text-slate-500 font-medium">
+                        ({gift.recipientCount} hộ thụ hưởng)
+                      </span>
                     </div>
-                    <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-medium">
-                      <CheckCircle2 className="w-3 h-3" />
-                      <span>Chứng từ mộc đỏ đầy đủ</span>
-                    </span>
+                    <h4 className="text-sm font-bold text-slate-900">{gift.title}</h4>
+                    <p className="text-xs text-slate-500 flex items-center gap-1">
+                      <FileText className="w-3.5 h-3.5 text-slate-400" />
+                      <span>{gift.proofNote}</span>
+                    </p>
                   </div>
 
-                  {/* Nút Sửa / Xóa đợt trao quà cho Admin */}
-                  {isAdmin && (
-                    <div className="flex items-center gap-1 pl-2 border-l border-slate-200">
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEditGift(gift)}
-                        className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors"
-                        title="Chỉnh sửa đợt trao quà"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteGift(gift.id)}
-                        className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 transition-colors"
-                        title="Xóa đợt trao quà"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                  <div className="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
+                    <div className="text-left sm:text-right shrink-0">
+                      <div className="text-base sm:text-lg font-extrabold text-rose-700 font-mono">
+                        -{formatVND(gift.amount)}
+                      </div>
+                      <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-medium">
+                        <CheckCircle2 className="w-3 h-3" />
+                        <span>Chứng từ mộc đỏ đầy đủ</span>
+                      </span>
                     </div>
-                  )}
+
+                    {/* Nút Sửa / Xóa đợt trao quà cho Admin */}
+                    {isAdmin && (
+                      <div className="flex items-center gap-1 pl-2 border-l border-slate-200">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditGift(gift)}
+                          className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors"
+                          title="Chỉnh sửa đợt trao quà"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteGift(gift.id)}
+                          className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 transition-colors"
+                          title="Xóa đợt trao quà"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )
         )}
       </div>
 

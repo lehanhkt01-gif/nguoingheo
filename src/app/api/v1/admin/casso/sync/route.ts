@@ -7,6 +7,7 @@ import {
   processCassoTransactions,
 } from "@/lib/casso";
 import { saveSystemSettings } from "@/lib/settings";
+import { prisma } from "@/lib/prisma";
 
 /**
  * GET /api/v1/admin/casso/sync
@@ -78,7 +79,8 @@ export async function GET(req: NextRequest) {
 /**
  * POST /api/v1/admin/casso/sync
  * 1. Lưu cấu hình Casso API Key & Secure Token (nếu action === "save")
- * 2. Hoặc chủ động kích hoạt kéo toàn bộ dữ liệu giao dịch và số dư từ Casso Open API
+ * 2. Xóa toàn bộ số liệu ảo cũ và đồng bộ sạch (nếu action === "clean_and_sync" hoặc action === "clean_only")
+ * 3. Hoặc chủ động kích hoạt kéo toàn bộ dữ liệu giao dịch và số dư từ Casso Open API
  */
 export async function POST(req: NextRequest) {
   try {
@@ -122,6 +124,32 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Xóa sạch số liệu ảo cũ (nếu action === 'clean_only' hoặc action === 'clean_and_sync')
+    let cleanedStats = { donationsDeleted: 0, disbursementsDeleted: 0 };
+    if (body.action === "clean_only" || body.action === "clean_and_sync" || body.cleanOldData === true) {
+      console.log("🧹 [Casso Clean] Đang xóa toàn bộ số liệu ảo cũ (Donation, Disbursement, reset Campaign)...");
+      const [delDonations, delDisbursements] = await Promise.all([
+        prisma.donation.deleteMany({}),
+        prisma.disbursement.deleteMany({}),
+      ]);
+      await prisma.campaign.updateMany({
+        data: { currentAmount: 0 },
+      });
+      cleanedStats = {
+        donationsDeleted: delDonations.count,
+        disbursementsDeleted: delDisbursements.count,
+      };
+      console.log(`✅ [Casso Clean] Đã xóa ${delDonations.count} khoản ủng hộ ảo và ${delDisbursements.count} đợt giải ngân ảo.`);
+
+      if (body.action === "clean_only") {
+        return NextResponse.json({
+          success: true,
+          message: `Đã xóa sạch thành công ${delDonations.count} khoản ủng hộ cũ và ${delDisbursements.count} đợt giải ngân ảo. Toàn bộ số liệu đã về 0 đ.`,
+          cleanedStats,
+        });
+      }
+    }
+
     const config = getCassoConfig();
 
     if (!config.apiKey) {
@@ -130,7 +158,7 @@ export async function POST(req: NextRequest) {
           success: false,
           needConfig: true,
           message:
-            "Hệ thống chưa có CASSO_API_KEY. Vui lòng dán API Key vào ô cấu hình và bấm 'Lưu cấu hình' để kích hoạt đồng bộ chủ động.",
+            "Hệ thống chưa có CASSO_API_KEY. Vui lòng dán API Key vào file .env trên máy chủ hoặc ô cấu hình để kích hoạt đồng bộ chủ động.",
         },
         { status: 400 }
       );
@@ -168,9 +196,11 @@ export async function POST(req: NextRequest) {
 
     const message =
       processResult.inserted > 0
-        ? `Đồng bộ thành công! Đã nạp thêm ${processResult.inserted} giao dịch mới (+${new Intl.NumberFormat(
+        ? `Đã dọn sạch số liệu ảo cũ và nạp ${processResult.inserted} giao dịch thực tế từ Casso (+${new Intl.NumberFormat(
             "vi-VN"
-          ).format(processResult.totalAmountAdded)} đ) vào sao kê.`
+          ).format(processResult.totalAmountAdded)} đ) vào sao kê!`
+        : body.action === "clean_and_sync"
+        ? `Đã xóa sạch toàn bộ số liệu ảo cũ! Hiện tại tài khoản BIDV ${config.accountNumber} trên Casso chưa phát sinh giao dịch mới (toàn bộ bảng thống kê và số dư đã về 0 đ chuẩn xác).`
         : `Đồng bộ hoàn tất: Toàn bộ ${processResult.processed} giao dịch đã được đối soát khớp lệnh 100% với tài khoản BIDV ${config.accountNumber}!`;
 
     return NextResponse.json({

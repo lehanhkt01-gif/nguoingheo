@@ -31,6 +31,7 @@ import {
   Check,
   Zap,
   Activity,
+  Trash2,
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
@@ -38,6 +39,7 @@ export default function AdminDashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [cleaningCasso, setCleaningCasso] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState<string | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
 
@@ -71,11 +73,11 @@ export default function AdminDashboardPage() {
   const [keyStatusMsg, setKeyStatusMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const [stats, setStats] = useState({
-    totalDonations: 82000000,
-    totalDisbursed: 18000000,
-    netBalance: 64000000,
-    donationCount: 5,
-    activeCampaigns: 2,
+    totalDonations: 0,
+    totalDisbursed: 0,
+    netBalance: 0,
+    donationCount: 0,
+    activeCampaigns: 0,
   });
 
   const [donations, setDonations] = useState<any[]>([]);
@@ -213,6 +215,46 @@ export default function AdminDashboardPage() {
       setTimeout(() => setSyncError(null), 8000);
     } finally {
       setSyncing(false);
+    }
+  };
+
+  // Xóa số liệu ảo cũ và đồng bộ sạch từ Casso
+  const handleCleanAndSyncCasso = async () => {
+    if (
+      !window.confirm(
+        "CẢNH BÁO QUẢN TRỊ VIÊN:\n\nThao tác này sẽ XÓA TOÀN BỘ số liệu mẫu/ảo cũ trong cơ sở dữ liệu (các khoản ủng hộ mẫu và đợt chi mẫu) và sau đó chủ động kết nối Casso Open API để kéo số liệu thật từ tài khoản BIDV 8630100930.\n\nQuý vị có chắc chắn muốn thực hiện?"
+      )
+    ) {
+      return;
+    }
+
+    setCleaningCasso(true);
+    setSyncSuccess(null);
+    setSyncError(null);
+
+    try {
+      const res = await fetch("/api/v1/admin/casso/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "clean_and_sync" }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setSyncSuccess(data.message || "Đã xóa sạch số liệu ảo và cập nhật số liệu mới từ Casso!");
+        loadStats();
+        loadDonations();
+        loadCassoInfo();
+        setTimeout(() => setSyncSuccess(null), 10000);
+      } else {
+        setSyncError(data.message || "Thao tác xóa và đồng bộ thất bại!");
+        setTimeout(() => setSyncError(null), 10000);
+      }
+    } catch (err: any) {
+      setSyncError("Lỗi kết nối đến máy chủ: " + err.message);
+      setTimeout(() => setSyncError(null), 10000);
+    } finally {
+      setCleaningCasso(false);
     }
   };
 
@@ -770,13 +812,23 @@ export default function AdminDashboardPage() {
                     <button
                       type="button"
                       onClick={handleManualCassoSync}
-                      disabled={syncing}
+                      disabled={syncing || cleaningCasso}
                       className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-all disabled:opacity-50 cursor-pointer"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin text-rose-400" : ""}`} />
-                      <span>{syncing ? "Đang kéo sao kê..." : "Kích hoạt đồng bộ ngay"}</span>
+                      <span>{syncing ? "Đang kéo sao kê..." : "Đồng bộ giao dịch mới"}</span>
                     </button>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={handleCleanAndSyncCasso}
+                    disabled={cleaningCasso || syncing}
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold shadow-xs transition-all disabled:opacity-50 cursor-pointer"
+                  >
+                    <Trash2 className={`w-3.5 h-3.5 text-rose-600 ${cleaningCasso ? "animate-spin" : ""}`} />
+                    <span>{cleaningCasso ? "Đang xóa số liệu ảo & kéo từ Casso..." : "Xóa toàn bộ số liệu ảo cũ & Cập nhật từ Casso"}</span>
+                  </button>
 
                   <p className="text-[11px] text-slate-500 leading-relaxed text-center sm:text-left">
                     ✓ Gọi trực tiếp <code>/v2/sync</code>, <code>/v2/transactions</code> và <code>/v2/accounts</code> để đối soát 100% không độ trễ.

@@ -6,11 +6,11 @@ export async function askGeminiCharityAssistant(userMessage: string): Promise<st
   const apiKey = settings.geminiApiKey || process.env.GEMINI_API_KEY;
 
   // Dữ liệu thời gian thực lấy trực tiếp từ CSDL
-  let inAmount = 82000000;
-  let outAmount = 18000000;
-  let inCount = 5;
-  let outCount = 3;
-  let activeCampaignsCount = 2;
+  let inAmount = 0;
+  let outAmount = 0;
+  let inCount = 0;
+  let outCount = 0;
+  let activeCampaignsCount = 0;
 
   try {
     const [totalIn, totalOut, activeCount] = await Promise.all([

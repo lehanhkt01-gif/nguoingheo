@@ -13,10 +13,10 @@ interface StatsData {
 
 export default function CounterDashboard() {
   const [stats, setStats] = useState<StatsData>({
-    totalDonations: 82000000,
-    totalDisbursed: 18000000,
-    netBalance: 64000000,
-    donationCount: 5,
+    totalDonations: 0,
+    totalDisbursed: 0,
+    netBalance: 0,
+    donationCount: 0,
   });
 
   useEffect(() => {
