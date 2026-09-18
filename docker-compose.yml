@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile
     container_name: vinguoingheo_web
     restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - "3080:3000"
     environment:

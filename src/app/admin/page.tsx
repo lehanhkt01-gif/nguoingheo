@@ -604,15 +604,20 @@ export default function AdminDashboardPage() {
                   <h3 className="font-bold text-sm text-slate-900">
                     Cơ Chế Đồng Bộ Kép Casso Banking V2 (BIDV 8630100930)
                   </h3>
-                  {hasCassoKey ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  {cassoInfo?.apiConnectionOk ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      Casso API Đã Kết Nối
+                      Casso API Đã Kết Nối (.env)
+                    </span>
+                  ) : hasCassoKey ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                      Đã Nhận Key (.env)
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
                       <AlertCircle className="w-3 h-3 text-amber-600" />
-                      Chưa nạp Casso API Key
+                      Đang kiểm tra .env
                     </span>
                   )}
                 </div>
@@ -653,7 +658,7 @@ export default function AdminDashboardPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Phân hệ 1: Cơ chế thụ động (Real-time Webhook) */}
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3">
+              <div className="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">
@@ -663,7 +668,7 @@ export default function AdminDashboardPage() {
                       Cơ chế Thụ động: Real-time Webhook
                     </span>
                   </div>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
                     Trực tuyến 24/7
                   </span>
@@ -671,19 +676,19 @@ export default function AdminDashboardPage() {
 
                 <div className="space-y-1.5">
                   <label className="block text-[11px] font-semibold text-slate-600">
-                    Endpoint Webhook (Cấu hình trên Casso Dashboard):
+                    Endpoint Webhook (Đã sẵn sàng kết nối):
                   </label>
                   <div className="flex items-center gap-1.5">
                     <input
                       type="text"
                       readOnly
                       value={cassoInfo?.webhookUrl || `${typeof window !== "undefined" ? window.location.origin : ""}/api/v1/webhook/casso`}
-                      className="w-full px-2.5 py-1.5 text-[11px] font-mono rounded-lg border border-slate-200 bg-white text-slate-800 select-all"
+                      className="w-full px-2.5 py-2 text-[11px] font-mono rounded-lg border border-slate-200 bg-white text-slate-800 select-all font-semibold"
                     />
                     <button
                       type="button"
                       onClick={copyWebhookUrl}
-                      className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs transition-colors shrink-0"
+                      className="p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs transition-colors shrink-0 cursor-pointer"
                       title="Sao chép URL"
                     >
                       {copiedWebhook ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
@@ -691,119 +696,92 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="block text-[11px] font-semibold text-slate-600 flex items-center justify-between">
-                    <span>Mã bảo mật Secure Token (Khắc phục lỗi 401):</span>
-                    <span className="text-[10px] text-emerald-600 font-bold">Khớp Webhook</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showCassoToken ? "text" : "password"}
-                      value={cassoSecureTokenInput}
-                      onChange={(e) => setCassoSecureTokenInput(e.target.value)}
-                      placeholder="Dán mã Secure Token từ Casso (VD: EaSup_Charity_2026_Secure_Token_Secret)"
-                      className="w-full pl-2.5 pr-8 py-1.5 text-xs rounded-lg border border-slate-200 font-mono focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 bg-white text-slate-800"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowCassoToken(!showCassoToken)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
-                      title={showCassoToken ? "Ẩn mã" : "Hiện mã"}
-                    >
-                      {showCassoToken ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                    </button>
+                <div className="p-3 rounded-lg bg-emerald-50/70 border border-emerald-200/80 space-y-1">
+                  <div className="flex items-center justify-between text-xs font-bold text-emerald-900">
+                    <span>Mã bảo mật Secure Token:</span>
+                    <span className="text-[10px] bg-emerald-200/80 text-emerald-900 px-2 py-0.5 rounded-full">
+                      Đã nạp qua file .env
+                    </span>
                   </div>
-                  <div className="flex items-center justify-between pt-1">
-                    <p className="text-[10px] text-slate-500">
-                      Dán vào đây để lưu hoặc dán mã này vào cấu hình Webhook Casso.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={handleSaveCassoSettings}
-                      disabled={savingCasso || !cassoSecureTokenInput.trim()}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-semibold shadow-2xs transition-all disabled:opacity-50 cursor-pointer shrink-0"
-                    >
-                      <Save className="w-3 h-3" />
-                      <span>{savingCasso ? "Đang lưu..." : "Lưu Token"}</span>
-                    </button>
-                  </div>
+                  <p className="text-[11px] text-emerald-800 leading-relaxed">
+                    Được bảo vệ tuyệt đối trong biến môi trường máy chủ. Khắc phục triệt để lỗi 401 Unauthorized khi Casso gửi dữ liệu.
+                  </p>
                 </div>
 
                 <p className="text-[11px] text-slate-500 leading-relaxed">
-                  ✓ Tự động đối soát giao dịch tiền vào, chống trùng lặp (Idempotency) và cộng dồn tiến độ chiến dịch.
+                  ✓ Tiếp nhận tức thì khi có biến động số dư • Chống trùng lặp (Idempotency) • Tự động bóc tách tên nhà hảo tâm và cộng dồn chiến dịch.
                 </p>
               </div>
 
               {/* Phân hệ 2: Cơ chế chủ động (Casso API Sync) */}
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">
-                      2
+              <div className="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3.5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">
+                        2
+                      </div>
+                      <span className="text-xs font-bold text-slate-800">
+                        Cơ chế Chủ động: Casso Open API Sync
+                      </span>
                     </div>
-                    <span className="text-xs font-bold text-slate-800">
-                      Cơ chế Chủ động: Casso Open API Sync
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
+                      <Zap className="w-3 h-3 text-blue-600" />
+                      Kéo Lịch Sử v2
                     </span>
                   </div>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
-                    <Zap className="w-3 h-3 text-blue-600" />
-                    Kéo Lịch Sử v2
-                  </span>
-                </div>
 
-                <div className="space-y-1.5">
-                  <label className="block text-[11px] font-semibold text-slate-600 flex items-center justify-between">
-                    <span>Casso Open API Key (Tạo trên oauth.casso.vn):</span>
-                    {cassoInfo?.liveAccount && (
-                      <span className="text-emerald-700 font-bold font-mono">
-                        Số dư: {formatVND(cassoInfo.liveAccount.balance)} đ
+                  <div className="mt-3 p-3 rounded-lg bg-blue-50/70 border border-blue-200/80 space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold text-blue-950">
+                      <span>Trạng thái kết nối Casso Open API:</span>
+                      {hasCassoKey ? (
+                        <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                          Đã nạp qua file .env
+                        </span>
+                      ) : (
+                        <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">
+                          Đang kiểm tra .env
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1 border-t border-blue-200/60 text-xs text-blue-900">
+                      <span className="font-medium">Số dư BIDV 8630100930:</span>
+                      <span className="font-mono font-extrabold text-blue-900 text-sm">
+                        {formatVND(cassoInfo?.liveAccount?.balance ?? stats.netBalance)} đ
                       </span>
-                    )}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showCassoKey ? "text" : "password"}
-                      value={cassoApiKeyInput}
-                      onChange={(e) => setCassoApiKeyInput(e.target.value)}
-                      placeholder="Dán mã Casso API Key (chuẩn AK_CS_...)"
-                      className="w-full pl-2.5 pr-8 py-1.5 text-xs rounded-lg border border-slate-200 font-mono focus:border-blue-600 focus:ring-1 focus:ring-blue-600 bg-white"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowCassoKey(!showCassoKey)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
-                      title={showCassoKey ? "Ẩn khóa" : "Hiện khóa"}
-                    >
-                      {showCassoKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                    </button>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={handleTestCassoConnection}
-                    disabled={testingCasso}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer"
-                  >
-                    <Activity className={`w-3.5 h-3.5 text-blue-600 ${testingCasso ? "animate-spin" : ""}`} />
-                    <span>{testingCasso ? "Đang kiểm tra..." : "Kiểm tra kết nối & Số dư"}</span>
-                  </button>
+                <div className="space-y-2 pt-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={handleTestCassoConnection}
+                      disabled={testingCasso}
+                      className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      <Activity className={`w-3.5 h-3.5 text-blue-600 ${testingCasso ? "animate-spin" : ""}`} />
+                      <span>{testingCasso ? "Đang kiểm tra..." : "Kiểm tra kết nối & Số dư"}</span>
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={handleSaveCassoSettings}
-                    disabled={savingCasso || (!cassoApiKeyInput.trim() && !cassoSecureTokenInput.trim())}
-                    className="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all disabled:opacity-50 cursor-pointer"
-                  >
-                    <Save className="w-3.5 h-3.5" />
-                    <span>{savingCasso ? "Đang lưu..." : "Lưu Cấu Hình (Token & Key)"}</span>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={handleManualCassoSync}
+                      disabled={syncing}
+                      className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin text-rose-400" : ""}`} />
+                      <span>{syncing ? "Đang kéo sao kê..." : "Kích hoạt đồng bộ ngay"}</span>
+                    </button>
+                  </div>
+
+                  <p className="text-[11px] text-slate-500 leading-relaxed text-center sm:text-left">
+                    ✓ Gọi trực tiếp <code>/v2/sync</code>, <code>/v2/transactions</code> và <code>/v2/accounts</code> để đối soát 100% không độ trễ.
+                  </p>
                 </div>
-
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  ✓ Chủ động gọi <code>/v2/sync</code>, <code>/v2/transactions</code> và <code>/v2/accounts</code> để đối soát 100% không độ trễ.
-                </p>
               </div>
             </div>
           </div>

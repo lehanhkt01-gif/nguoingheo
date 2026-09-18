@@ -48,6 +48,34 @@ function cleanEnvString(val?: string | null): string {
   return s;
 }
 
+import fs from "fs";
+import path from "path";
+
+/**
+ * Đọc trực tiếp từ file .env phòng trường hợp container chưa nạp vào process.env
+ */
+function readEnvFileFallback(key: string): string {
+  try {
+    const envPaths = [
+      path.join(process.cwd(), ".env"),
+      path.join(process.cwd(), ".env.local"),
+      path.join(process.cwd(), ".env.production"),
+      "/app/.env",
+      "/var/www/nguoingheo/.env",
+    ];
+    for (const p of envPaths) {
+      if (fs.existsSync(p)) {
+        const content = fs.readFileSync(p, "utf-8");
+        const match = content.match(new RegExp(`^${key}\\s*=\\s*(.*)$`, "m"));
+        if (match && match[1]) {
+          return cleanEnvString(match[1]);
+        }
+      }
+    }
+  } catch {}
+  return "";
+}
+
 /**
  * Lấy cấu hình Casso chuẩn hóa từ biến môi trường và thiết lập runtime
  */
@@ -57,23 +85,28 @@ export function getCassoConfig(): CassoConfig {
   const apiKey =
     cleanEnvString(process.env.CASSO_API_KEY) ||
     cleanEnvString(settings.cassoApiKey) ||
+    readEnvFileFallback("CASSO_API_KEY") ||
     "";
 
   const secureToken =
     cleanEnvString(process.env.CASSO_SECURE_TOKEN) ||
     cleanEnvString(settings.cassoSecureToken) ||
     cleanEnvString(process.env.CASSO_WEBHOOK_SECRET) ||
+    readEnvFileFallback("CASSO_SECURE_TOKEN") ||
+    readEnvFileFallback("CASSO_WEBHOOK_SECRET") ||
     "EaSup_Charity_2026_Secure_Token_Secret";
 
   const accountNumber =
     cleanEnvString(process.env.CASSO_ACCOUNT_NUMBER) ||
     cleanEnvString(settings.cassoAccountNumber) ||
     cleanEnvString(process.env.NEXT_PUBLIC_BIDV_ACCOUNT) ||
+    readEnvFileFallback("CASSO_ACCOUNT_NUMBER") ||
     "8630100930";
 
   let apiUrl =
     cleanEnvString(process.env.CASSO_API_URL) ||
     cleanEnvString(settings.cassoApiUrl) ||
+    readEnvFileFallback("CASSO_API_URL") ||
     "https://oauth.casso.vn/v2";
 
   // Chuẩn hóa xóa dấu / ở cuối URL nếu có
