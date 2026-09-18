@@ -12,7 +12,29 @@ export interface SystemSettings {
   updatedAt?: string;
 }
 
-const SETTINGS_FILE_PATH = path.join(process.cwd(), "data", "system_settings.json");
+import os from "os";
+
+let activeSettingsFilePath: string | null = null;
+
+function getActiveSettingsFilePath(): string {
+  if (activeSettingsFilePath) return activeSettingsFilePath;
+
+  const defaultPath = path.join(process.cwd(), "data", "system_settings.json");
+  const defaultDir = path.dirname(defaultPath);
+
+  try {
+    if (!fs.existsSync(defaultDir)) {
+      fs.mkdirSync(defaultDir, { recursive: true });
+    }
+    fs.accessSync(defaultDir, fs.constants.W_OK);
+    activeSettingsFilePath = defaultPath;
+    return defaultPath;
+  } catch {
+    const fallbackPath = path.join(os.tmpdir(), "system_settings.json");
+    activeSettingsFilePath = fallbackPath;
+    return fallbackPath;
+  }
+}
 
 let memoryCache: SystemSettings | null = null;
 
@@ -33,8 +55,12 @@ export function getSystemSettings(): SystemSettings {
   };
 
   try {
-    if (fs.existsSync(SETTINGS_FILE_PATH)) {
-      const content = fs.readFileSync(SETTINGS_FILE_PATH, "utf-8");
+    const filePath = getActiveSettingsFilePath();
+    const fallbackPath = path.join(os.tmpdir(), "system_settings.json");
+    const targetPath = fs.existsSync(filePath) ? filePath : (fs.existsSync(fallbackPath) ? fallbackPath : null);
+
+    if (targetPath) {
+      const content = fs.readFileSync(targetPath, "utf-8");
       const parsed = JSON.parse(content);
       memoryCache = {
         geminiApiKey: parsed.geminiApiKey || process.env.GEMINI_API_KEY || "",
@@ -89,13 +115,20 @@ export function saveSystemSettings(settings: Partial<SystemSettings>): SystemSet
   }
 
   try {
-    const dir = path.dirname(SETTINGS_FILE_PATH);
+    const targetPath = getActiveSettingsFilePath();
+    const dir = path.dirname(targetPath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    fs.writeFileSync(SETTINGS_FILE_PATH, JSON.stringify(updated, null, 2), "utf-8");
+    fs.writeFileSync(targetPath, JSON.stringify(updated, null, 2), "utf-8");
   } catch (error) {
-    console.error("Lỗi khi lưu file system_settings.json:", error);
+    // Nếu vẫn lỗi, thử ghi vào /tmp trực tiếp
+    try {
+      const tmpPath = path.join(os.tmpdir(), "system_settings.json");
+      fs.writeFileSync(tmpPath, JSON.stringify(updated, null, 2), "utf-8");
+    } catch {
+      // MemoryCache và process.env đã được cập nhật thành công, bỏ qua lỗi filesystem
+    }
   }
 
   return updated;
