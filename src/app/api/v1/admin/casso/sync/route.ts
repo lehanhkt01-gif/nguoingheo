@@ -10,7 +10,7 @@ import { saveSystemSettings } from "@/lib/settings";
 
 /**
  * GET /api/v1/admin/casso/sync
- * Kiểm tra trạng thái cấu hình và kết nối Casso Open API
+ * Kiểm tra trạng thái cấu hình và kết nối Casso Open API & Webhook
  */
 export async function GET(req: NextRequest) {
   try {
@@ -19,6 +19,13 @@ export async function GET(req: NextRequest) {
     const maskedKey = hasApiKey
       ? config.apiKey.length > 8
         ? `${config.apiKey.substring(0, 6)}...${config.apiKey.substring(config.apiKey.length - 4)}`
+        : "********"
+      : "";
+
+    const hasSecureToken = Boolean(config.secureToken);
+    const maskedToken = hasSecureToken
+      ? config.secureToken.length > 8
+        ? `${config.secureToken.substring(0, 6)}...${config.secureToken.substring(config.secureToken.length - 4)}`
         : "********"
       : "";
 
@@ -46,12 +53,13 @@ export async function GET(req: NextRequest) {
       data: {
         hasApiKey,
         cassoApiKey: maskedKey,
+        hasSecureToken,
+        cassoSecureToken: maskedToken,
         accountNumber: config.accountNumber,
         accountName: "UY BAN MTTQ VN XA EA SUP",
         bankName: "BIDV",
         apiUrl: config.apiUrl,
         webhookUrl: `${origin}/api/v1/webhook/casso`,
-        hasSecureToken: Boolean(config.secureToken),
         apiConnectionOk,
         apiErrorMessage,
         liveAccount,
@@ -69,7 +77,8 @@ export async function GET(req: NextRequest) {
 
 /**
  * POST /api/v1/admin/casso/sync
- * Cơ chế 2: Chủ động kích hoạt kéo toàn bộ dữ liệu giao dịch và số dư từ Casso Open API
+ * 1. Lưu cấu hình Casso API Key & Secure Token (nếu action === "save")
+ * 2. Hoặc chủ động kích hoạt kéo toàn bộ dữ liệu giao dịch và số dư từ Casso Open API
  */
 export async function POST(req: NextRequest) {
   try {
@@ -80,13 +89,36 @@ export async function POST(req: NextRequest) {
       body = {};
     }
 
-    // Nếu admin gửi kèm apiKey từ giao diện để lưu và thử ngay
-    if (body.cassoApiKey && body.cassoApiKey.trim()) {
-      saveSystemSettings({
-        cassoApiKey: body.cassoApiKey.trim(),
-        cassoSecureToken: body.cassoSecureToken?.trim(),
-        cassoAccountNumber: body.cassoAccountNumber?.trim() || "8630100930",
-        cassoApiUrl: body.cassoApiUrl?.trim() || "https://oauth.casso.vn/v2",
+    const toSave: any = {};
+    if (body.cassoApiKey !== undefined && !body.cassoApiKey.includes("...")) {
+      toSave.cassoApiKey = body.cassoApiKey.trim();
+    }
+    if (body.cassoSecureToken !== undefined && !body.cassoSecureToken.includes("...")) {
+      toSave.cassoSecureToken = body.cassoSecureToken.trim();
+    }
+    if (body.cassoAccountNumber !== undefined) {
+      toSave.cassoAccountNumber = body.cassoAccountNumber.trim();
+    }
+    if (body.cassoApiUrl !== undefined) {
+      toSave.cassoApiUrl = body.cassoApiUrl.trim();
+    }
+
+    if (Object.keys(toSave).length > 0) {
+      saveSystemSettings(toSave);
+      console.log("💾 [Casso Settings] Đã lưu cấu hình Casso mới:", Object.keys(toSave));
+    }
+
+    // Nếu chỉ yêu cầu lưu cấu hình (action === 'save')
+    if (body.action === "save") {
+      const updatedConfig = getCassoConfig();
+      return NextResponse.json({
+        success: true,
+        message: "Đã lưu cài đặt Casso API Key và Secure Token thành công!",
+        config: {
+          hasApiKey: Boolean(updatedConfig.apiKey),
+          hasSecureToken: Boolean(updatedConfig.secureToken),
+          accountNumber: updatedConfig.accountNumber,
+        },
       });
     }
 
@@ -98,7 +130,7 @@ export async function POST(req: NextRequest) {
           success: false,
           needConfig: true,
           message:
-            "Hệ thống chưa có CASSO_API_KEY. Vui lòng thiết lập biến môi trường CASSO_API_KEY trong .env hoặc cập nhật trong Cài đặt hệ thống để thực hiện đồng bộ chủ động.",
+            "Hệ thống chưa có CASSO_API_KEY. Vui lòng dán API Key vào ô cấu hình và bấm 'Lưu cấu hình' để kích hoạt đồng bộ chủ động.",
         },
         { status: 400 }
       );

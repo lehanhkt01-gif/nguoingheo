@@ -114,6 +114,9 @@ export default function AdminDashboardPage() {
           if (d.data.cassoApiKey && !cassoApiKeyInput) {
             setCassoApiKeyInput(d.data.cassoApiKey);
           }
+          if (d.data.cassoSecureToken && !cassoSecureTokenInput) {
+            setCassoSecureTokenInput(d.data.cassoSecureToken);
+          }
         }
       })
       .catch(() => {});
@@ -222,6 +225,7 @@ export default function AdminDashboardPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          action: "save",
           cassoApiKey: cassoApiKeyInput,
           cassoSecureToken: cassoSecureTokenInput,
         }),
@@ -230,7 +234,7 @@ export default function AdminDashboardPage() {
       if (data.success) {
         setCassoStatusMsg({
           type: "success",
-          text: "Đã lưu cài đặt Casso và kiểm tra đồng bộ thành công!",
+          text: "Đã lưu cài đặt Casso Secure Token và API Key thành công!",
         });
         loadCassoInfo();
         loadStats();
@@ -687,13 +691,41 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="block text-[11px] font-semibold text-slate-600">
-                    Mã bảo mật Secure Token (Chống lỗi 401 Unauthorized):
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-semibold text-slate-600 flex items-center justify-between">
+                    <span>Mã bảo mật Secure Token (Khắc phục lỗi 401):</span>
+                    <span className="text-[10px] text-emerald-600 font-bold">Khớp Webhook</span>
                   </label>
-                  <div className="flex items-center justify-between text-[11px] font-mono bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700">
-                    <span>{cassoInfo?.hasSecureToken ? "••••••••••••••••••••••••••••••••" : "EaSup_Charity_2026_Secure_Token_Secret"}</span>
-                    <span className="text-[10px] text-emerald-600 font-sans font-bold">Khớp chuẩn header</span>
+                  <div className="relative">
+                    <input
+                      type={showCassoToken ? "text" : "password"}
+                      value={cassoSecureTokenInput}
+                      onChange={(e) => setCassoSecureTokenInput(e.target.value)}
+                      placeholder="Dán mã Secure Token từ Casso (VD: EaSup_Charity_2026_Secure_Token_Secret)"
+                      className="w-full pl-2.5 pr-8 py-1.5 text-xs rounded-lg border border-slate-200 font-mono focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 bg-white text-slate-800"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCassoToken(!showCassoToken)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
+                      title={showCassoToken ? "Ẩn mã" : "Hiện mã"}
+                    >
+                      {showCassoToken ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between pt-1">
+                    <p className="text-[10px] text-slate-500">
+                      Dán vào đây để lưu hoặc dán mã này vào cấu hình Webhook Casso.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleSaveCassoSettings}
+                      disabled={savingCasso || !cassoSecureTokenInput.trim()}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-semibold shadow-2xs transition-all disabled:opacity-50 cursor-pointer shrink-0"
+                    >
+                      <Save className="w-3 h-3" />
+                      <span>{savingCasso ? "Đang lưu..." : "Lưu Token"}</span>
+                    </button>
                   </div>
                 </div>
 
@@ -761,11 +793,11 @@ export default function AdminDashboardPage() {
                   <button
                     type="button"
                     onClick={handleSaveCassoSettings}
-                    disabled={savingCasso || !cassoApiKeyInput.trim()}
+                    disabled={savingCasso || (!cassoApiKeyInput.trim() && !cassoSecureTokenInput.trim())}
                     className="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all disabled:opacity-50 cursor-pointer"
                   >
                     <Save className="w-3.5 h-3.5" />
-                    <span>{savingCasso ? "Lưu..." : "Lưu API Key"}</span>
+                    <span>{savingCasso ? "Đang lưu..." : "Lưu Cấu Hình (Token & Key)"}</span>
                   </button>
                 </div>
 
