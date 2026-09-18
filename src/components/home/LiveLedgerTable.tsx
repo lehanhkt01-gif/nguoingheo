@@ -259,17 +259,17 @@ export default function LiveLedgerTable() {
           </div>
 
           {/* 3. Số dư quỹ hiện tại */}
-          <div className="bg-white p-3 sm:p-4 rounded-xl border border-rose-200 shadow-2xs bg-gradient-to-br from-white to-rose-50/30">
-            <div className="flex items-center justify-between text-rose-900 mb-1">
+          <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 p-3 sm:p-4 rounded-xl border border-emerald-500 shadow-sm text-white">
+            <div className="flex items-center justify-between text-yellow-300 mb-1">
               <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
                 Số dư quỹ thực tế
               </span>
-              <Wallet className="w-4 h-4 text-rose-700" />
+              <Wallet className="w-4 h-4 text-yellow-300" />
             </div>
-            <div className="text-base sm:text-xl font-extrabold text-rose-700 font-mono truncate">
+            <div className="text-base sm:text-xl font-extrabold text-yellow-300 font-mono truncate">
               {formatVND(netBalance)}
             </div>
-            <span className="text-[10px] text-rose-800/80 block mt-0.5 truncate font-medium">
+            <span className="text-[10px] text-yellow-100 block mt-0.5 truncate font-medium">
               Đối soát khớp 100% BIDV 8630100930
             </span>
           </div>

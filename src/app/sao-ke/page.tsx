@@ -228,17 +228,17 @@ export default function SaoKePage() {
               </span>
             </div>
 
-            <div className="bg-gradient-to-br from-rose-50/60 to-pink-50/40 p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-rose-300/80 shadow-2xs">
-              <div className="flex items-center justify-between text-rose-900 text-xs font-bold mb-1">
+            <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-emerald-500 shadow-sm text-white">
+              <div className="flex items-center justify-between text-yellow-300 text-xs font-bold mb-1">
                 <span>SỐ DƯ TÀI KHOẢN THỰC TẾ (=)</span>
-                <div className="w-6 h-6 rounded-full bg-rose-100 flex items-center justify-center">
-                  <Wallet className="w-3.5 h-3.5 text-rose-700" />
+                <div className="w-6 h-6 rounded-full bg-emerald-800/60 flex items-center justify-center">
+                  <Wallet className="w-3.5 h-3.5 text-yellow-300" />
                 </div>
               </div>
-              <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-rose-700 font-mono tracking-tight">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-yellow-300 font-mono tracking-tight">
                 {formatVND(summary?.currentBalance || 0)}
               </div>
-              <span className="text-[11px] sm:text-xs text-rose-900/80 mt-1 block font-medium">
+              <span className="text-[11px] sm:text-xs text-yellow-100 mt-1 block font-medium">
                 Đối soát khớp 100% BIDV 8630100930
               </span>
             </div>

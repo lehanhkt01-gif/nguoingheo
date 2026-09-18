@@ -89,15 +89,15 @@ export default function CounterDashboard() {
           </div>
 
           {/* Card 3: Số dư quỹ */}
-          <div className="bg-pink-50/80 rounded-xl p-4 border border-pink-200/80">
-            <div className="flex items-center justify-between text-pink-700 text-xs mb-1">
+          <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-xl p-4 border border-emerald-500 shadow-sm text-white">
+            <div className="flex items-center justify-between text-yellow-300 text-xs mb-1">
               <span className="font-bold uppercase tracking-wider">Số dư quỹ (=)</span>
-              <Wallet className="w-4 h-4 text-pink-600" />
+              <Wallet className="w-4 h-4 text-yellow-300" />
             </div>
-            <div className="text-xl sm:text-2xl font-extrabold text-pink-900 tracking-tight font-mono">
+            <div className="text-xl sm:text-2xl font-extrabold text-yellow-300 tracking-tight font-mono">
               {formatVND(stats.netBalance)}
             </div>
-            <p className="text-[11px] text-pink-700/80 mt-1 font-medium">
+            <p className="text-[11px] text-yellow-100 mt-1 font-medium">
               Số dư khả dụng BIDV 8630100930
             </p>
           </div>
