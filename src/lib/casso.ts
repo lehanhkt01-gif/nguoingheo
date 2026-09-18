@@ -612,3 +612,32 @@ export async function fetchCassoAccounts(): Promise<{
     };
   }
 }
+
+let cachedLiveBalance: { balance: number; timestamp: number } | null = null;
+
+/**
+ * Lấy số dư thực tế hiện có trong tài khoản ngân hàng BIDV 8630100930 từ Casso Open API.
+ * Có cache 30 giây để tối ưu tốc độ phản hồi và không vượt quá giới hạn API.
+ */
+export async function getLiveAccountBalance(): Promise<number | null> {
+  const now = Date.now();
+  if (cachedLiveBalance && now - cachedLiveBalance.timestamp < 30000) {
+    return cachedLiveBalance.balance;
+  }
+
+  try {
+    const res = await fetchCassoAccounts();
+    if (res.success && res.account && typeof res.account.balance === "number" && !isNaN(res.account.balance)) {
+      cachedLiveBalance = {
+        balance: res.account.balance,
+        timestamp: now,
+      };
+      return res.account.balance;
+    }
+  } catch (err) {
+    console.error("[Casso] Lỗi lấy số dư tài khoản trực tiếp từ API:", err);
+  }
+
+  return cachedLiveBalance ? cachedLiveBalance.balance : null;
+}
+

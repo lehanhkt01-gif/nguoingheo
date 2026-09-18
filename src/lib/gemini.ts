@@ -1,5 +1,6 @@
 import { prisma } from "./prisma";
 import { getSystemSettings } from "./settings";
+import { getLiveAccountBalance } from "./casso";
 
 export async function askGeminiCharityAssistant(userMessage: string): Promise<string> {
   const settings = getSystemSettings();
@@ -11,9 +12,10 @@ export async function askGeminiCharityAssistant(userMessage: string): Promise<st
   let inCount = 0;
   let outCount = 0;
   let activeCampaignsCount = 0;
+  let liveBal: number | null = null;
 
   try {
-    const [totalIn, totalOut, activeCount] = await Promise.all([
+    const [totalIn, totalOut, activeCount, liveAccountBalance] = await Promise.all([
       prisma.donation.aggregate({
         where: { status: "COMPLETED" },
         _sum: { amount: true },
@@ -23,9 +25,13 @@ export async function askGeminiCharityAssistant(userMessage: string): Promise<st
         _sum: { amount: true },
         _count: true,
       }),
-      prisma.campaign.count({ where: { status: "ACTIVE" } }),
+      prisma.campaign.count({
+        where: { status: "ACTIVE" },
+      }),
+      getLiveAccountBalance(),
     ]);
 
+    liveBal = liveAccountBalance;
     if (totalIn._sum.amount !== null) {
       inAmount = Number(totalIn._sum.amount);
       inCount = totalIn._count;
@@ -39,7 +45,7 @@ export async function askGeminiCharityAssistant(userMessage: string): Promise<st
     console.warn("Không thể truy vấn CSDL, dùng số liệu mặc định:", dbError);
   }
 
-  const balance = inAmount - outAmount;
+  const balance = liveBal !== null ? liveBal : (inAmount - outAmount);
 
   const defaultPrompt = `
 Bạn là "Gem Mặt Trận Ea Súp" - Trợ lý Trí tuệ Nhân tạo chính thức của Cổng thông tin & Sao kê Quỹ "Vì Người Nghèo" xã Ea Súp, huyện Ea Súp, tỉnh Đắk Lắk (website: nguoingheo.easupso.com).

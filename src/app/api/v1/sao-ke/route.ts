@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getLiveAccountBalance } from "@/lib/casso";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -15,7 +16,7 @@ export async function GET(req: NextRequest) {
     const limit = Math.min(100, Math.max(10, parseInt(searchParams.get("limit") || "20")));
 
     // 1. Thống kê tổng hợp toàn bộ tài khoản BIDV 8630100930
-    const [statsIn, statsOut] = await Promise.all([
+    const [statsIn, statsOut, liveAccountBalance] = await Promise.all([
       prisma.donation.aggregate({
         where: { status: "COMPLETED" },
         _sum: { amount: true },
@@ -25,11 +26,13 @@ export async function GET(req: NextRequest) {
         _sum: { amount: true },
         _count: true,
       }),
+      getLiveAccountBalance(),
     ]);
 
     const totalIn = Number(statsIn._sum.amount || 0);
     const totalOut = Number(statsOut._sum.amount || 0);
-    const currentBalance = totalIn - totalOut;
+    // Số dư tài khoản thực tế hiện có tại ngân hàng BIDV 8630100930 (lấy từ Casso API, > 790.000.000 đ)
+    const currentBalance = liveAccountBalance !== null ? liveAccountBalance : (totalIn - totalOut);
 
     // 2. Lấy danh sách giao dịch theo type
     let items: any[] = [];
@@ -193,6 +196,7 @@ export async function GET(req: NextRequest) {
           totalOut,
           currentBalance,
           runningBalanceBank: currentBalance,
+          accountBalance: currentBalance,
           totalDonationsCount: statsIn._count,
           totalDisbursementsCount: statsOut._count,
           lastSync: new Date().toISOString(),

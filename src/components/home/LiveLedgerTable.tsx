@@ -63,6 +63,7 @@ export default function LiveLedgerTable() {
     totalTransactions: 0,
     countIn: 0,
     countOut: 0,
+    accountBalance: 0,
   });
 
   const fetchData = async () => {
@@ -108,12 +109,14 @@ export default function LiveLedgerTable() {
           const totalOutVal = Number(json.summary.totalOut || 0);
           const cIn = Number(json.summary.totalDonationsCount || 0);
           const cOut = Number(json.summary.totalDisbursementsCount || 0);
+          const accBal = Number(json.summary.accountBalance ?? json.summary.runningBalanceBank ?? json.summary.currentBalance ?? (totalInVal - totalOutVal));
           setStats({
             totalIn: totalInVal,
             totalOut: totalOutVal,
             totalTransactions: cIn + cOut,
             countIn: cIn,
             countOut: cOut,
+            accountBalance: accBal,
           });
         }
       }
@@ -165,7 +168,7 @@ export default function LiveLedgerTable() {
     return list;
   }, [transactions, activeTab]);
 
-  const netBalance = stats.totalIn - stats.totalOut;
+  const netBalance = stats.accountBalance || (stats.totalIn - stats.totalOut);
 
   return (
     <section id="sao-ke" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
