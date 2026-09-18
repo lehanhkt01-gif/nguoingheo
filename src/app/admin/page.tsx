@@ -25,7 +25,12 @@ import {
   EyeOff,
   Sparkles,
   Save,
-  AlertCircle
+  AlertCircle,
+  CreditCard,
+  Copy,
+  Check,
+  Zap,
+  Activity,
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
@@ -34,6 +39,19 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState<string | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
+
+  // Cấu hình Casso Banking V2 (Đồng bộ kép)
+  const [cassoInfo, setCassoInfo] = useState<any>(null);
+  const [hasCassoKey, setHasCassoKey] = useState(false);
+  const [cassoApiKeyInput, setCassoApiKeyInput] = useState("");
+  const [cassoSecureTokenInput, setCassoSecureTokenInput] = useState("");
+  const [showCassoKey, setShowCassoKey] = useState(false);
+  const [showCassoToken, setShowCassoToken] = useState(false);
+  const [savingCasso, setSavingCasso] = useState(false);
+  const [testingCasso, setTestingCasso] = useState(false);
+  const [cassoStatusMsg, setCassoStatusMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [copiedWebhook, setCopiedWebhook] = useState(false);
 
   // Cấu hình Gemini API cho Chatbot Gem
   const [apiKeyInput, setApiKeyInput] = useState("");
@@ -57,12 +75,49 @@ export default function AdminDashboardPage() {
     totalDisbursed: 18000000,
     netBalance: 64000000,
     donationCount: 5,
-    activeCampaigns: 2
+    activeCampaigns: 2,
   });
 
   const [donations, setDonations] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [villageFilter, setVillageFilter] = useState("ALL");
+
+  const loadStats = () => {
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success) {
+          setStats(d.data);
+        }
+      })
+      .catch(() => {});
+  };
+
+  const loadDonations = () => {
+    fetch("/api/donations?limit=20")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success) {
+          setDonations(d.data);
+        }
+      })
+      .catch(() => {});
+  };
+
+  const loadCassoInfo = () => {
+    fetch("/api/v1/admin/casso/sync")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.data) {
+          setCassoInfo(d.data);
+          setHasCassoKey(d.data.hasApiKey);
+          if (d.data.cassoApiKey && !cassoApiKeyInput) {
+            setCassoApiKeyInput(d.data.cassoApiKey);
+          }
+        }
+      })
+      .catch(() => {});
+  };
 
   useEffect(() => {
     // Kiểm tra phiên đăng nhập
@@ -96,25 +151,10 @@ export default function AdminDashboardPage() {
         setLoading(false);
       });
 
-    // Tải thống kê
-    fetch("/api/stats")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.success) {
-          setStats(d.data);
-        }
-      })
-      .catch(() => {});
-
-    // Tải danh sách giao dịch
-    fetch("/api/donations?limit=20")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.success) {
-          setDonations(d.data);
-        }
-      })
-      .catch(() => {});
+    // Tải dữ liệu ban đầu
+    loadStats();
+    loadDonations();
+    loadCassoInfo();
 
     // Tải cấu hình Gemini API hiện tại
     fetch("/api/v1/admin/settings")
@@ -141,6 +181,117 @@ export default function AdminDashboardPage() {
       .catch(() => {});
   }, [router]);
 
+  // Hành động Đồng bộ thủ công với Casso (Cơ chế 2: Chủ động)
+  const handleManualCassoSync = async () => {
+    setSyncing(true);
+    setSyncSuccess(null);
+    setSyncError(null);
+
+    try {
+      const res = await fetch("/api/v1/admin/casso/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setSyncSuccess(data.message);
+        loadStats();
+        loadDonations();
+        loadCassoInfo();
+        setTimeout(() => setSyncSuccess(null), 8000);
+      } else {
+        setSyncError(data.message || "Đồng bộ Casso thất bại!");
+        setTimeout(() => setSyncError(null), 8000);
+      }
+    } catch (err: any) {
+      setSyncError("Lỗi kết nối đến máy chủ đồng bộ: " + err.message);
+      setTimeout(() => setSyncError(null), 8000);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  // Lưu cấu hình Casso API & Webhook
+  const handleSaveCassoSettings = async () => {
+    setSavingCasso(true);
+    setCassoStatusMsg(null);
+    try {
+      const res = await fetch("/api/v1/admin/casso/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cassoApiKey: cassoApiKeyInput,
+          cassoSecureToken: cassoSecureTokenInput,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCassoStatusMsg({
+          type: "success",
+          text: "Đã lưu cài đặt Casso và kiểm tra đồng bộ thành công!",
+        });
+        loadCassoInfo();
+        loadStats();
+        loadDonations();
+        setTimeout(() => setCassoStatusMsg(null), 5000);
+      } else {
+        setCassoStatusMsg({ type: "error", text: data.message });
+      }
+    } catch (err: any) {
+      setCassoStatusMsg({ type: "error", text: "Lỗi lưu cấu hình Casso!" });
+    } finally {
+      setSavingCasso(false);
+    }
+  };
+
+  // Kiểm tra kết nối Casso Open API
+  const handleTestCassoConnection = async () => {
+    setTestingCasso(true);
+    setCassoStatusMsg(null);
+    try {
+      const res = await fetch("/api/v1/admin/casso/sync");
+      const data = await res.json();
+      if (data.success) {
+        if (data.data.apiConnectionOk) {
+          setCassoStatusMsg({
+            type: "success",
+            text: `Kết nối Casso Open API thành công! Số dư BIDV 8630100930: ${formatVND(
+              data.data.liveAccount?.balance || 0
+            )} đ`,
+          });
+        } else if (data.data.hasApiKey) {
+          setCassoStatusMsg({
+            type: "error",
+            text: `Casso API phản hồi: ${data.data.apiErrorMessage || "Vui lòng kiểm tra lại API Key"}`,
+          });
+        } else {
+          setCassoStatusMsg({
+            type: "error",
+            text: "Chưa cấu hình Casso API Key! Vui lòng nhập API Key để kiểm tra.",
+          });
+        }
+        loadCassoInfo();
+      } else {
+        setCassoStatusMsg({ type: "error", text: data.message });
+      }
+    } catch (err: any) {
+      setCassoStatusMsg({ type: "error", text: "Không thể kết nối kiểm tra Casso API!" });
+    } finally {
+      setTestingCasso(false);
+    }
+  };
+
+  // Copy Webhook URL
+  const copyWebhookUrl = () => {
+    const url = cassoInfo?.webhookUrl || `${window.location.origin}/api/v1/webhook/casso`;
+    navigator.clipboard.writeText(url);
+    setCopiedWebhook(true);
+    setTimeout(() => setCopiedWebhook(false), 3000);
+  };
+
+  // Gemini Handlers
   const handleTestGeminiKey = async () => {
     if (!apiKeyInput.trim()) {
       setKeyStatusMsg({ type: "error", text: "Vui lòng nhập Google Gemini API Key trước khi kiểm tra!" });
@@ -215,18 +366,6 @@ export default function AdminDashboardPage() {
     router.push("/admin/login");
   };
 
-  const handleManualCassoSync = async () => {
-    setSyncing(true);
-    setSyncSuccess(null);
-
-    // Giả lập hoặc gọi kiểm tra đối soát với Casso Banking Webhook
-    setTimeout(() => {
-      setSyncing(false);
-      setSyncSuccess("Đã hoàn tất đối soát với Casso: 100% dữ liệu khớp lệnh với tài khoản BIDV 8630100930!");
-      setTimeout(() => setSyncSuccess(null), 4000);
-    }, 1200);
-  };
-
   const filteredDonations = donations.filter((d) => {
     const q = search.toLowerCase();
     const matchSearch =
@@ -255,7 +394,7 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-16">
-      {/* Thanh công cụ quản trị (Gọn gàng, không lặp lại Logo và Tên quỹ của Header chính) */}
+      {/* Thanh công cụ quản trị */}
       <div className="bg-white border-b border-slate-200 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -308,14 +447,30 @@ export default function AdminDashboardPage() {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
-        {/* Banner thông báo trạng thái đồng bộ */}
+        {/* Banner thông báo trạng thái đồng bộ thành công */}
         {syncSuccess && (
           <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-300 text-xs text-emerald-900 font-medium flex items-center justify-between animate-in fade-in">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>{syncSuccess}</span>
             </div>
             <span className="text-[11px] text-emerald-700 font-mono">Status: 200 OK</span>
+          </div>
+        )}
+
+        {/* Banner thông báo lỗi đồng bộ */}
+        {syncError && (
+          <div className="p-4 rounded-xl bg-rose-50 border border-rose-300 text-xs text-rose-900 font-medium flex items-center justify-between animate-in fade-in">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <span>{syncError}</span>
+            </div>
+            <button
+              onClick={() => setSyncError(null)}
+              className="text-xs font-bold text-rose-700 hover:underline cursor-pointer"
+            >
+              Đóng
+            </button>
           </div>
         )}
 
@@ -329,10 +484,10 @@ export default function AdminDashboardPage() {
               </span>
             </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">
-              Tổng Quan Tài Chính & Sao Kê Minh Bạch
+              Tổng Quan Tài Chính &amp; Sao Kê Minh Bạch
             </h2>
             <p className="text-xs text-slate-600 mt-0.5">
-              Dữ liệu đối soát tự động qua Casso Banking Webhook V2 và xác nhận chi 20 thôn buôn.
+              Đồng bộ kép: Tiếp nhận tức thì qua Webhook V2 và chủ động đối soát qua Casso Open API.
             </p>
           </div>
 
@@ -343,8 +498,8 @@ export default function AdminDashboardPage() {
               disabled={syncing}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-all disabled:opacity-60 cursor-pointer"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
-              <span>{syncing ? "Đang đối soát..." : "Đồng bộ thủ công với Casso"}</span>
+              <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin text-rose-400" : ""}`} />
+              <span>{syncing ? "Đang đối soát Casso API..." : "Đồng bộ thủ công với Casso"}</span>
             </button>
 
             {/* Quản lý An sinh & Hoàn cảnh */}
@@ -429,6 +584,195 @@ export default function AdminDashboardPage() {
             </div>
             <div className="text-[11px] text-slate-500 pt-1 border-t border-slate-100">
               {stats.activeCampaigns} chiến dịch trọng điểm đang mở
+            </div>
+          </div>
+        </div>
+
+        {/* KHỐI CẤU HÌNH & TRẠNG THÁI CASSO OPEN API & WEBHOOK (ĐỒNG BỘ KÉP) */}
+        <div className="bg-white rounded-2xl border border-blue-200/80 shadow-xs overflow-hidden">
+          <div className="p-4 sm:p-5 bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-white border-b border-blue-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-xs">
+                <CreditCard className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-sm text-slate-900">
+                    Cơ Chế Đồng Bộ Kép Casso Banking V2 (BIDV 8630100930)
+                  </h3>
+                  {hasCassoKey ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Casso API Đã Kết Nối
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                      <AlertCircle className="w-3 h-3 text-amber-600" />
+                      Chưa nạp Casso API Key
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Tài khoản tiếp nhận duy nhất: <strong>BIDV 8630100930</strong> • Chủ tài khoản: <strong>UY BAN MTTQ VN XA EA SUP</strong>.
+                </p>
+              </div>
+            </div>
+
+            <a
+              href="https://casso.vn"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 hover:text-blue-800 hover:underline shrink-0"
+            >
+              <span>Trang quản trị Casso.vn</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+
+          <div className="p-4 sm:p-5 space-y-4">
+            {cassoStatusMsg && (
+              <div
+                className={`p-3.5 rounded-xl text-xs flex items-center gap-2.5 animate-in fade-in ${
+                  cassoStatusMsg.type === "success"
+                    ? "bg-emerald-50 text-emerald-900 border border-emerald-200"
+                    : "bg-red-50 text-red-900 border border-red-200"
+                }`}
+              >
+                {cassoStatusMsg.type === "success" ? (
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                )}
+                <span>{cassoStatusMsg.text}</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Phân hệ 1: Cơ chế thụ động (Real-time Webhook) */}
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">
+                      1
+                    </div>
+                    <span className="text-xs font-bold text-slate-800">
+                      Cơ chế Thụ động: Real-time Webhook
+                    </span>
+                  </div>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                    Trực tuyến 24/7
+                  </span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-semibold text-slate-600">
+                    Endpoint Webhook (Cấu hình trên Casso Dashboard):
+                  </label>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="text"
+                      readOnly
+                      value={cassoInfo?.webhookUrl || `${typeof window !== "undefined" ? window.location.origin : ""}/api/v1/webhook/casso`}
+                      className="w-full px-2.5 py-1.5 text-[11px] font-mono rounded-lg border border-slate-200 bg-white text-slate-800 select-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={copyWebhookUrl}
+                      className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs transition-colors shrink-0"
+                      title="Sao chép URL"
+                    >
+                      {copiedWebhook ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-[11px] font-semibold text-slate-600">
+                    Mã bảo mật Secure Token (Chống lỗi 401 Unauthorized):
+                  </label>
+                  <div className="flex items-center justify-between text-[11px] font-mono bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700">
+                    <span>{cassoInfo?.hasSecureToken ? "••••••••••••••••••••••••••••••••" : "EaSup_Charity_2026_Secure_Token_Secret"}</span>
+                    <span className="text-[10px] text-emerald-600 font-sans font-bold">Khớp chuẩn header</span>
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  ✓ Tự động đối soát giao dịch tiền vào, chống trùng lặp (Idempotency) và cộng dồn tiến độ chiến dịch.
+                </p>
+              </div>
+
+              {/* Phân hệ 2: Cơ chế chủ động (Casso API Sync) */}
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">
+                      2
+                    </div>
+                    <span className="text-xs font-bold text-slate-800">
+                      Cơ chế Chủ động: Casso Open API Sync
+                    </span>
+                  </div>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
+                    <Zap className="w-3 h-3 text-blue-600" />
+                    Kéo Lịch Sử v2
+                  </span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-semibold text-slate-600 flex items-center justify-between">
+                    <span>Casso Open API Key (Tạo trên oauth.casso.vn):</span>
+                    {cassoInfo?.liveAccount && (
+                      <span className="text-emerald-700 font-bold font-mono">
+                        Số dư: {formatVND(cassoInfo.liveAccount.balance)} đ
+                      </span>
+                    )}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showCassoKey ? "text" : "password"}
+                      value={cassoApiKeyInput}
+                      onChange={(e) => setCassoApiKeyInput(e.target.value)}
+                      placeholder="Dán mã Casso API Key (chuẩn AK_CS_...)"
+                      className="w-full pl-2.5 pr-8 py-1.5 text-xs rounded-lg border border-slate-200 font-mono focus:border-blue-600 focus:ring-1 focus:ring-blue-600 bg-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCassoKey(!showCassoKey)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
+                      title={showCassoKey ? "Ẩn khóa" : "Hiện khóa"}
+                    >
+                      {showCassoKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleTestCassoConnection}
+                    disabled={testingCasso}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer"
+                  >
+                    <Activity className={`w-3.5 h-3.5 text-blue-600 ${testingCasso ? "animate-spin" : ""}`} />
+                    <span>{testingCasso ? "Đang kiểm tra..." : "Kiểm tra kết nối & Số dư"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSaveCassoSettings}
+                    disabled={savingCasso || !cassoApiKeyInput.trim()}
+                    className="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all disabled:opacity-50 cursor-pointer"
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    <span>{savingCasso ? "Lưu..." : "Lưu API Key"}</span>
+                  </button>
+                </div>
+
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  ✓ Chủ động gọi <code>/v2/sync</code>, <code>/v2/transactions</code> và <code>/v2/accounts</code> để đối soát 100% không độ trễ.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -557,7 +901,7 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* Các nút hành động */}
+            {/* Các nút hành động Gemini */}
             <div className="flex flex-wrap items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
               <button
                 type="button"
@@ -590,7 +934,7 @@ export default function AdminDashboardPage() {
                 Danh Sách Giao Dịch Tiếp Nhận Tiền Vào (Donations)
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Cập nhật tự động từ cổng Casso Banking Webhook V2.
+                Cập nhật tự động từ cổng Casso Banking Webhook V2 và Casso Open API.
               </p>
             </div>
 
