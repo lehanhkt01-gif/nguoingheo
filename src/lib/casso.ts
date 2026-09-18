@@ -37,15 +37,14 @@ export interface CassoConfig {
 }
 
 /**
- * Hàm chuẩn hóa chuỗi cấu hình (bỏ dấu nháy kép/đơn bao quanh và khoảng trắng)
+ * Hàm chuẩn hóa chuỗi cấu hình (bỏ dấu nháy kép/đơn bao quanh, ký tự thừa và khoảng trắng)
  */
 function cleanEnvString(val?: string | null): string {
   if (!val) return "";
   let s = val.trim();
-  if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
-    s = s.slice(1, -1).trim();
-  }
-  return s;
+  // Loại bỏ nháy kép hoặc nháy đơn bao quanh hoặc ở đầu/cuối chuỗi
+  s = s.replace(/^["'\s]+|["'\s]+$/g, "");
+  return s.trim();
 }
 
 import fs from "fs";
@@ -53,6 +52,7 @@ import path from "path";
 
 /**
  * Đọc trực tiếp từ file .env phòng trường hợp container chưa nạp vào process.env
+ * Hỗ trợ cả định dạng: KEY=VAL, KEY="VAL", KEY: VAL hoặc KEY VAL (nếu lỡ gõ thiếu dấu =)
  */
 function readEnvFileFallback(key: string): string {
   try {
@@ -62,13 +62,17 @@ function readEnvFileFallback(key: string): string {
       path.join(process.cwd(), ".env.production"),
       "/app/.env",
       "/var/www/nguoingheo/.env",
+      path.join(process.cwd(), "..", ".env"),
     ];
     for (const p of envPaths) {
       if (fs.existsSync(p)) {
         const content = fs.readFileSync(p, "utf-8");
-        const match = content.match(new RegExp(`^${key}\\s*=\\s*(.*)$`, "m"));
+        // Regex khớp: KEY = "VAL", KEY: "VAL", KEY "VAL" hoặc KEY VAL
+        const regex = new RegExp(`^\\s*${key}\\s*[:=\\s]\\s*([^\\r\\n]+)`, "m");
+        const match = content.match(regex);
         if (match && match[1]) {
-          return cleanEnvString(match[1]);
+          const val = cleanEnvString(match[1]);
+          if (val) return val;
         }
       }
     }

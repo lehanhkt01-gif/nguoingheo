@@ -10,13 +10,12 @@ services:
       - .env
     ports:
       - "3080:3000"
+    volumes:
+      - ./.env:/app/.env:ro
+      - ./data:/app/data
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-EaSupSecureDb2026}@db:5432/${DB_NAME:-vinguoingheo_db}?schema=public
-      - CASSO_API_KEY=${CASSO_API_KEY:-}
-      - CASSO_SECURE_TOKEN=${CASSO_SECURE_TOKEN:-EaSup_Charity_2026_Secure_Token_Secret}
-      - CASSO_ACCOUNT_NUMBER=${CASSO_ACCOUNT_NUMBER:-8630100930}
-      - CASSO_API_URL=${CASSO_API_URL:-https://oauth.casso.vn/v2}
       - JWT_SECRET=${JWT_SECRET:-EaSup_Charity_JWT_Secret_Key_2026}
       - NEXT_PUBLIC_BIDV_ACCOUNT=8630100930
       - NEXT_PUBLIC_BIDV_BIN=970418

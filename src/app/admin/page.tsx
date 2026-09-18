@@ -49,6 +49,7 @@ export default function AdminDashboardPage() {
   const [cassoApiKeyInput, setCassoApiKeyInput] = useState("");
   const [cassoSecureTokenInput, setCassoSecureTokenInput] = useState("");
   const [showCassoKey, setShowCassoKey] = useState(false);
+  const [showCassoKeyInput, setShowCassoKeyInput] = useState(false);
   const [showCassoToken, setShowCassoToken] = useState(false);
   const [savingCasso, setSavingCasso] = useState(false);
   const [testingCasso, setTestingCasso] = useState(false);
@@ -260,6 +261,10 @@ export default function AdminDashboardPage() {
 
   // Lưu cấu hình Casso API & Webhook
   const handleSaveCassoSettings = async () => {
+    if (!cassoApiKeyInput.trim()) {
+      setCassoStatusMsg({ type: "error", text: "Vui lòng dán mã API Key hợp lệ trước khi lưu!" });
+      return;
+    }
     setSavingCasso(true);
     setCassoStatusMsg(null);
     try {
@@ -276,12 +281,16 @@ export default function AdminDashboardPage() {
       if (data.success) {
         setCassoStatusMsg({
           type: "success",
-          text: "Đã lưu cài đặt Casso Secure Token và API Key thành công!",
+          text: "Đã lưu cài đặt Casso API Key thành công! Đang kiểm tra kết nối...",
         });
+        setShowCassoKeyInput(false);
         loadCassoInfo();
         loadStats();
         loadDonations();
-        setTimeout(() => setCassoStatusMsg(null), 5000);
+        // Kiểm tra kết nối ngay sau khi lưu
+        setTimeout(() => {
+          handleTestCassoConnection();
+        }, 1000);
       } else {
         setCassoStatusMsg({ type: "error", text: data.message });
       }
@@ -312,11 +321,13 @@ export default function AdminDashboardPage() {
             type: "error",
             text: `Casso API phản hồi: ${data.data.apiErrorMessage || "Vui lòng kiểm tra lại API Key"}`,
           });
+          setShowCassoKeyInput(true);
         } else {
           setCassoStatusMsg({
             type: "error",
-            text: "Chưa cấu hình Casso API Key! Vui lòng nhập API Key để kiểm tra.",
+            text: "Chưa nhận diện được Casso API Key từ file .env máy chủ! Quý vị có thể dán trực tiếp mã AK_CS... vào ô bên dưới và bấm 'Lưu & Kết nối'.",
           });
+          setShowCassoKeyInput(true);
         }
         loadCassoInfo();
       } else {
@@ -776,16 +787,25 @@ export default function AdminDashboardPage() {
                   <div className="mt-3 p-3 rounded-lg bg-blue-50/70 border border-blue-200/80 space-y-2">
                     <div className="flex items-center justify-between text-xs font-bold text-blue-950">
                       <span>Trạng thái kết nối Casso Open API:</span>
-                      {hasCassoKey ? (
-                        <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                          Đã nạp qua file .env
-                        </span>
-                      ) : (
-                        <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">
-                          Đang kiểm tra .env
-                        </span>
-                      )}
+                      <div className="flex items-center gap-1.5">
+                        {hasCassoKey ? (
+                          <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                            Đã nạp Key ({cassoInfo?.cassoApiKey})
+                          </span>
+                        ) : (
+                          <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">
+                            Chưa nhận diện được Key
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setShowCassoKeyInput(!showCassoKeyInput)}
+                          className="text-[10px] text-blue-700 hover:text-blue-900 underline font-semibold cursor-pointer"
+                        >
+                          {showCassoKeyInput ? "Đóng" : (hasCassoKey ? "Đổi Key" : "Dán Key")}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="flex items-center justify-between pt-1 border-t border-blue-200/60 text-xs text-blue-900">
@@ -795,6 +815,56 @@ export default function AdminDashboardPage() {
                       </span>
                     </div>
                   </div>
+
+                  {/* Hộp dán/cập nhật Casso API Key trực tiếp */}
+                  {(!hasCassoKey || showCassoKeyInput) && (
+                    <div className="p-3 bg-white rounded-xl border border-blue-200 shadow-xs space-y-2 mt-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[11px] font-bold text-slate-700">
+                          Casso Open API Key (Tài khoản BIDV 8630100930):
+                        </label>
+                        {hasCassoKey && (
+                          <button
+                            type="button"
+                            onClick={() => setShowCassoKeyInput(false)}
+                            className="text-[10px] text-slate-500 hover:text-slate-800 cursor-pointer"
+                          >
+                            ✕ Đóng
+                          </button>
+                        )}
+                      </div>
+                      <div className="relative">
+                        <input
+                          type={showCassoKey ? "text" : "password"}
+                          value={cassoApiKeyInput}
+                          onChange={(e) => setCassoApiKeyInput(e.target.value)}
+                          placeholder="Dán mã API Key bắt đầu bằng AK_CS..."
+                          className="w-full pl-2.5 pr-24 py-2 text-xs font-mono rounded-lg border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 bg-slate-50/50"
+                        />
+                        <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setShowCassoKey(!showCassoKey)}
+                            className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                            title={showCassoKey ? "Ẩn khóa" : "Hiện khóa"}
+                          >
+                            {showCassoKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleSaveCassoSettings}
+                            disabled={savingCasso || !cassoApiKeyInput.trim()}
+                            className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[11px] font-bold transition-all disabled:opacity-50 cursor-pointer"
+                          >
+                            {savingCasso ? "Đang lưu..." : "Lưu & Kết nối"}
+                          </button>
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-slate-500 leading-relaxed">
+                        💡 Quý vị có thể dán trực tiếp mã <code>AK_CS...</code> vào đây và nhấn <strong>Lưu & Kết nối</strong> để kích hoạt ngay mà không cần cấu hình lại VPS.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2 pt-2">
