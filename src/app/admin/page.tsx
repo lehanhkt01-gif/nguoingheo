@@ -520,17 +520,17 @@ export default function AdminDashboardPage() {
         {/* 4 Thẻ Thống Kê Nhanh Số Dư BIDV */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1: Số dư thực tế */}
-          <div className="bg-gradient-to-br from-rose-600 to-pink-600 text-white p-5 rounded-2xl shadow-sm space-y-2">
-            <div className="flex items-center justify-between text-rose-100">
-              <span className="text-xs font-bold uppercase tracking-wider">Số Dư Quỹ Khả Dụng</span>
-              <Wallet className="w-5 h-5 text-rose-200" />
+          <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 text-white p-5 rounded-2xl shadow-sm space-y-2 border border-emerald-500">
+            <div className="flex items-center justify-between text-yellow-300">
+              <span className="text-xs font-bold uppercase tracking-wider">Số Dư Tài Khoản (Hiện Có)</span>
+              <Wallet className="w-5 h-5 text-yellow-300" />
             </div>
-            <div className="text-2xl sm:text-3xl font-extrabold tracking-tight font-mono">
+            <div className="text-2xl sm:text-3xl font-extrabold tracking-tight font-mono text-yellow-300">
               {formatVND(stats.netBalance)}
             </div>
-            <div className="text-[11px] text-rose-100 flex items-center justify-between pt-1 border-t border-white/20">
+            <div className="text-[11px] text-yellow-100 flex items-center justify-between pt-1 border-t border-emerald-500/50">
               <span>BIDV 8630100930</span>
-              <span className="font-semibold text-emerald-200">Khớp lệnh 100%</span>
+              <span className="font-semibold text-yellow-200">Khớp lệnh 100%</span>
             </div>
           </div>
 
