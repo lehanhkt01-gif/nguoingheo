@@ -839,9 +839,16 @@ export default function SocialWelfareList() {
                           </div>
                         )}
 
-                        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-bold text-rose-700 flex items-center gap-1 shadow-xs max-w-[70%] truncate">
-                          <MapPin className="w-3 h-3 shrink-0" />
-                          <span className="truncate">{item.village}</span>
+                        {/* Địa chỉ Thôn & Huy hiệu CẦN GIÚP ĐỠ */}
+                        <div className="absolute top-3 left-3 flex items-center gap-1.5 max-w-[80%] flex-wrap">
+                          <div className="bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-bold text-rose-700 flex items-center gap-1 shadow-xs truncate">
+                            <MapPin className="w-3 h-3 shrink-0" />
+                            <span className="truncate">{item.village}</span>
+                          </div>
+                          <div className="bg-rose-600 px-2.5 py-1 rounded-full text-[10px] font-black text-white shadow-xs tracking-wider uppercase flex items-center gap-1 shrink-0">
+                            <Heart className="w-2.5 h-2.5 fill-white shrink-0" />
+                            <span>CẦN GIÚP ĐỠ</span>
+                          </div>
                         </div>
 
                         {fileCount > 0 && (
@@ -988,10 +995,16 @@ export default function SocialWelfareList() {
                           </div>
                         )}
 
-                        {/* Thôn / Buôn đã chọn (Có thể nhiều thôn) */}
-                        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-bold text-rose-700 flex items-center gap-1 shadow-xs max-w-[70%] truncate">
-                          <MapPin className="w-3 h-3 shrink-0" />
-                          <span className="truncate">{gift.village}</span>
+                        {/* Địa chỉ Thôn & Huy hiệu ĐÃ TRAO/GIẢI NGÂN */}
+                        <div className="absolute top-3 left-3 flex items-center gap-1.5 max-w-[80%] flex-wrap">
+                          <div className="bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-bold text-emerald-800 flex items-center gap-1 shadow-xs truncate">
+                            <MapPin className="w-3 h-3 shrink-0 text-emerald-600" />
+                            <span className="truncate">{gift.village}</span>
+                          </div>
+                          <div className="bg-emerald-600 px-2.5 py-1 rounded-full text-[10px] font-black text-white shadow-xs tracking-wider uppercase flex items-center gap-1 shrink-0">
+                            <Gift className="w-2.5 h-2.5 text-white shrink-0" />
+                            <span>ĐÃ TRAO/GIẢI NGÂN</span>
+                          </div>
                         </div>
 
                         {/* Badge số file */}
@@ -1165,6 +1178,16 @@ export default function SocialWelfareList() {
                     {currentPreview && (
                       <div className="relative aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-xs">
                         <img src={currentPreview} alt={detailCase.recipientName} className="w-full h-full object-cover" />
+                        <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                          <div className="bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-bold text-rose-700 flex items-center gap-1 shadow-xs">
+                            <MapPin className="w-3 h-3 shrink-0" />
+                            <span>{detailCase.village}</span>
+                          </div>
+                          <div className="bg-rose-600 px-2.5 py-1 rounded-full text-[10px] font-black text-white shadow-xs tracking-wider uppercase flex items-center gap-1">
+                            <Heart className="w-2.5 h-2.5 fill-white shrink-0" />
+                            <span>CẦN GIÚP ĐỠ</span>
+                          </div>
+                        </div>
                       </div>
                     )}
 
@@ -1355,6 +1378,16 @@ export default function SocialWelfareList() {
                     {currentPreview && (
                       <div className="relative aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-xs">
                         <img src={currentPreview} alt={detailGift.title} className="w-full h-full object-cover" />
+                        <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                          <div className="bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-bold text-emerald-800 flex items-center gap-1 shadow-xs">
+                            <MapPin className="w-3 h-3 shrink-0 text-emerald-600" />
+                            <span>{detailGift.village}</span>
+                          </div>
+                          <div className="bg-emerald-600 px-2.5 py-1 rounded-full text-[10px] font-black text-white shadow-xs tracking-wider uppercase flex items-center gap-1">
+                            <Gift className="w-2.5 h-2.5 text-white shrink-0" />
+                            <span>ĐÃ TRAO/GIẢI NGÂN</span>
+                          </div>
+                        </div>
                       </div>
                     )}
 
