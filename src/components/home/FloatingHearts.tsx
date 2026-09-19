@@ -36,8 +36,8 @@ export default function FloatingHearts() {
         id: i,
         // Rải đều trên chiều ngang màn hình với độ lệch ngẫu nhiên nhẹ
         left: Math.round(((i + Math.random() * 0.8) / heartCount) * 96 + 2),
-        // Kích thước nhỏ xinh từ 11px đến 22px
-        size: Math.floor(Math.random() * 11) + 12,
+        // Kích thước to hơn rõ nét: từ 24px đến 42px
+        size: Math.floor(Math.random() * 19) + 24,
         // Thời gian bay từ dưới lên từ 9s đến 18s để chuyển động thật êm ái
         duration: Math.floor(Math.random() * 9) + 10,
         // Độ trễ xuất hiện từ 0s đến 12s để các trái tim bay liên tục không ngắt quãng
