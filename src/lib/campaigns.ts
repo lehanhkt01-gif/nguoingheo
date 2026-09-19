@@ -2,6 +2,13 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 
+export interface CampaignFileItem {
+  url: string;
+  name: string;
+  type: "image" | "pdf";
+  size?: number;
+}
+
 export interface CampaignItem {
   id: number;
   code: string;
@@ -9,10 +16,12 @@ export interface CampaignItem {
   beneficiaryName: string;
   village: string;
   situation: string;
-  targetAmount: number;
-  currentAmount: number;
+  amount: number; // "Số tiền trao"
+  targetAmount?: number;
+  currentAmount?: number;
   status: "ACTIVE" | "COMPLETED";
   images: string[];
+  files?: CampaignFileItem[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -22,42 +31,8 @@ export interface CampaignsStoreData {
   updatedAt?: string;
 }
 
-export const INITIAL_CAMPAIGNS: CampaignItem[] = [
-  {
-    id: 1,
-    code: "CD-1",
-    title: "Xây dựng Nhà Đại đoàn kết cho hộ nghèo khó khăn về nhà ở",
-    beneficiaryName: "Đồng bào khó khăn",
-    village: "Xã Ea Súp",
-    situation: "Xóa nhà tạm dột nát cho các hộ đồng bào và gia đình neo đơn có hoàn cảnh đặc biệt khó khăn tại 20 thôn buôn. Khảo sát thực địa ghi nhận nhiều căn nhà tranh tre nứa lá xuống cấp nghiêm trọng cần kinh phí mua tôn, gạch, xi măng kiên cố.",
-    targetAmount: 200000000,
-    currentAmount: 1297019,
-    status: "ACTIVE",
-    images: [
-      "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=80",
-      "/images/hero-charity-bg.jpg",
-    ],
-    createdAt: "2026-01-15T08:00:00.000Z",
-  },
-  {
-    id: 2,
-    code: "CD-2",
-    title: "Trao tặng Bò giống sinh kế giúp đồng bào thoát nghèo bền vững",
-    beneficiaryName: "Đồng bào khó khăn",
-    village: "Xã Ea Súp",
-    situation: "Hỗ trợ bò cái sinh sản giống địa phương cho các hộ nghèo chí thú làm ăn nhưng thiếu vốn sản xuất trên địa bàn xã Ea Súp nhằm tạo sinh kế thoát nghèo bền vững lâu dài.",
-    targetAmount: 100000000,
-    currentAmount: 0,
-    status: "ACTIVE",
-    images: [
-      "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=800&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80",
-      "/images/hero-charity-bg.jpg",
-    ],
-    createdAt: "2026-02-01T08:00:00.000Z",
-  },
-];
+// Xóa sạch toàn bộ dữ liệu mẫu cũ để bắt đầu nhập dữ liệu thực tế
+export const INITIAL_CAMPAIGNS: CampaignItem[] = [];
 
 let activeCampaignsFilePath: string | null = null;
 

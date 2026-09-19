@@ -18,13 +18,13 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { action, campaigns, campaign } = body;
 
-    if (action === "reset") {
+    if (action === "reset" || action === "clear_all") {
       const resetData = saveCampaignsData({
-        campaigns: INITIAL_CAMPAIGNS,
+        campaigns: [],
       });
       return NextResponse.json({
         success: true,
-        message: "Đã khôi phục danh mục chiến dịch mẫu của hệ thống thành công!",
+        message: "Đã xóa sạch toàn bộ dữ liệu hoàn cảnh/chiến dịch cũ thành công!",
         data: resetData.campaigns,
       });
     }
@@ -46,9 +46,9 @@ export async function POST(req: NextRequest) {
         ...campaign,
         id: newId,
         code: newCode,
-        targetAmount: Number(campaign.targetAmount) || 0,
-        currentAmount: Number(campaign.currentAmount) || 0,
+        amount: Number(campaign.amount) || Number(campaign.currentAmount) || 0,
         images: Array.isArray(campaign.images) ? campaign.images.slice(0, 5) : [],
+        files: Array.isArray(campaign.files) ? campaign.files.slice(0, 5) : [],
         createdAt: new Date().toISOString(),
       };
       const updated = saveCampaignsData({ campaigns: [newCampaign, ...current] });
@@ -66,9 +66,9 @@ export async function POST(req: NextRequest) {
           ? {
               ...c,
               ...campaign,
-              targetAmount: Number(campaign.targetAmount) || 0,
-              currentAmount: Number(campaign.currentAmount) || 0,
+              amount: Number(campaign.amount) || Number(campaign.currentAmount) || c.amount || 0,
               images: Array.isArray(campaign.images) ? campaign.images.slice(0, 5) : c.images,
+              files: Array.isArray(campaign.files) ? campaign.files.slice(0, 5) : c.files,
               updatedAt: new Date().toISOString(),
             }
           : c

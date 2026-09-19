@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { formatVND, buildVietQRUrl } from "@/lib/utils";
-import { CampaignItem } from "@/lib/campaigns";
+import { CampaignItem, CampaignFileItem } from "@/lib/campaigns";
 import {
   Heart,
   MapPin,
@@ -16,16 +16,11 @@ import {
   Image as ImageIcon,
   QrCode,
   Copy,
-  Check,
   Eye,
-  ArrowRight,
   ExternalLink,
-  ChevronLeft,
-  ChevronRight,
-  Info,
-  User,
-  Sparkles,
-  Layers
+  Upload,
+  FileText,
+  DollarSign
 } from "lucide-react";
 
 const VILLAGES = [
@@ -59,14 +54,14 @@ interface CampaignsManagerProps {
 }
 
 export default function CampaignsManager({ initialCampaigns }: CampaignsManagerProps) {
-  const [campaigns, setCampaigns] = useState<CampaignItem[]>(initialCampaigns);
+  const [campaigns, setCampaigns] = useState<CampaignItem[]>(initialCampaigns || []);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
   // Modal Chi Tiết Hoàn Cảnh (Khi người dùng click vào card)
   const [detailCampaign, setDetailCampaign] = useState<CampaignItem | null>(null);
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+  const [activePreviewImg, setActivePreviewImg] = useState<string>("");
 
   // Modal Quyên Góp VietQR
   const [donateCampaign, setDonateCampaign] = useState<CampaignItem | null>(null);
@@ -77,18 +72,32 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
   // Modal Thêm / Chỉnh Sửa Cho Admin
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [formData, setFormData] = useState<Omit<CampaignItem, "id">>({
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [formData, setFormData] = useState<{
+    code: string;
+    title: string;
+    beneficiaryName: string;
+    village: string;
+    situation: string;
+    amount: number;
+    status: "ACTIVE" | "COMPLETED";
+    images: string[];
+    files: CampaignFileItem[];
+  }>({
     code: "",
     title: "",
-    beneficiaryName: "Đồng bào khó khăn",
-    village: "Xã Ea Súp",
+    beneficiaryName: "",
+    village: "Buôn A",
     situation: "",
-    targetAmount: 100000000,
-    currentAmount: 0,
+    amount: 5000000,
     status: "ACTIVE",
-    images: ["/images/hero-charity-bg.jpg"],
+    images: [],
+    files: [],
   });
-  const [newImageUrl, setNewImageUrl] = useState("");
+  const [manualImageUrl, setManualImageUrl] = useState("");
 
   // Kiểm tra quyền admin
   useEffect(() => {
@@ -101,7 +110,7 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
     return () => window.removeEventListener("storage", checkAuth);
   }, []);
 
-  // Tải dữ liệu từ máy chủ API
+  // Tải dữ liệu từ máy chủ API & dọn dẹp cache dữ liệu mẫu cũ
   const reloadData = async () => {
     try {
       const res = await fetch("/api/v1/campaigns");
@@ -110,7 +119,7 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
         setCampaigns(json.data);
       }
     } catch (err) {
-      console.warn("Lỗi tải danh sách chiến dịch:", err);
+      console.warn("Lỗi tải danh sách hoàn cảnh:", err);
     }
   };
 
@@ -121,43 +130,131 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
   // --- Handlers Admin ---
   const handleOpenAdd = () => {
     setEditingId(null);
-    const nextCode = `CD-${campaigns.length + 1}`;
+    setUploadError(null);
+    const nextCode = `HC-${Date.now().toString().slice(-4)}`;
     setFormData({
       code: nextCode,
       title: "",
-      beneficiaryName: "Đồng bào khó khăn",
-      village: "Xã Ea Súp",
+      beneficiaryName: "",
+      village: "Buôn A",
       situation: "",
-      targetAmount: 100000000,
-      currentAmount: 0,
+      amount: 5000000,
       status: "ACTIVE",
-      images: ["/images/hero-charity-bg.jpg"],
+      images: [],
+      files: [],
     });
-    setNewImageUrl("");
+    setManualImageUrl("");
     setIsEditModalOpen(true);
   };
 
   const handleOpenEdit = (item: CampaignItem, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     setEditingId(item.id);
+    setUploadError(null);
+    const amountVal = item.amount !== undefined ? item.amount : (item.currentAmount || 0);
     setFormData({
       code: item.code,
       title: item.title,
       beneficiaryName: item.beneficiaryName,
       village: item.village,
       situation: item.situation,
-      targetAmount: item.targetAmount,
-      currentAmount: item.currentAmount,
+      amount: amountVal,
       status: item.status,
-      images: item.images && item.images.length > 0 ? [...item.images] : ["/images/hero-charity-bg.jpg"],
+      images: Array.isArray(item.images) ? [...item.images] : [],
+      files: Array.isArray(item.files) ? [...item.files] : [],
     });
-    setNewImageUrl("");
+    setManualImageUrl("");
     setIsEditModalOpen(true);
   };
 
+  // Upload ảnh và file PDF chứng từ (tối đa 5 file)
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files;
+    if (!selectedFiles || selectedFiles.length === 0) return;
+
+    const currentFiles = formData.files || [];
+    if (currentFiles.length + selectedFiles.length > 5) {
+      alert(`Hệ thống chỉ cho phép tải lên tối đa 5 file (ảnh hoặc PDF chứng từ). Hiện tại đã có ${currentFiles.length} file.`);
+      e.target.value = "";
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      const uploadedItems: CampaignFileItem[] = [];
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        const bodyFormData = new FormData();
+        bodyFormData.append("file", file);
+
+        const res = await fetch("/api/v1/upload", {
+          method: "POST",
+          body: bodyFormData,
+        });
+        const resData = await res.json();
+        if (resData.success && resData.file) {
+          uploadedItems.push(resData.file);
+        } else {
+          throw new Error(resData.error || resData.message || `Lỗi tải tệp: ${file.name}`);
+        }
+      }
+
+      const updatedFiles = [...currentFiles, ...uploadedItems].slice(0, 5);
+      const imgUrls = updatedFiles.filter((f) => f.type === "image").map((f) => f.url);
+
+      setFormData((prev) => ({
+        ...prev,
+        files: updatedFiles,
+        images: imgUrls.length > 0 ? imgUrls : prev.images,
+      }));
+    } catch (err: any) {
+      console.error("Lỗi tải tệp lên:", err);
+      setUploadError(err.message || "Không thể tải tệp lên hệ thống.");
+    } finally {
+      setIsUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setFormData((prev) => {
+      const updatedFiles = prev.files.filter((_, i) => i !== index);
+      const updatedImages = updatedFiles.filter((f) => f.type === "image").map((f) => f.url);
+      return {
+        ...prev,
+        files: updatedFiles,
+        images: updatedImages.length > 0 ? updatedImages : prev.images,
+      };
+    });
+  };
+
+  // Thêm ảnh thủ công
+  const handleAddManualImage = () => {
+    const url = manualImageUrl.trim();
+    if (!url) return;
+    if (formData.files.length >= 5) {
+      alert("Đã đạt tối đa 5 file/hình ảnh cho hoàn cảnh này!");
+      return;
+    }
+    const newFile: CampaignFileItem = {
+      url,
+      name: `Ảnh ${formData.images.length + 1}`,
+      type: "image",
+    };
+    setFormData((prev) => ({
+      ...prev,
+      images: [...prev.images, url],
+      files: [...prev.files, newFile],
+    }));
+    setManualImageUrl("");
+  };
+
+  // Xóa một hoàn cảnh
   const handleDelete = async (id: number, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    if (!window.confirm("Quý vị có chắc chắn muốn xóa hoàn cảnh / chiến dịch này khỏi hệ thống?")) {
+    if (!window.confirm("Quý vị có chắc chắn muốn xóa hoàn cảnh này khỏi hệ thống?")) {
       return;
     }
 
@@ -171,18 +268,24 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
       const data = await res.json();
       if (data.success) {
         setCampaigns(data.data);
+        if (detailCampaign?.id === id) setDetailCampaign(null);
         setSaveStatus("Đã xóa hoàn cảnh khỏi hệ thống máy chủ!");
         setTimeout(() => setSaveStatus(null), 4000);
       }
     } catch (err) {
-      console.error("Lỗi khi xóa chiến dịch:", err);
+      console.error("Lỗi khi xóa hoàn cảnh:", err);
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleResetDefaults = async () => {
-    if (!window.confirm("Khôi phục toàn bộ danh mục chiến dịch / hoàn cảnh về dữ liệu chuẩn của hệ thống?")) {
+  // Xóa sạch toàn bộ dữ liệu rác cũ
+  const handleClearAll = async () => {
+    if (
+      !window.confirm(
+        "CẢNH BÁO XÓA SẠCH DỮ LIỆU:\n\nQuý vị có chắc chắn muốn XÓA SẠCH TOÀN BỘ dữ liệu mẫu cũ để bắt đầu nhập dữ liệu thực tế mới?"
+      )
+    ) {
       return;
     }
 
@@ -191,56 +294,37 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
       const res = await fetch("/api/v1/campaigns", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "reset" }),
+        body: JSON.stringify({ action: "clear_all" }),
       });
       const data = await res.json();
       if (data.success) {
-        setCampaigns(data.data);
-        setSaveStatus("Đã khôi phục dữ liệu chuẩn hệ thống!");
+        setCampaigns([]);
+        setSaveStatus("Đã xóa sạch toàn bộ dữ liệu cũ!");
         setTimeout(() => setSaveStatus(null), 4000);
       }
     } catch (err) {
-      console.error("Lỗi khi reset chiến dịch:", err);
+      console.error("Lỗi khi xóa toàn bộ dữ liệu:", err);
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Thêm ảnh vào form (tối đa 5 ảnh)
-  const handleAddImage = () => {
-    const url = newImageUrl.trim();
-    if (!url) return;
-    if (formData.images.length >= 5) {
-      alert("Đã đạt tối đa 5 hình ảnh cho hoàn cảnh này!");
-      return;
-    }
-    setFormData({
-      ...formData,
-      images: [...formData.images, url],
-    });
-    setNewImageUrl("");
-  };
-
-  // Xóa ảnh khỏi form
-  const handleRemoveImage = (index: number) => {
-    if (formData.images.length <= 1) {
-      alert("Cần giữ lại ít nhất 1 hình ảnh đại diện!");
-      return;
-    }
-    const updated = formData.images.filter((_, i) => i !== index);
-    setFormData({ ...formData, images: updated });
-  };
-
   // Lưu form
   const handleSaveForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title.trim()) return;
+    if (!formData.beneficiaryName.trim()) return;
 
     try {
       setIsSaving(true);
+      const payloadTitle = formData.title.trim() || `Hỗ trợ ${formData.beneficiaryName} (${formData.village})`;
       const payload = {
         action: editingId ? "update" : "create",
-        campaign: editingId ? { ...formData, id: editingId } : formData,
+        campaign: {
+          ...(editingId ? { id: editingId } : {}),
+          ...formData,
+          title: payloadTitle,
+          amount: Number(formData.amount) || 0,
+        },
       };
       const res = await fetch("/api/v1/campaigns", {
         method: "POST",
@@ -255,18 +339,20 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
         setTimeout(() => setSaveStatus(null), 4000);
       }
     } catch (err) {
-      console.error("Lỗi lưu chiến dịch:", err);
+      console.error("Lỗi lưu hoàn cảnh:", err);
     } finally {
       setIsSaving(false);
     }
   };
 
-  // --- Handlers Xem Chi Tiết & Quyên Góp ---
+  // Mở modal xem chi tiết
   const handleOpenDetail = (item: CampaignItem) => {
     setDetailCampaign(item);
-    setSelectedImageIndex(0);
+    const firstImg = item.images?.[0] || item.files?.find((f) => f.type === "image")?.url || "";
+    setActivePreviewImg(firstImg);
   };
 
+  // Mở modal quyên góp VietQR
   const handleOpenDonate = (item: CampaignItem, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     setDonateCampaign(item);
@@ -280,10 +366,10 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
     setTimeout(() => setCopiedField(null), 2500);
   };
 
-  // Tính số tiền và URL QR VietQR
   const effectiveAmount = customAmountInput ? parseInt(customAmountInput.replace(/\D/g, "") || "0") : donateAmount;
-  const cleanCode = donateCampaign?.code ? donateCampaign.code.replace(/[^A-Za-z0-9]/g, "") : "CHUNG";
-  const memoText = `VNN ${cleanCode}`.toUpperCase();
+  const memoText = donateCampaign?.beneficiaryName
+    ? `VNN ${donateCampaign.beneficiaryName}`
+    : "VNN UNG HO";
 
   const qrUrl = buildVietQRUrl({
     amount: effectiveAmount,
@@ -306,7 +392,7 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
                 Quyền Quản Trị Cán Bộ UBMTTQ Xã Ea Súp
               </span>
               <span className="text-[11px] text-slate-600">
-                Toàn quyền thêm mới, xóa, chỉnh sửa thông tin chi tiết và ảnh hoàn cảnh khó khăn.
+                Toàn quyền tạo mới, upload ảnh &amp; file PDF chứng từ, chỉnh sửa số tiền trao và xóa dữ liệu.
               </span>
             </div>
           </div>
@@ -336,331 +422,338 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
 
             <button
               type="button"
-              onClick={handleResetDefaults}
-              title="Khôi phục dữ liệu chuẩn hệ thống"
-              className="p-2 rounded-xl border border-rose-200 bg-white hover:bg-rose-100 text-slate-600 text-xs transition-colors cursor-pointer"
+              onClick={handleClearAll}
+              title="Xóa sạch dữ liệu cũ để cập nhật dữ liệu thực tế"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-red-200 bg-white hover:bg-red-50 text-red-600 text-xs font-bold transition-colors cursor-pointer shadow-xs"
             >
-              <RotateCcw className="w-4 h-4" />
+              <Trash2 className="w-4 h-4" />
+              <span>Xóa sạch dữ liệu cũ</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* Lưới Danh Sách Các Chiến Dịch / Hoàn Cảnh */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-        {campaigns.map((item) => {
-          const target = Number(item.targetAmount) || 1;
-          const current = Number(item.currentAmount) || 0;
-          const percent = Math.min(100, Math.round((current / target) * 100));
-          const isCompleted = item.status === "COMPLETED" || percent >= 100;
-          const mainImage = item.images && item.images.length > 0 ? item.images[0] : "/images/hero-charity-bg.jpg";
-          const imageCount = item.images ? item.images.length : 1;
-
-          return (
-            <div
-              key={item.id}
-              onClick={() => handleOpenDetail(item)}
-              className="bg-white rounded-2xl border border-rose-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between group cursor-pointer"
+      {/* Lưới Danh Sách Các Hoàn Cảnh Khó Khăn */}
+      {campaigns.length === 0 ? (
+        <div className="bg-white p-8 sm:p-12 rounded-3xl border border-rose-100 text-center space-y-4 shadow-xs">
+          <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto shadow-xs">
+            <Heart className="w-7 h-7" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-base sm:text-lg font-extrabold text-slate-800">
+              Hệ thống đã sẵn sàng nhập dữ liệu thực tế
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-500 max-w-lg mx-auto leading-relaxed">
+              Hiện chưa có hoàn cảnh nào. Quý Cán bộ hãy bấm nút <strong>&quot;Tạo hoàn cảnh mới&quot;</strong> ở trên để cập nhật thông tin hộ gia đình, số tiền trao, kèm tải lên ảnh và tệp PDF chứng từ lưu trữ bền vững.
+            </p>
+          </div>
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={handleOpenAdd}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-200 transition-all cursor-pointer"
             >
-              <div>
-                {/* Ảnh hoàn cảnh */}
-                <div className="relative aspect-[16/10] overflow-hidden bg-rose-50">
-                  <img
-                    src={mainImage}
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+              <Plus className="w-4 h-4" />
+              <span>Tạo hoàn cảnh thực tế đầu tiên</span>
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {campaigns.map((item) => {
+            const amountVal = item.amount !== undefined ? item.amount : (item.currentAmount || 0);
+            const mainImage = item.images?.[0] || item.files?.find((f) => f.type === "image")?.url || "";
+            const totalFiles = item.files?.length || (item.images?.length || 0);
+            const pdfCount = item.files?.filter((f) => f.type === "pdf").length || 0;
 
-                  {/* Badge trạng thái */}
-                  <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-                    <span
-                      className={`px-2.5 py-0.5 rounded-md text-[11px] font-semibold shadow-sm ${
-                        isCompleted ? "bg-emerald-600 text-white" : "bg-rose-600 text-white"
-                      }`}
-                    >
-                      {isCompleted ? "Đã đạt mục tiêu" : "Đang quyên góp"}
-                    </span>
-
-                    {/* Số lượng ảnh */}
-                    {imageCount > 1 && (
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-900/70 text-white backdrop-blur-xs flex items-center gap-1">
-                        <ImageIcon className="w-3 h-3" />
-                        <span>{imageCount} ảnh</span>
-                      </span>
+            return (
+              <div
+                key={item.id}
+                onClick={() => handleOpenDetail(item)}
+                className="bg-white rounded-2xl border border-rose-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between group cursor-pointer"
+              >
+                <div>
+                  {/* Ảnh hoàn cảnh */}
+                  <div className="relative aspect-[16/10] overflow-hidden bg-rose-50">
+                    {mainImage ? (
+                      <img
+                        src={mainImage}
+                        alt={item.beneficiaryName || item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-gradient-to-br from-slate-50 to-rose-50/30">
+                        <ImageIcon className="w-10 h-10 stroke-1 mb-1 text-rose-300" />
+                        <span className="text-[11px] font-medium text-slate-500">Chưa có ảnh bìa</span>
+                      </div>
                     )}
-                  </div>
 
-                  {/* Mã định danh */}
-                  <div className="absolute top-2.5 right-2.5 flex items-center gap-1">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-900/80 text-rose-200 backdrop-blur-sm">
-                      #{item.code}
-                    </span>
+                    {/* Vị trí */}
+                    <div className="absolute top-2.5 left-2.5 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-bold text-rose-700 flex items-center gap-1 shadow-xs">
+                      <MapPin className="w-3 h-3" />
+                      <span>{item.village}</span>
+                    </div>
+
+                    {/* Badge số file / PDF */}
+                    {totalFiles > 0 && (
+                      <div className="absolute bottom-2.5 left-2.5 bg-slate-900/80 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] font-medium text-white flex items-center gap-1 shadow-xs">
+                        <FileText className="w-3 h-3 text-rose-300" />
+                        <span>{totalFiles} tệp {pdfCount > 0 ? `(${pdfCount} PDF)` : ""}</span>
+                      </div>
+                    )}
 
                     {/* Nút Sửa / Xóa cho Admin */}
                     {isAdmin && (
-                      <div className="flex items-center gap-1 bg-black/50 backdrop-blur-sm p-1 rounded-lg">
+                      <div
+                        className="absolute top-2.5 right-2.5 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm p-1 rounded-lg"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <button
                           type="button"
                           onClick={(e) => handleOpenEdit(item, e)}
-                          className="p-1 rounded bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition-colors shadow-xs"
-                          title="Chỉnh sửa hoàn cảnh"
+                          className="p-1.5 rounded bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition-colors shadow-xs cursor-pointer"
+                          title="Sửa hoàn cảnh này"
                         >
-                          <Edit3 className="w-3 h-3" />
+                          <Edit3 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           type="button"
                           onClick={(e) => handleDelete(item.id, e)}
-                          className="p-1 rounded bg-white hover:bg-red-50 text-slate-700 hover:text-red-600 transition-colors shadow-xs"
-                          title="Xóa hoàn cảnh"
+                          className="p-1.5 rounded bg-white hover:bg-red-50 text-slate-700 hover:text-red-600 transition-colors shadow-xs cursor-pointer"
+                          title="Xóa hoàn cảnh này"
                         >
-                          <Trash2 className="w-3 h-3" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     )}
                   </div>
-                </div>
 
-                {/* Nội dung tóm tắt */}
-                <div className="p-5 space-y-3">
-                  <div className="flex items-center gap-1.5 text-xs text-rose-600 font-semibold">
-                    <MapPin className="w-3.5 h-3.5" />
-                    <span>{item.village || "Xã Ea Súp"}</span>
-                    <span>•</span>
-                    <span className="text-slate-700 font-medium">{item.beneficiaryName || "Đồng bào khó khăn"}</span>
-                  </div>
+                  {/* Thông tin hoàn cảnh */}
+                  <div className="p-5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-bold text-base text-slate-900 group-hover:text-rose-600 transition-colors leading-snug">
+                        {item.beneficiaryName || item.title}
+                      </h3>
+                      <span className="text-[10px] text-rose-600 bg-rose-50 px-2 py-0.5 rounded font-semibold border border-rose-200">
+                        Chi tiết &raquo;
+                      </span>
+                    </div>
 
-                  <h3 className="font-bold text-sm text-slate-900 line-clamp-2 group-hover:text-rose-600 transition-colors leading-snug">
-                    {item.title}
-                  </h3>
+                    <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
+                      {item.situation}
+                    </p>
 
-                  <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                    {item.situation}
-                  </p>
-                </div>
-              </div>
-
-              {/* Phần chân Card: Tiến độ & Nút ủng hộ */}
-              <div className="p-5 pt-0 space-y-3">
-                {/* Thanh tiến độ */}
-                <div className="space-y-1.5 pt-2 border-t border-rose-100">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500">Đã vận động:</span>
-                    <span className="font-bold text-rose-700">{formatVND(current)}</span>
-                  </div>
-
-                  <div className="w-full h-1.5 bg-rose-100 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        isCompleted ? "bg-emerald-500" : "bg-gradient-to-r from-pink-500 to-rose-600"
-                      }`}
-                      style={{ width: `${percent}%` }}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between text-[11px] text-slate-500">
-                    <span>Tiến độ: <strong className="text-slate-800">{percent}%</strong></span>
-                    <span>Mục tiêu: <strong className="text-slate-800">{formatVND(target)}</strong></span>
+                    {/* Số tiền trao */}
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                      <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                        <DollarSign className="w-3.5 h-3.5 text-rose-500" />
+                        Số tiền trao:
+                      </span>
+                      <span className="font-extrabold text-rose-600 font-mono text-base">
+                        {formatVND(amountVal)}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Các nút bấm */}
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleOpenDetail(item);
-                    }}
-                    className="flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-semibold transition-colors"
-                  >
-                    <Eye className="w-3.5 h-3.5" />
-                    <span>Xem chi tiết</span>
-                  </button>
-
+                {/* Footer thẻ & nút hành động */}
+                <div
+                  className="p-3 bg-rose-50/40 border-t border-rose-100 flex items-center gap-2"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <button
                     type="button"
                     onClick={(e) => handleOpenDonate(item, e)}
-                    className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white text-xs font-bold shadow-sm shadow-rose-200 transition-all cursor-pointer"
+                    className="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-semibold text-xs shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                   >
-                    <Heart className="w-3.5 h-3.5 fill-current" />
-                    <span>Ủng hộ ngay</span>
+                    <Heart className="w-3.5 h-3.5 fill-white" />
+                    <span>Ủng hộ hoàn cảnh này</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenDetail(item)}
+                    className="py-2 px-3 rounded-xl border border-rose-200 bg-white hover:bg-rose-50 text-rose-700 text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Xem đủ</span>
                   </button>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* ========================================================================= */}
-      {/* 1. MODAL CHI TIẾT HOÀN CẢNH (KHI BẤM VÀO CARD SẼ HIỆN NHIỀU NỘI DUNG)    */}
+      {/* 1. MODAL CHI TIẾT MỞ RỘNG (KHI NGƯỜI DÙNG BẤM VÀO THẺ)                     */}
       {/* ========================================================================= */}
       {detailCampaign && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 max-w-2xl w-full overflow-hidden animate-in fade-in zoom-in-95 my-auto max-h-[90vh] flex flex-col">
+          <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 max-w-2xl w-full overflow-hidden animate-in fade-in zoom-in-95 my-auto max-h-[92vh] flex flex-col">
             {/* Header Modal */}
             <div className="bg-gradient-to-r from-rose-600 to-pink-600 p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
-                <Heart className="w-5 h-5 fill-current" />
-                <h3 className="font-bold text-sm sm:text-base line-clamp-1">
-                  Thông Tin Hoàn Cảnh &amp; Chiến Dịch Cần Giúp Đỡ
-                </h3>
+                <Heart className="w-5 h-5 fill-white" />
+                <div>
+                  <h3 className="font-bold text-base sm:text-lg leading-tight">
+                    {detailCampaign.beneficiaryName || detailCampaign.title}
+                  </h3>
+                  <p className="text-rose-100 text-xs flex items-center gap-1 mt-0.5">
+                    <MapPin className="w-3 h-3" />
+                    <span>{detailCampaign.village}, Xã Ea Súp</span>
+                  </p>
+                </div>
               </div>
               <button
                 type="button"
                 onClick={() => setDetailCampaign(null)}
-                className="p-1 rounded-full hover:bg-white/20 text-white transition-colors cursor-pointer"
+                className="p-1.5 rounded-full hover:bg-white/20 text-white transition-colors cursor-pointer"
+                title="Đóng"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Nội dung chi tiết cuộn được */}
-            <div className="p-4 sm:p-6 overflow-y-auto space-y-5 text-xs sm:text-sm">
-              {/* Gallery tối đa 5 hình ảnh */}
-              {detailCampaign.images && detailCampaign.images.length > 0 && (
-                <div className="space-y-2">
-                  <div className="relative aspect-[16/9] rounded-2xl overflow-hidden bg-slate-900 shadow-md">
-                    <img
-                      src={detailCampaign.images[selectedImageIndex] || detailCampaign.images[0]}
-                      alt={detailCampaign.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute bottom-2 right-2 px-2.5 py-1 rounded-lg bg-black/60 text-white text-xs backdrop-blur-xs font-mono">
-                      Ảnh {selectedImageIndex + 1} / {detailCampaign.images.length}
-                    </div>
-                  </div>
-
-                  {/* Danh sách thumbnail */}
-                  {detailCampaign.images.length > 1 && (
-                    <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                      {detailCampaign.images.map((img, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => setSelectedImageIndex(idx)}
-                          className={`relative w-16 h-12 rounded-lg overflow-hidden border-2 shrink-0 transition-all ${
-                            selectedImageIndex === idx
-                              ? "border-rose-600 ring-2 ring-rose-200 scale-105"
-                              : "border-slate-200 opacity-70 hover:opacity-100"
-                          }`}
-                        >
-                          <img src={img} alt={`Ảnh ${idx + 1}`} className="w-full h-full object-cover" />
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Thẻ định danh & tiêu đề */}
-              <div>
-                <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <span className="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-xs font-bold">
-                    #{detailCampaign.code}
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-5 text-slate-800">
+              {/* Thẻ số tiền trao nổi bật */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-50 via-pink-50 to-amber-50 border border-rose-200 flex items-center justify-between">
+                <div>
+                  <span className="text-xs uppercase tracking-wider font-bold text-slate-500 block">
+                    Số tiền trao
                   </span>
-                  <span
-                    className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                      detailCampaign.status === "COMPLETED"
-                        ? "bg-emerald-100 text-emerald-800"
-                        : "bg-amber-100 text-amber-800"
-                    }`}
-                  >
-                    {detailCampaign.status === "COMPLETED" ? "Đã đạt mục tiêu" : "Đang kêu gọi quyên góp"}
+                  <span className="text-xl sm:text-2xl font-black text-rose-600 font-mono">
+                    {formatVND(detailCampaign.amount !== undefined ? detailCampaign.amount : (detailCampaign.currentAmount || 0))}
                   </span>
                 </div>
-                <h2 className="text-base sm:text-xl font-extrabold text-slate-900 leading-snug">
-                  {detailCampaign.title}
-                </h2>
-              </div>
-
-              {/* Thông tin Đối tượng & Địa chỉ */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-rose-50/50 border border-rose-100">
-                <div className="flex items-start gap-2.5">
-                  <div className="p-2 rounded-xl bg-rose-100 text-rose-700 shrink-0">
-                    <User className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-500 font-medium block">Đối tượng thụ hưởng:</span>
-                    <span className="text-xs sm:text-sm font-bold text-slate-800">
-                      {detailCampaign.beneficiaryName || "Đồng bào khó khăn"}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2.5">
-                  <div className="p-2 rounded-xl bg-rose-100 text-rose-700 shrink-0">
-                    <MapPin className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-500 font-medium block">Địa chỉ sinh sống:</span>
-                    <span className="text-xs sm:text-sm font-bold text-slate-800">
-                      {detailCampaign.village || "Xã Ea Súp"}
-                    </span>
-                  </div>
+                <div className="text-right">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    Đã xác minh UBMTTQ
+                  </span>
                 </div>
               </div>
 
-              {/* Tiến độ tài chính */}
-              <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-500 text-xs">Mục tiêu vận động:</span>
-                  <span className="font-bold text-slate-900 font-mono">
-                    {formatVND(detailCampaign.targetAmount)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-500 text-xs">Số tiền đã tiếp nhận:</span>
-                  <span className="font-extrabold text-rose-600 font-mono text-sm sm:text-base">
-                    {formatVND(detailCampaign.currentAmount)}
-                  </span>
-                </div>
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                  <div
-                    className="bg-gradient-to-r from-pink-500 to-rose-600 h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${Math.min(
-                        100,
-                        Math.round((Number(detailCampaign.currentAmount) / Number(detailCampaign.targetAmount || 1)) * 100)
-                      )}%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Mô tả hoàn cảnh chi tiết */}
-              <div className="space-y-1.5">
-                <h4 className="font-bold text-slate-800 flex items-center gap-1.5 text-xs uppercase tracking-wide">
-                  <Info className="w-4 h-4 text-rose-600" />
-                  <span>Nội dung hoàn cảnh gia đình:</span>
+              {/* Mô tả hoàn cảnh đầy đủ */}
+              <div className="space-y-2">
+                <h4 className="text-xs uppercase font-extrabold text-slate-400 tracking-wider">
+                  Mô tả hoàn cảnh khó khăn chi tiết:
                 </h4>
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-700 leading-relaxed whitespace-pre-line text-xs sm:text-sm">
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-sm leading-relaxed text-slate-700 whitespace-pre-line">
                   {detailCampaign.situation}
                 </div>
               </div>
+
+              {/* Thư viện hình ảnh */}
+              {(() => {
+                const imgFiles = detailCampaign.files?.filter((f) => f.type === "image").map((f) => f.url) || [];
+                const allImgs = Array.from(new Set([...(detailCampaign.images || []), ...imgFiles].filter(Boolean)));
+                const currentPreview = activePreviewImg || allImgs[0] || "";
+
+                if (allImgs.length === 0) return null;
+
+                return (
+                  <div className="space-y-2">
+                    <h4 className="text-xs uppercase font-extrabold text-slate-400 tracking-wider flex items-center gap-1.5">
+                      <ImageIcon className="w-3.5 h-3.5 text-rose-500" />
+                      <span>Hình ảnh thực tế ({allImgs.length} ảnh):</span>
+                    </h4>
+
+                    {currentPreview && (
+                      <div className="relative aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-xs">
+                        <img src={currentPreview} alt="Ảnh thực tế" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+
+                    {allImgs.length > 1 && (
+                      <div className="flex items-center gap-2 overflow-x-auto py-1">
+                        {allImgs.map((imgUrl, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setActivePreviewImg(imgUrl)}
+                            className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
+                              currentPreview === imgUrl ? "border-rose-600 scale-105 shadow-md" : "border-slate-200 opacity-70 hover:opacity-100"
+                            }`}
+                          >
+                            <img src={imgUrl} alt={`Ảnh ${idx + 1}`} className="w-full h-full object-cover" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Chứng từ / File PDF đính kèm */}
+              {(() => {
+                const pdfFiles = detailCampaign.files?.filter((f) => f.type === "pdf") || [];
+                if (pdfFiles.length === 0) return null;
+
+                return (
+                  <div className="space-y-2">
+                    <h4 className="text-xs uppercase font-extrabold text-slate-400 tracking-wider flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 text-rose-500" />
+                      <span>Hồ sơ &amp; Chứng từ PDF ({pdfFiles.length} file):</span>
+                    </h4>
+                    <div className="space-y-2">
+                      {pdfFiles.map((pdf, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-rose-300 transition-colors"
+                        >
+                          <div className="flex items-center gap-2.5 overflow-hidden">
+                            <div className="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0 font-bold text-xs">
+                              PDF
+                            </div>
+                            <div className="truncate">
+                              <span className="text-xs font-semibold text-slate-800 block truncate">
+                                {pdf.name}
+                              </span>
+                              <span className="text-[10px] text-slate-400">
+                                Lưu trữ vĩnh viễn trên máy chủ
+                              </span>
+                            </div>
+                          </div>
+                          <a
+                            href={pdf.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs transition-colors shrink-0 cursor-pointer"
+                          >
+                            <span>Xem / Tải PDF</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
-            {/* Footer Modal: Giữ nút bấm ủng hộ để liên kết với QR chuyển tiền */}
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
+            {/* Footer Modal */}
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
               <button
                 type="button"
                 onClick={() => setDetailCampaign(null)}
-                className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-100 transition-colors"
+                className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-white transition-colors cursor-pointer"
               >
-                Đóng
+                Đóng lại
               </button>
 
               <button
                 type="button"
                 onClick={() => {
-                  const targetItem = detailCampaign;
+                  const target = detailCampaign;
                   setDetailCampaign(null);
-                  handleOpenDonate(targetItem);
+                  handleOpenDonate(target);
                 }}
-                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-200 transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-bold text-xs shadow-md shadow-rose-200 transition-all cursor-pointer"
               >
-                <Heart className="w-4 h-4 fill-current" />
-                <span>Ủng hộ hoàn cảnh này (Chuyển khoản VietQR)</span>
+                <Heart className="w-4 h-4 fill-white" />
+                <span>Ủng hộ hoàn cảnh này (VietQR)</span>
               </button>
             </div>
           </div>
@@ -668,20 +761,19 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
       )}
 
       {/* ========================================================================= */}
-      {/* 2. MODAL VIETQR CHUYỂN TIỀN LIÊN KẾT ĐÚNG HOÀN CẢNH                      */}
+      {/* 2. MODAL QUYÊN GÓP TỰ ĐỘNG VIETQR THEO TỪNG HOÀN CẢNH                     */}
       {/* ========================================================================= */}
       {donateCampaign && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
           <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 my-auto">
-            {/* Header */}
             <div className="bg-gradient-to-r from-rose-600 to-pink-600 p-4 sm:p-5 text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <QrCode className="w-5 h-5" />
                 <div>
-                  <h3 className="font-bold text-sm sm:text-base">Ủng Hộ Chuyển Khoản VietQR</h3>
-                  <span className="text-[11px] text-rose-100 block">
-                    Khắc phục nghèo bền vững • Minh bạch 100%
-                  </span>
+                  <h3 className="font-bold text-sm sm:text-base">Ủng Hộ Hoàn Cảnh Khó Khăn</h3>
+                  <p className="text-[11px] text-rose-100">
+                    {donateCampaign.beneficiaryName || donateCampaign.title} - {donateCampaign.village}
+                  </p>
                 </div>
               </div>
               <button
@@ -694,37 +786,12 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
             </div>
 
             <div className="p-5 sm:p-6 space-y-4 text-xs">
-              {/* Tên hoàn cảnh */}
-              <div className="p-3 rounded-xl bg-rose-50 border border-rose-100">
-                <span className="text-[11px] text-rose-700 font-semibold block uppercase">Hoàn cảnh thụ hưởng:</span>
-                <span className="font-bold text-slate-900 text-xs sm:text-sm block line-clamp-1">
-                  {donateCampaign.title}
-                </span>
-                <span className="text-[11px] text-slate-500">
-                  {donateCampaign.village} • {donateCampaign.beneficiaryName}
-                </span>
-              </div>
-
-              {/* Ảnh mã QR */}
-              <div className="flex flex-col items-center justify-center p-3 bg-white rounded-2xl border-2 border-dashed border-rose-200 space-y-2">
-                <div className="relative w-56 h-56 sm:w-60 sm:h-60 rounded-xl overflow-hidden bg-white shadow-inner flex items-center justify-center">
-                  <img
-                    src={qrUrl}
-                    alt="VietQR BIDV Ea Súp"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <span className="text-[11px] text-slate-500 text-center font-medium">
-                  Mở ứng dụng Ngân hàng hoặc Ví điện tử bất kỳ để quét mã
-                </span>
-              </div>
-
-              {/* Chọn số tiền quyên góp */}
-              <div className="space-y-1.5">
-                <label className="block font-bold text-slate-700 uppercase text-[11px]">
+              {/* Chọn mức ủng hộ */}
+              <div>
+                <label className="block font-bold text-slate-700 uppercase mb-2 text-[11px]">
                   Chọn số tiền ủng hộ (VNĐ):
                 </label>
-                <div className="grid grid-cols-3 gap-1.5">
+                <div className="grid grid-cols-3 gap-2">
                   {PRESET_DONATION_AMOUNTS.map((amt) => (
                     <button
                       key={amt}
@@ -733,65 +800,73 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
                         setDonateAmount(amt);
                         setCustomAmountInput("");
                       }}
-                      className={`py-1.5 px-2 rounded-lg text-xs font-bold transition-all ${
-                        !customAmountInput && donateAmount === amt
-                          ? "bg-rose-600 text-white shadow-xs"
-                          : "bg-slate-100 text-slate-700 hover:bg-rose-50"
+                      className={`py-2 px-1 rounded-xl font-mono font-bold text-xs transition-all border cursor-pointer ${
+                        donateAmount === amt && !customAmountInput
+                          ? "bg-rose-600 text-white border-rose-600 shadow-xs"
+                          : "bg-slate-50 text-slate-700 border-slate-200 hover:border-rose-300"
                       }`}
                     >
-                      {formatVND(amt).replace(" ₫", "đ")}
+                      {formatVND(amt)}
                     </button>
                   ))}
                 </div>
-                <input
-                  type="text"
-                  placeholder="Hoặc nhập số tiền khác tùy tâm..."
-                  value={customAmountInput}
-                  onChange={(e) => setCustomAmountInput(e.target.value)}
-                  className="w-full p-2 mt-1 rounded-xl border border-slate-300 font-mono text-xs focus:border-rose-500 font-medium"
-                />
               </div>
 
-              {/* Thông tin tài khoản & Cú pháp sao chép */}
-              <div className="space-y-2 pt-2 border-t border-slate-100">
-                <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-200">
-                  <div>
-                    <span className="text-[10px] text-slate-500 uppercase block">Số tài khoản BIDV Ea Súp:</span>
-                    <span className="font-mono font-bold text-slate-900 text-xs sm:text-sm">8630100930</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleCopy("8630100930", "stk")}
-                    className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-rose-50 text-slate-600 text-xs font-semibold flex items-center gap-1 cursor-pointer"
-                  >
-                    {copiedField === "stk" ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedField === "stk" ? "Đã chép" : "Chép STK"}</span>
-                  </button>
+              {/* Mã VietQR */}
+              <div className="p-3 bg-rose-50/50 rounded-2xl border border-rose-200 flex flex-col items-center text-center">
+                <div className="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-200 max-w-[220px]">
+                  <img src={qrUrl} alt="Mã VietQR Chuyển Khoản" className="w-full h-auto rounded-lg" />
                 </div>
+                <p className="text-[11px] text-slate-500 mt-2">
+                  Mở ứng dụng ngân hàng bất kỳ để quét mã và chuyển tiền tự động đúng cú pháp.
+                </p>
+              </div>
 
-                <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-200">
-                  <div>
-                    <span className="text-[10px] text-slate-500 uppercase block">Nội dung chuyển khoản (Đã gán mã CD):</span>
-                    <span className="font-mono font-bold text-rose-600 text-xs sm:text-sm">{memoText}</span>
+              {/* Thông tin tài khoản */}
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2 font-medium">
+                <div className="flex items-center justify-between text-slate-700">
+                  <span className="text-slate-500">Ngân hàng:</span>
+                  <span className="font-bold text-slate-900">BIDV Ea Súp - Đắk Lắk</span>
+                </div>
+                <div className="flex items-center justify-between text-slate-700">
+                  <span className="text-slate-500">Số tài khoản:</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono font-bold text-rose-600 text-sm">8630100930</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy("8630100930", "stk")}
+                      className="p-1 hover:bg-slate-200 rounded text-slate-600 cursor-pointer"
+                    >
+                      {copiedField === "stk" ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleCopy(memoText, "memo")}
-                    className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-rose-50 text-slate-600 text-xs font-semibold flex items-center gap-1 cursor-pointer"
-                  >
-                    {copiedField === "memo" ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedField === "memo" ? "Đã chép" : "Chép mã"}</span>
-                  </button>
+                </div>
+                <div className="flex items-center justify-between text-slate-700">
+                  <span className="text-slate-500">Chủ tài khoản:</span>
+                  <span className="font-bold text-slate-900 text-[11px]">UB MTTQ VN XA EA SUP</span>
+                </div>
+                <div className="flex items-center justify-between text-slate-700 pt-1 border-t border-slate-200">
+                  <span className="text-slate-500">Nội dung CK:</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono font-bold text-rose-700 text-xs">{memoText}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(memoText, "memo")}
+                      className="p-1 hover:bg-slate-200 rounded text-slate-600 cursor-pointer"
+                    >
+                      {copiedField === "memo" ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              <div className="pt-2 flex justify-end">
+              <div className="flex justify-end pt-1">
                 <button
                   type="button"
                   onClick={() => setDonateCampaign(null)}
-                  className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm shadow-rose-200 transition-colors"
+                  className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-colors cursor-pointer"
                 >
-                  Hoàn tất chuyển khoản
+                  Đã hoàn tất / Đóng
                 </button>
               </div>
             </div>
@@ -800,11 +875,11 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
       )}
 
       {/* ========================================================================= */}
-      {/* 3. MODAL THÊM / CHỈNH SỬA CHO ADMIN (QUẢN LÝ TỐI ĐA 5 ẢNH)                */}
+      {/* 3. MODAL THÊM / CHỈNH SỬA CHO ADMIN (HỖ TRỢ UPLOAD ẢNH & PDF TỐI ĐA 5 FILE)*/}
       {/* ========================================================================= */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 my-auto max-h-[90vh] flex flex-col">
+          <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 my-auto max-h-[92vh] flex flex-col">
             <div className="bg-gradient-to-r from-rose-600 to-pink-600 p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5" />
@@ -822,71 +897,26 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
             </div>
 
             <form onSubmit={handleSaveForm} className="p-4 sm:p-6 overflow-y-auto space-y-4 text-xs">
-              {/* Tiêu đề */}
+              {/* Tên đối tượng */}
               <div>
                 <label className="block font-bold text-slate-700 uppercase mb-1">
-                  Tiêu đề hoàn cảnh / chiến dịch: *
+                  Tên đối tượng / Hộ gia đình: *
                 </label>
                 <input
                   type="text"
                   required
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Ví dụ: Xây dựng Nhà Đại đoàn kết hộ bà Y Thị..."
+                  value={formData.beneficiaryName}
+                  onChange={(e) => setFormData({ ...formData, beneficiaryName: e.target.value })}
+                  placeholder="Ví dụ: Hộ bà H'Nghê, Hộ ông Triệu Văn Long..."
                   className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium"
                 />
               </div>
 
-              {/* Mã & Trạng thái */}
+              {/* Địa chỉ & Số tiền trao */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-700 uppercase mb-1">
-                    Mã chiến dịch:
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.code}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                    placeholder="CD-1, CD-2..."
-                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-mono font-medium"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 uppercase mb-1">
-                    Trạng thái:
-                  </label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 bg-white font-medium"
-                  >
-                    <option value="ACTIVE">Đang quyên góp</option>
-                    <option value="COMPLETED">Đã đạt mục tiêu</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Đối tượng & Địa chỉ */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 uppercase mb-1">
-                    Đối tượng thụ hưởng: *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.beneficiaryName}
-                    onChange={(e) => setFormData({ ...formData, beneficiaryName: e.target.value })}
-                    placeholder="Ví dụ: Hộ bà Y Thị, 10 hộ nghèo..."
-                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 uppercase mb-1">
-                    Địa chỉ (Thôn / Buôn): *
+                    Thôn / Buôn: *
                   </label>
                   <select
                     value={formData.village}
@@ -900,35 +930,18 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
                     ))}
                   </select>
                 </div>
-              </div>
-
-              {/* Mục tiêu & Đã vận động */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 uppercase mb-1">
-                    Mục tiêu vận động (VNĐ): *
-                  </label>
-                  <input
-                    type="number"
-                    min="1000000"
-                    step="1000000"
-                    required
-                    value={formData.targetAmount}
-                    onChange={(e) => setFormData({ ...formData, targetAmount: Number(e.target.value) })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-mono font-medium"
-                  />
-                </div>
 
                 <div>
                   <label className="block font-bold text-slate-700 uppercase mb-1">
-                    Số tiền hiện đã vận động (VNĐ):
+                    Số tiền trao (VNĐ): *
                   </label>
                   <input
                     type="number"
                     min="0"
                     step="500000"
-                    value={formData.currentAmount}
-                    onChange={(e) => setFormData({ ...formData, currentAmount: Number(e.target.value) })}
+                    required
+                    value={formData.amount}
+                    onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
                     className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-mono font-medium"
                   />
                 </div>
@@ -937,72 +950,143 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
               {/* Hoàn cảnh chi tiết */}
               <div>
                 <label className="block font-bold text-slate-700 uppercase mb-1">
-                  Mô tả hoàn cảnh khó khăn chi tiết: *
+                  Mô tả hoàn cảnh khó khăn: *
                 </label>
                 <textarea
-                  rows={4}
+                  rows={3}
                   required
                   value={formData.situation}
                   onChange={(e) => setFormData({ ...formData, situation: e.target.value })}
-                  placeholder="Ghi rõ hoàn cảnh gia đình, nhân khẩu, bệnh tật, nhà ở dột nát, tư liệu sản xuất..."
+                  placeholder="Ghi rõ hoàn cảnh gia đình, bệnh tật, nhà ở dột nát, con nhỏ..."
                   className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium leading-relaxed"
                 />
               </div>
 
-              {/* Quản lý danh sách hình ảnh (TỐI ĐA 5 HÌNH ẢNH) */}
-              <div className="p-3.5 rounded-2xl bg-rose-50/50 border border-rose-200 space-y-2.5">
+              {/* Quản lý danh sách hình ảnh & chứng từ PDF (TỐI ĐA 5 FILE) */}
+              <div className="p-3.5 rounded-2xl bg-rose-50/50 border border-rose-200 space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="font-bold text-rose-900 uppercase text-[11px] flex items-center gap-1.5">
-                    <ImageIcon className="w-3.5 h-3.5 text-rose-600" />
-                    <span>Hình ảnh thực tế (Tối đa 5 ảnh):</span>
+                  <label className="font-bold text-rose-900 uppercase text-[11px]">
+                    Hình ảnh &amp; Chứng từ (File PDF) - Tối đa 5 file:
                   </label>
-                  <span className="text-[11px] font-bold text-rose-700">
-                    {formData.images.length}/5 ảnh
+                  <span className="text-[11px] font-bold text-rose-700 font-mono">
+                    {formData.files.length}/5 file
                   </span>
                 </div>
 
-                {/* Danh sách ảnh đã thêm */}
-                <div className="grid grid-cols-5 gap-2">
-                  {formData.images.map((img, idx) => (
-                    <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-rose-300 group">
-                      <img src={img} alt={`Ảnh ${idx + 1}`} className="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveImage(idx)}
-                        className="absolute top-1 right-1 p-1 rounded-full bg-red-600 text-white hover:bg-red-700 transition-colors shadow-xs"
-                        title="Xóa ảnh này"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                      <span className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[9px] text-center font-mono py-0.5">
-                        {idx === 0 ? "Ảnh bìa" : `Ảnh ${idx + 1}`}
-                      </span>
-                    </div>
-                  ))}
+                {/* Nút bấm tải lên */}
+                <div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    disabled={isUploading || formData.files.length >= 5}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading || formData.files.length >= 5}
+                    className={`w-full py-2.5 px-3 rounded-xl border-2 border-dashed flex items-center justify-center gap-2 font-bold text-xs transition-all cursor-pointer ${
+                      formData.files.length >= 5
+                        ? "border-slate-300 bg-slate-100 text-slate-400 cursor-not-allowed"
+                        : isUploading
+                        ? "border-amber-400 bg-amber-50 text-amber-700"
+                        : "border-rose-300 bg-white hover:bg-rose-50 text-rose-700 shadow-2xs"
+                    }`}
+                  >
+                    {isUploading ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
+                        <span>Đang tải tệp lên hệ thống máy chủ...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 text-rose-600" />
+                        <span>
+                          {formData.files.length >= 5
+                            ? "Đã đạt tối đa 5 file"
+                            : "Up ảnh, chứng từ (file PDF) vào hệ thống"}
+                        </span>
+                      </>
+                    )}
+                  </button>
+
+                  {uploadError && (
+                    <p className="text-[11px] text-red-600 font-medium mt-1">
+                      ⚠️ {uploadError}
+                    </p>
+                  )}
+                  <p className="text-[10px] text-slate-500 mt-1">
+                    Hỗ trợ file ảnh và chứng từ PDF (tối đa 15MB/tệp). Toàn bộ dữ liệu được lưu trữ vĩnh viễn trong máy chủ hệ thống.
+                  </p>
                 </div>
 
-                {/* Ô thêm ảnh mới nếu chưa đủ 5 ảnh */}
-                {formData.images.length < 5 && (
-                  <div className="flex items-center gap-2 pt-1">
+                {/* Danh sách file đã tải lên */}
+                {formData.files.length > 0 && (
+                  <div className="space-y-1.5 pt-1">
+                    {formData.files.map((file, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200 text-[11px]"
+                      >
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          {file.type === "image" ? (
+                            <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 border border-slate-200">
+                              <img src={file.url} alt={file.name} className="w-full h-full object-cover" />
+                            </div>
+                          ) : (
+                            <div className="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0 font-bold text-[10px]">
+                              PDF
+                            </div>
+                          )}
+                          <div className="truncate">
+                            <span className="font-semibold text-slate-800 block truncate">
+                              {file.name}
+                            </span>
+                            <span className="text-[10px] text-slate-400">
+                              {file.type === "image" ? "Ảnh chụp" : "Tài liệu PDF"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFile(idx)}
+                          className="p-1 rounded text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                          title="Xóa tệp này"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Ô thêm ảnh thủ công */}
+                <div className="pt-2 border-t border-rose-200/60">
+                  <label className="block font-semibold text-slate-600 text-[10px] mb-1">
+                    Hoặc nhập trực tiếp URL đường dẫn ảnh:
+                  </label>
+                  <div className="flex items-center gap-2">
                     <input
                       type="text"
-                      value={newImageUrl}
-                      onChange={(e) => setNewImageUrl(e.target.value)}
-                      placeholder="/images/hero-charity-bg.jpg hoặc https://..."
-                      className="flex-1 p-2 rounded-xl border border-slate-300 focus:border-rose-500 font-mono text-[11px] bg-white"
+                      value={manualImageUrl}
+                      onChange={(e) => setManualImageUrl(e.target.value)}
+                      placeholder="https://... hoặc đường dẫn nội bộ"
+                      className="flex-1 p-2 rounded-lg border border-slate-200 bg-white focus:border-rose-500 font-mono text-[11px]"
                     />
                     <button
                       type="button"
-                      onClick={handleAddImage}
-                      className="px-3 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shrink-0 transition-colors cursor-pointer"
+                      onClick={handleAddManualImage}
+                      className="px-3 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shrink-0 transition-colors cursor-pointer"
                     >
-                      + Thêm ảnh
+                      + Thêm
                     </button>
                   </div>
-                )}
-                <span className="text-[10px] text-slate-500 block">
-                  Gợi ý: Quý vị có thể dùng đường dẫn nội bộ như <code>/images/hero-charity-bg.jpg</code> hoặc link ảnh HTTPS trên mạng.
-                </span>
+                </div>
               </div>
 
               {/* Nút lưu */}
@@ -1010,16 +1094,16 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50"
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 cursor-pointer"
                 >
                   Hủy bỏ
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold flex items-center gap-1.5 shadow-sm shadow-rose-200"
+                  className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold flex items-center gap-1.5 shadow-sm shadow-rose-200 cursor-pointer"
                 >
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>{editingId ? "Lưu thay đổi" : "Tạo hoàn cảnh mới"}</span>
+                  <span>{editingId ? "Lưu thay đổi" : "Tạo hoàn cảnh"}</span>
                 </button>
               </div>
             </form>
