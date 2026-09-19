@@ -63,12 +63,12 @@ const VILLAGES = [
 const DEFAULT_CASES: WelfareCase[] = [
   {
     id: 1,
-    recipientName: "Bà Y Thị",
+    recipientName: "Trao quà 2230 hộ nghèo, cận nghèo",
     village: "Buôn A",
-    situation: "Hộ nghèo đặc biệt khó khăn, neo đơn bệnh tật. Căn nhà vách nứa dột nát cần hỗ trợ xây nhà Đại đoàn kết.",
+    situation: "Trao quà hộ gia đình nghèo, cận nghèo",
     targetAmount: 80000000,
     currentAmount: 0,
-    imageUrl: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80",
+    imageUrl: "/images/hero-charity-bg.jpg",
   },
   {
     id: 2,
@@ -95,6 +95,8 @@ const DEFAULT_GIFT_BATCHES: GiftBatch[] = [];
 export default function SocialWelfareList() {
   const [activeTab, setActiveTab] = useState<"CASES" | "GIFTS">("CASES");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
   // Danh sách dữ liệu
   const [cases, setCases] = useState<WelfareCase[]>(DEFAULT_CASES);
@@ -109,7 +111,7 @@ export default function SocialWelfareList() {
     situation: "",
     targetAmount: 50000000,
     currentAmount: 0,
-    imageUrl: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop&q=80",
+    imageUrl: "/images/hero-charity-bg.jpg",
   });
 
   // Modal Đợt trao quà
@@ -135,29 +137,92 @@ export default function SocialWelfareList() {
     return () => window.removeEventListener("storage", checkAuth);
   }, []);
 
-  // Đọc dữ liệu từ localStorage khi tải trang
+  // Tải dữ liệu: ưu tiên dữ liệu từ Hệ Thống máy chủ Backend, kết hợp localStorage
   useEffect(() => {
     try {
       const storedCases = localStorage.getItem("vinguoingheo_cases");
-      if (storedCases) setCases(JSON.parse(storedCases));
+      if (storedCases) {
+        const parsed = JSON.parse(storedCases);
+        if (Array.isArray(parsed) && parsed.length > 0) setCases(parsed);
+      }
       const storedGifts = localStorage.getItem("vinguoingheo_gifts");
-      if (storedGifts) setGiftBatches(JSON.parse(storedGifts));
+      if (storedGifts) {
+        const parsed = JSON.parse(storedGifts);
+        if (Array.isArray(parsed)) setGiftBatches(parsed);
+      }
     } catch {}
+
+    // Truy vấn dữ liệu lưu trữ từ Hệ Thống máy chủ
+    fetch("/api/v1/welfare")
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success && res.data) {
+          if (Array.isArray(res.data.cases) && res.data.cases.length > 0) {
+            setCases(res.data.cases);
+            try {
+              localStorage.setItem("vinguoingheo_cases", JSON.stringify(res.data.cases));
+            } catch {}
+          }
+          if (Array.isArray(res.data.gifts)) {
+            setGiftBatches(res.data.gifts);
+            try {
+              localStorage.setItem("vinguoingheo_gifts", JSON.stringify(res.data.gifts));
+            } catch {}
+          }
+        }
+      })
+      .catch((err) => console.warn("Không thể tải dữ liệu an sinh từ API máy chủ:", err));
   }, []);
 
-  // Lưu dữ liệu vào localStorage
-  const updateCases = (newCases: WelfareCase[]) => {
+  // Lưu dữ liệu vĩnh viễn vào Hệ Thống máy chủ (Backend + Database/JSON File)
+  const updateCases = async (newCases: WelfareCase[]) => {
     setCases(newCases);
     try {
       localStorage.setItem("vinguoingheo_cases", JSON.stringify(newCases));
     } catch {}
+
+    try {
+      setIsSaving(true);
+      const res = await fetch("/api/v1/welfare", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cases: newCases }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSaveStatus("Đã lưu vào hệ thống máy chủ vĩnh viễn!");
+        setTimeout(() => setSaveStatus(null), 5000);
+      }
+    } catch (err) {
+      console.error("Lỗi lưu hoàn cảnh vào hệ thống:", err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const updateGifts = (newGifts: GiftBatch[]) => {
+  const updateGifts = async (newGifts: GiftBatch[]) => {
     setGiftBatches(newGifts);
     try {
       localStorage.setItem("vinguoingheo_gifts", JSON.stringify(newGifts));
     } catch {}
+
+    try {
+      setIsSaving(true);
+      const res = await fetch("/api/v1/welfare", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gifts: newGifts }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSaveStatus("Đã lưu vào hệ thống máy chủ vĩnh viễn!");
+        setTimeout(() => setSaveStatus(null), 5000);
+      }
+    } catch (err) {
+      console.error("Lỗi lưu đợt trao quà vào hệ thống:", err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // --- Xử lý Hoàn cảnh ---
@@ -269,8 +334,33 @@ export default function SocialWelfareList() {
   };
 
   // Khôi phục mặc định
-  const handleResetDefaults = () => {
-    if (window.confirm("Khôi phục danh sách về dữ liệu mẫu ban đầu?")) {
+  const handleResetDefaults = async () => {
+    if (window.confirm("Khôi phục danh sách hoàn cảnh về dữ liệu chuẩn của hệ thống?")) {
+      try {
+        setIsSaving(true);
+        const res = await fetch("/api/v1/welfare", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "reset" }),
+        });
+        const resData = await res.json();
+        if (resData.success && resData.data) {
+          setCases(resData.data.cases);
+          setGiftBatches(resData.data.gifts);
+          try {
+            localStorage.setItem("vinguoingheo_cases", JSON.stringify(resData.data.cases));
+            localStorage.setItem("vinguoingheo_gifts", JSON.stringify(resData.data.gifts));
+          } catch {}
+          setSaveStatus("Đã khôi phục dữ liệu chuẩn hệ thống!");
+          setTimeout(() => setSaveStatus(null), 4000);
+          return;
+        }
+      } catch (e) {
+        console.error("Lỗi reset dữ liệu an sinh:", e);
+      } finally {
+        setIsSaving(false);
+      }
+
       updateCases(DEFAULT_CASES);
       updateGifts(DEFAULT_GIFT_BATCHES);
     }
@@ -336,7 +426,20 @@ export default function SocialWelfareList() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              {saveStatus && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold shadow-xs animate-in fade-in">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>{saveStatus}</span>
+                </div>
+              )}
+              {isSaving && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 text-white text-xs font-bold shadow-xs animate-in fade-in">
+                  <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Đang lưu vào hệ thống...</span>
+                </div>
+              )}
+
               {activeTab === "CASES" ? (
                 <button
                   type="button"
@@ -360,8 +463,8 @@ export default function SocialWelfareList() {
               <button
                 type="button"
                 onClick={handleResetDefaults}
-                title="Khôi phục dữ liệu mẫu ban đầu"
-                className="p-2 rounded-xl border border-rose-200 bg-white hover:bg-rose-100 text-slate-600 text-xs transition-colors"
+                title="Khôi phục dữ liệu chuẩn hệ thống"
+                className="p-2 rounded-xl border border-rose-200 bg-white hover:bg-rose-100 text-slate-600 text-xs transition-colors cursor-pointer"
               >
                 <RotateCcw className="w-4 h-4" />
               </button>
@@ -655,13 +758,13 @@ export default function SocialWelfareList() {
 
               <div>
                 <label className="block font-bold text-slate-700 uppercase mb-1">
-                  Đường dẫn ảnh chụp thực tế (URL):
+                  Đường dẫn ảnh chụp thực tế (URL hoặc ảnh nội bộ):
                 </label>
                 <input
-                  type="url"
+                  type="text"
                   value={caseForm.imageUrl}
                   onChange={(e) => setCaseForm({ ...caseForm, imageUrl: e.target.value })}
-                  placeholder="https://images.unsplash.com/..."
+                  placeholder="/images/hero-charity-bg.jpg hoặc https://..."
                   className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-mono text-[11px]"
                 />
               </div>

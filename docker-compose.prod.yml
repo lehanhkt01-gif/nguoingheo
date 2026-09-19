@@ -11,6 +11,8 @@ services:
       - "3000"
     env_file:
       - .env.production
+    volumes:
+      - ./data:/app/data
     depends_on:
       postgres:
         condition: service_healthy
