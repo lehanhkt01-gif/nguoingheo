@@ -364,13 +364,14 @@ export default function LiveLedgerTable() {
               {displayTransactions.length > 0 ? (
                 displayTransactions.map((t, idx) => {
                   const isOut = t.type === "OUT";
-                  // Đánh số thứ tự tăng dần chuẩn: Trang 1 (#01 - #10), Trang 2 (#11 - #15)...
-                  const stt = (page - 1) * 10 + idx + 1;
+                  // Đánh số thứ tự ngược từ tổng số giao dịch giảm dần về 1: Trang 1 (#15 - #06), Trang 2 (#05 - #01)...
+                  const baseTotal = totalCount > 0 ? totalCount : displayTransactions.length;
+                  const stt = Math.max(1, baseTotal - ((page - 1) * 10 + idx));
                   const sttStr = String(stt).padStart(2, "0");
 
                   return (
                     <tr key={t.reference ? `${t.type}_${t.reference}` : `${t.id}_${idx}`} className="hover:bg-rose-50/30 transition-colors">
-                      {/* STT tăng dần */}
+                      {/* STT đếm ngược từ tổng số về 1 */}
                       <td className="py-3.5 px-3 text-center whitespace-nowrap">
                         <span
                           className={`inline-block px-2 py-0.5 rounded font-mono text-[11px] font-bold ${
