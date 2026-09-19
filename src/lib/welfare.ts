@@ -26,10 +26,14 @@ export interface GiftBatch {
   id: number;
   title: string;
   village: string;
+  villages?: string[]; // Hỗ trợ chọn nhiều thôn/buôn một lúc
   recipientCount: number;
   amount: number;
   date: string;
   proofNote: string;
+  imageUrl?: string;
+  files?: WelfareFileItem[]; // Tối đa 5 file: ảnh hoặc PDF chứng từ
+  createdAt?: string;
 }
 
 export interface WelfareStoreData {

@@ -15,13 +15,15 @@ import {
   ShieldCheck,
   Save,
   Upload,
-  File,
   Image as ImageIcon,
   ExternalLink,
   Eye,
   Copy,
   QrCode,
-  DollarSign
+  DollarSign,
+  Calendar,
+  Users,
+  Check
 } from "lucide-react";
 
 export interface WelfareFileItem {
@@ -35,6 +37,7 @@ export interface WelfareCase {
   id: number;
   recipientName: string;
   village: string;
+  villages?: string[];
   situation: string;
   amount: number; // "Số tiền trao"
   targetAmount?: number;
@@ -48,13 +51,17 @@ export interface GiftBatch {
   id: number;
   title: string;
   village: string;
+  villages?: string[];
   recipientCount: number;
   amount: number;
   date: string;
   proofNote: string;
+  imageUrl?: string;
+  files?: WelfareFileItem[];
+  createdAt?: string;
 }
 
-const VILLAGES = [
+const VILLAGES_LIST = [
   "Buôn A",
   "Buôn B",
   "Buôn C",
@@ -89,7 +96,11 @@ export default function SocialWelfareList() {
 
   // Modal Chi tiết mở rộng hoàn cảnh
   const [detailCase, setDetailCase] = useState<WelfareCase | null>(null);
-  const [activePreviewImg, setActivePreviewImg] = useState<string>("");
+  const [activeCasePreviewImg, setActiveCasePreviewImg] = useState<string>("");
+
+  // Modal Chi tiết mở rộng Đợt trao quà
+  const [detailGift, setDetailGift] = useState<GiftBatch | null>(null);
+  const [activeGiftPreviewImg, setActiveGiftPreviewImg] = useState<string>("");
 
   // Modal Ủng hộ qua VietQR cho từng hoàn cảnh
   const [donateCase, setDonateCase] = useState<WelfareCase | null>(null);
@@ -100,13 +111,14 @@ export default function SocialWelfareList() {
   // Modal Tạo / Sửa Hoàn cảnh
   const [isCaseModalOpen, setIsCaseModalOpen] = useState(false);
   const [editingCaseId, setEditingCaseId] = useState<number | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingCase, setIsUploadingCase] = useState(false);
+  const [uploadErrorCase, setUploadErrorCase] = useState<string | null>(null);
+  const caseFileInputRef = useRef<HTMLInputElement>(null);
 
   const [caseForm, setCaseForm] = useState<{
     recipientName: string;
     village: string;
+    villages: string[];
     situation: string;
     amount: number;
     imageUrl: string;
@@ -114,22 +126,38 @@ export default function SocialWelfareList() {
   }>({
     recipientName: "",
     village: "Buôn A",
+    villages: ["Buôn A"],
     situation: "",
     amount: 5000000,
     imageUrl: "",
     files: [],
   });
 
-  // Modal Đợt trao quà
+  // Modal Tạo / Sửa Đợt trao quà
   const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
   const [editingGiftId, setEditingGiftId] = useState<number | null>(null);
-  const [giftForm, setGiftForm] = useState<Omit<GiftBatch, "id">>({
+  const [isUploadingGift, setIsUploadingGift] = useState(false);
+  const [uploadErrorGift, setUploadErrorGift] = useState<string | null>(null);
+  const giftFileInputRef = useRef<HTMLInputElement>(null);
+
+  const [giftForm, setGiftForm] = useState<{
+    title: string;
+    villages: string[];
+    recipientCount: number;
+    amount: number;
+    date: string;
+    proofNote: string;
+    imageUrl: string;
+    files: WelfareFileItem[];
+  }>({
     title: "",
-    village: "Buôn A",
+    villages: ["Buôn A"],
     recipientCount: 1,
     amount: 5000000,
     date: new Date().toISOString().split("T")[0],
     proofNote: "Biên bản bàn giao có xác nhận của UBMTTQ xã Ea Súp",
+    imageUrl: "",
+    files: [],
   });
 
   // Kiểm tra quyền admin
@@ -143,7 +171,7 @@ export default function SocialWelfareList() {
     return () => window.removeEventListener("storage", checkAuth);
   }, []);
 
-  // Tải dữ liệu chuẩn từ Hệ Thống máy chủ Backend
+  // Tải dữ liệu từ Backend
   useEffect(() => {
     try {
       const oldCached = localStorage.getItem("vinguoingheo_cases");
@@ -185,11 +213,11 @@ export default function SocialWelfareList() {
       });
       const data = await res.json();
       if (data.success) {
-        setSaveStatus("Đã lưu vào hệ thống máy chủ vĩnh viễn!");
-        setTimeout(() => setSaveStatus(null), 5000);
+        setSaveStatus("Đã lưu hoàn cảnh vào hệ thống máy chủ vĩnh viễn!");
+        setTimeout(() => setSaveStatus(null), 4000);
       }
     } catch (err) {
-      console.error("Lỗi lưu hoàn cảnh vào hệ thống:", err);
+      console.error("Lỗi lưu hoàn cảnh:", err);
     } finally {
       setIsSaving(false);
     }
@@ -211,23 +239,24 @@ export default function SocialWelfareList() {
       });
       const data = await res.json();
       if (data.success) {
-        setSaveStatus("Đã lưu vào hệ thống máy chủ vĩnh viễn!");
-        setTimeout(() => setSaveStatus(null), 5000);
+        setSaveStatus("Đã lưu đợt trao quà vào hệ thống máy chủ vĩnh viễn!");
+        setTimeout(() => setSaveStatus(null), 4000);
       }
     } catch (err) {
-      console.error("Lỗi lưu đợt trao quà vào hệ thống:", err);
+      console.error("Lỗi lưu đợt trao quà:", err);
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Mở modal tạo mới hoàn cảnh
+  // --- Handlers Hoàn Cảnh ---
   const handleOpenAddCase = () => {
     setEditingCaseId(null);
-    setUploadError(null);
+    setUploadErrorCase(null);
     setCaseForm({
       recipientName: "",
       village: "Buôn A",
+      villages: ["Buôn A"],
       situation: "",
       amount: 5000000,
       imageUrl: "",
@@ -236,14 +265,21 @@ export default function SocialWelfareList() {
     setIsCaseModalOpen(true);
   };
 
-  // Mở modal sửa hoàn cảnh
   const handleOpenEditCase = (item: WelfareCase) => {
     setEditingCaseId(item.id);
-    setUploadError(null);
+    setUploadErrorCase(null);
     const amountVal = item.amount !== undefined ? item.amount : (item.currentAmount || 0);
+    const resolvedVillages =
+      Array.isArray(item.villages) && item.villages.length > 0
+        ? item.villages
+        : item.village
+        ? item.village.split(",").map((s) => s.trim()).filter(Boolean)
+        : ["Buôn A"];
+
     setCaseForm({
       recipientName: item.recipientName,
-      village: item.village,
+      village: item.village || resolvedVillages.join(", "),
+      villages: resolvedVillages,
       situation: item.situation,
       amount: amountVal,
       imageUrl: item.imageUrl || "",
@@ -252,20 +288,45 @@ export default function SocialWelfareList() {
     setIsCaseModalOpen(true);
   };
 
-  // Xử lý upload ảnh / file PDF (tối đa 5 file)
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleToggleCaseVillage = (vName: string) => {
+    setCaseForm((prev) => {
+      const exists = prev.villages.includes(vName);
+      let updated: string[];
+      if (exists) {
+        updated = prev.villages.filter((v) => v !== vName);
+        if (updated.length === 0) updated = [vName]; // giữ ít nhất 1
+      } else {
+        updated = [...prev.villages, vName];
+      }
+      return {
+        ...prev,
+        villages: updated,
+        village: updated.join(", "),
+      };
+    });
+  };
+
+  const handleSelectAllCaseVillages = () => {
+    setCaseForm((prev) => ({
+      ...prev,
+      villages: [...VILLAGES_LIST],
+      village: "Toàn xã (20 thôn buôn)",
+    }));
+  };
+
+  const handleCaseFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files;
     if (!selectedFiles || selectedFiles.length === 0) return;
 
     const currentFiles = caseForm.files || [];
     if (currentFiles.length + selectedFiles.length > 5) {
-      alert(`Hệ thống chỉ cho phép tải lên tối đa 5 file (ảnh hoặc PDF chứng từ). Hiện tại đã có ${currentFiles.length} file.`);
+      alert(`Hệ thống chỉ cho phép tải lên tối đa 5 file (ảnh hoặc PDF). Đang có ${currentFiles.length} file.`);
       e.target.value = "";
       return;
     }
 
-    setIsUploading(true);
-    setUploadError(null);
+    setIsUploadingCase(true);
+    setUploadErrorCase(null);
 
     try {
       const uploadedItems: WelfareFileItem[] = [];
@@ -282,19 +343,15 @@ export default function SocialWelfareList() {
         if (data.success && data.file) {
           uploadedItems.push(data.file);
         } else {
-          throw new Error(data.error || `Lỗi tải tệp: ${file.name}`);
+          throw new Error(data.error || data.message || `Lỗi tải: ${file.name}`);
         }
       }
 
       const updatedFiles = [...currentFiles, ...uploadedItems].slice(0, 5);
-
-      // Nếu chưa có ảnh đại diện, lấy ảnh đầu tiên trong danh sách file làm ảnh đại diện
       let newImageUrl = caseForm.imageUrl;
       if (!newImageUrl) {
         const firstImg = updatedFiles.find((f) => f.type === "image");
-        if (firstImg) {
-          newImageUrl = firstImg.url;
-        }
+        if (firstImg) newImageUrl = firstImg.url;
       }
 
       setCaseForm((prev) => ({
@@ -303,40 +360,33 @@ export default function SocialWelfareList() {
         imageUrl: newImageUrl,
       }));
     } catch (err: any) {
-      console.error("Lỗi upload file:", err);
-      setUploadError(err.message || "Không thể tải tệp lên máy chủ. Vui lòng thử lại.");
+      console.error("Lỗi upload hoàn cảnh:", err);
+      setUploadErrorCase(err.message || "Không thể tải tệp lên máy chủ.");
     } finally {
-      setIsUploading(false);
+      setIsUploadingCase(false);
       e.target.value = "";
     }
   };
 
-  const handleRemoveFile = (indexToRemove: number) => {
+  const handleRemoveCaseFile = (indexToRemove: number) => {
     setCaseForm((prev) => {
-      const removedFile = prev.files[indexToRemove];
-      const updatedFiles = prev.files.filter((_, idx) => idx !== indexToRemove);
-      let newImageUrl = prev.imageUrl;
-      if (removedFile?.url === prev.imageUrl) {
-        const nextImg = updatedFiles.find((f) => f.type === "image");
-        newImageUrl = nextImg ? nextImg.url : "";
+      const removed = prev.files[indexToRemove];
+      const updated = prev.files.filter((_, idx) => idx !== indexToRemove);
+      let newImg = prev.imageUrl;
+      if (removed?.url === prev.imageUrl) {
+        const nextImg = updated.find((f) => f.type === "image");
+        newImg = nextImg ? nextImg.url : "";
       }
-      return {
-        ...prev,
-        files: updatedFiles,
-        imageUrl: newImageUrl,
-      };
+      return { ...prev, files: updated, imageUrl: newImg };
     });
   };
 
-  const handleSetCoverImage = (url: string) => {
-    setCaseForm((prev) => ({ ...prev, imageUrl: url }));
-  };
-
-  // Lưu hoàn cảnh (Tạo mới hoặc Sửa)
   const handleSaveCase = (e: React.FormEvent) => {
     e.preventDefault();
     if (!caseForm.recipientName.trim()) return;
 
+    const resolvedVillage =
+      caseForm.villages.length > 0 ? caseForm.villages.join(", ") : caseForm.village || "Buôn A";
     const resolvedImageUrl =
       caseForm.imageUrl.trim() ||
       caseForm.files.find((f) => f.type === "image")?.url ||
@@ -348,7 +398,8 @@ export default function SocialWelfareList() {
           ? {
               ...c,
               recipientName: caseForm.recipientName.trim(),
-              village: caseForm.village,
+              village: resolvedVillage,
+              villages: caseForm.villages,
               situation: caseForm.situation.trim(),
               amount: Number(caseForm.amount) || 0,
               imageUrl: resolvedImageUrl,
@@ -361,7 +412,8 @@ export default function SocialWelfareList() {
       const newCase: WelfareCase = {
         id: Date.now(),
         recipientName: caseForm.recipientName.trim(),
-        village: caseForm.village,
+        village: resolvedVillage,
+        villages: caseForm.villages,
         situation: caseForm.situation.trim(),
         amount: Number(caseForm.amount) || 0,
         imageUrl: resolvedImageUrl,
@@ -377,52 +429,186 @@ export default function SocialWelfareList() {
     if (window.confirm("Quý vị có chắc chắn muốn xóa hoàn cảnh khó khăn này?")) {
       const updated = cases.filter((c) => c.id !== id);
       updateCases(updated);
-      if (detailCase?.id === id) {
-        setDetailCase(null);
-      }
+      if (detailCase?.id === id) setDetailCase(null);
     }
   };
 
-  // --- Xử lý Đợt trao quà ---
+  // --- Handlers Đợt Trao Quà Thực Tế (GiftBatch) ---
   const handleOpenAddGift = () => {
     setEditingGiftId(null);
+    setUploadErrorGift(null);
     setGiftForm({
       title: "",
-      village: "Buôn A",
+      villages: ["Buôn A"],
       recipientCount: 1,
       amount: 5000000,
       date: new Date().toISOString().split("T")[0],
       proofNote: "Biên bản bàn giao có xác nhận của UBMTTQ xã Ea Súp",
+      imageUrl: "",
+      files: [],
     });
     setIsGiftModalOpen(true);
   };
 
   const handleOpenEditGift = (item: GiftBatch) => {
     setEditingGiftId(item.id);
+    setUploadErrorGift(null);
+    const resolvedVillages =
+      Array.isArray(item.villages) && item.villages.length > 0
+        ? item.villages
+        : item.village
+        ? item.village.split(",").map((s) => s.trim()).filter(Boolean)
+        : ["Buôn A"];
+
     setGiftForm({
       title: item.title,
-      village: item.village,
-      recipientCount: item.recipientCount,
-      amount: item.amount,
-      date: item.date,
-      proofNote: item.proofNote,
+      villages: resolvedVillages,
+      recipientCount: item.recipientCount || 1,
+      amount: item.amount || 0,
+      date: item.date || new Date().toISOString().split("T")[0],
+      proofNote: item.proofNote || "Biên bản bàn giao có xác nhận của UBMTTQ xã Ea Súp",
+      imageUrl: item.imageUrl || "",
+      files: Array.isArray(item.files) ? item.files : [],
     });
     setIsGiftModalOpen(true);
+  };
+
+  const handleToggleGiftVillage = (vName: string) => {
+    setGiftForm((prev) => {
+      const exists = prev.villages.includes(vName);
+      let updated: string[];
+      if (exists) {
+        updated = prev.villages.filter((v) => v !== vName);
+        if (updated.length === 0) updated = [vName]; // giữ ít nhất 1
+      } else {
+        updated = [...prev.villages, vName];
+      }
+      return {
+        ...prev,
+        villages: updated,
+      };
+    });
+  };
+
+  const handleSelectAllGiftVillages = () => {
+    setGiftForm((prev) => ({
+      ...prev,
+      villages: [...VILLAGES_LIST],
+    }));
+  };
+
+  const handleGiftFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files;
+    if (!selectedFiles || selectedFiles.length === 0) return;
+
+    const currentFiles = giftForm.files || [];
+    if (currentFiles.length + selectedFiles.length > 5) {
+      alert(`Hệ thống chỉ cho phép tải lên tối đa 5 file (ảnh hoặc PDF). Đang có ${currentFiles.length} file.`);
+      e.target.value = "";
+      return;
+    }
+
+    setIsUploadingGift(true);
+    setUploadErrorGift(null);
+
+    try {
+      const uploadedItems: WelfareFileItem[] = [];
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch("/api/v1/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        if (data.success && data.file) {
+          uploadedItems.push(data.file);
+        } else {
+          throw new Error(data.error || data.message || `Lỗi tải tệp: ${file.name}`);
+        }
+      }
+
+      const updatedFiles = [...currentFiles, ...uploadedItems].slice(0, 5);
+      let newImageUrl = giftForm.imageUrl;
+      if (!newImageUrl) {
+        const firstImg = updatedFiles.find((f) => f.type === "image");
+        if (firstImg) newImageUrl = firstImg.url;
+      }
+
+      setGiftForm((prev) => ({
+        ...prev,
+        files: updatedFiles,
+        imageUrl: newImageUrl,
+      }));
+    } catch (err: any) {
+      console.error("Lỗi upload đợt trao quà:", err);
+      setUploadErrorGift(err.message || "Không thể tải tệp lên máy chủ.");
+    } finally {
+      setIsUploadingGift(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleRemoveGiftFile = (indexToRemove: number) => {
+    setGiftForm((prev) => {
+      const removed = prev.files[indexToRemove];
+      const updated = prev.files.filter((_, idx) => idx !== indexToRemove);
+      let newImg = prev.imageUrl;
+      if (removed?.url === prev.imageUrl) {
+        const nextImg = updated.find((f) => f.type === "image");
+        newImg = nextImg ? nextImg.url : "";
+      }
+      return { ...prev, files: updated, imageUrl: newImg };
+    });
   };
 
   const handleSaveGift = (e: React.FormEvent) => {
     e.preventDefault();
     if (!giftForm.title.trim()) return;
 
+    const resolvedVillage =
+      giftForm.villages.length === VILLAGES_LIST.length
+        ? "Toàn xã (20 thôn buôn)"
+        : giftForm.villages.join(", ");
+
+    const resolvedImageUrl =
+      giftForm.imageUrl.trim() ||
+      giftForm.files.find((f) => f.type === "image")?.url ||
+      "";
+
     if (editingGiftId !== null) {
       const updated = giftBatches.map((g) =>
-        g.id === editingGiftId ? { ...g, ...giftForm } : g
+        g.id === editingGiftId
+          ? {
+              ...g,
+              title: giftForm.title.trim(),
+              village: resolvedVillage,
+              villages: giftForm.villages,
+              recipientCount: Number(giftForm.recipientCount) || 1,
+              amount: Number(giftForm.amount) || 0,
+              date: giftForm.date,
+              proofNote: giftForm.proofNote.trim(),
+              imageUrl: resolvedImageUrl,
+              files: giftForm.files,
+            }
+          : g
       );
       updateGifts(updated);
     } else {
       const newGift: GiftBatch = {
         id: Date.now(),
-        ...giftForm,
+        title: giftForm.title.trim(),
+        village: resolvedVillage,
+        villages: giftForm.villages,
+        recipientCount: Number(giftForm.recipientCount) || 1,
+        amount: Number(giftForm.amount) || 0,
+        date: giftForm.date,
+        proofNote: giftForm.proofNote.trim(),
+        imageUrl: resolvedImageUrl,
+        files: giftForm.files,
+        createdAt: new Date().toISOString(),
       };
       updateGifts([newGift, ...giftBatches]);
     }
@@ -433,47 +619,21 @@ export default function SocialWelfareList() {
     if (window.confirm("Quý vị có chắc chắn muốn xóa đợt trao quà này?")) {
       const updated = giftBatches.filter((g) => g.id !== id);
       updateGifts(updated);
-    }
-  };
-
-  // Xóa sạch toàn bộ dữ liệu cũ
-  const handleClearAllData = async () => {
-    if (
-      window.confirm(
-        "CẢNH BÁO XÓA DỮ LIỆU RÁC:\n\nQuý vị có chắc chắn muốn XÓA SẠCH TOÀN BỘ dữ liệu mẫu cũ để bắt đầu nhập dữ liệu thực tế mới?\n\nThao tác này sẽ làm sạch hoàn toàn hệ thống và trình duyệt."
-      )
-    ) {
-      try {
-        setIsSaving(true);
-        const res = await fetch("/api/v1/welfare", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "clear_all" }),
-        });
-        const resData = await res.json();
-        if (resData.success) {
-          setCases([]);
-          setGiftBatches([]);
-          try {
-            localStorage.removeItem("vinguoingheo_cases");
-            localStorage.removeItem("vinguoingheo_gifts");
-          } catch {}
-          setSaveStatus("Đã xóa sạch toàn bộ dữ liệu mẫu cũ!");
-          setTimeout(() => setSaveStatus(null), 5000);
-        }
-      } catch (e) {
-        console.error("Lỗi xóa dữ liệu:", e);
-      } finally {
-        setIsSaving(false);
-      }
+      if (detailGift?.id === id) setDetailGift(null);
     }
   };
 
   // Mở modal xem chi tiết
-  const handleOpenDetail = (c: WelfareCase) => {
+  const handleOpenCaseDetail = (c: WelfareCase) => {
     setDetailCase(c);
     const firstImg = c.imageUrl || c.files?.find((f) => f.type === "image")?.url || "";
-    setActivePreviewImg(firstImg);
+    setActiveCasePreviewImg(firstImg);
+  };
+
+  const handleOpenGiftDetail = (g: GiftBatch) => {
+    setDetailGift(g);
+    const firstImg = g.imageUrl || g.files?.find((f) => f.type === "image")?.url || "";
+    setActiveGiftPreviewImg(firstImg);
   };
 
   // Mở modal ủng hộ VietQR
@@ -509,7 +669,7 @@ export default function SocialWelfareList() {
               Hồ Sơ Hoàn Cảnh Khó Khăn &amp; Các Đợt Trao Quà Thực Tế
             </h2>
             <p className="text-slate-600 text-xs sm:text-sm mt-0.5 sm:mt-1">
-              Khảo sát trực tiếp từ 20 thôn buôn xã Ea Súp. Lưu trữ hình ảnh và hồ sơ chứng từ PDF minh bạch. Bấm vào từng hoàn cảnh để xem đầy đủ thông tin.
+              Khảo sát trực tiếp từ 20 thôn buôn xã Ea Súp. Ảnh thumbnail hiển thị rõ nét, bấm vào để mở rộng xem trọn vẹn hình ảnh và biên bản nghiệm thu PDF.
             </p>
           </div>
 
@@ -538,7 +698,7 @@ export default function SocialWelfareList() {
           </div>
         </div>
 
-        {/* Thanh công cụ dành cho Cán bộ Quản trị khi ĐÃ ĐĂNG NHẬP ADMIN */}
+        {/* Thanh công cụ Cán bộ Quản trị khi ĐÃ ĐĂNG NHẬP */}
         {isAdmin && (
           <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-50 via-pink-50 to-rose-50 border border-rose-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in">
             <div className="flex items-center gap-2">
@@ -550,7 +710,7 @@ export default function SocialWelfareList() {
                   Quyền Quản Trị Cán Bộ UBMTTQ Xã Ea Súp
                 </span>
                 <span className="text-[11px] text-slate-600">
-                  Bạn đang đăng nhập admin: có toàn quyền thêm mới, sửa, upload ảnh, chứng từ PDF và xóa thông tin.
+                  Toàn quyền thêm mới, sửa, chọn nhiều thôn buôn, upload ảnh &amp; chứng từ PDF tối đa 5 file.
                 </span>
               </div>
             </div>
@@ -588,21 +748,11 @@ export default function SocialWelfareList() {
                   <span>Tạo đợt trao quà mới</span>
                 </button>
               )}
-
-              <button
-                type="button"
-                onClick={handleClearAllData}
-                title="Xóa toàn bộ dữ liệu mẫu cũ"
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-red-200 bg-white hover:bg-red-50 text-red-600 text-xs font-bold transition-colors cursor-pointer shadow-xs"
-              >
-                <Trash2 className="w-4 h-4" />
-                <span>Xóa sạch dữ liệu mẫu cũ</span>
-              </button>
             </div>
           </div>
         )}
 
-        {/* Tab 1: Các Hoàn Cảnh Cần Giúp Đỡ */}
+        {/* TAB 1: CÁC HOÀN CẢNH KHÓ KHĂN CẦN GIÚP ĐỠ */}
         {activeTab === "CASES" && (
           cases.length === 0 ? (
             <div className="bg-white p-8 sm:p-12 rounded-3xl border border-rose-100 text-center space-y-4 shadow-xs">
@@ -614,7 +764,7 @@ export default function SocialWelfareList() {
                   Hệ thống đã sẵn sàng nhập dữ liệu thực tế
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-500 max-w-lg mx-auto leading-relaxed">
-                  Hiện chưa có hoàn cảnh nào. Quý Cán bộ hãy bấm nút <strong>&quot;Tạo hoàn cảnh mới&quot;</strong> ở trên để cập nhật thông tin, số tiền trao, kèm tải lên hình ảnh và tệp PDF chứng từ thực tế từ 20 thôn buôn.
+                  Hiện chưa có hoàn cảnh nào. Quý Cán bộ hãy bấm nút <strong>&quot;Tạo hoàn cảnh mới&quot;</strong> ở trên để cập nhật thông tin hộ gia đình, số tiền trao, kèm tải lên ảnh và tệp PDF chứng từ.
                 </p>
               </div>
               {isAdmin && (
@@ -640,10 +790,10 @@ export default function SocialWelfareList() {
                   <div
                     key={item.id}
                     className="bg-white rounded-2xl border border-rose-100 shadow-md hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group cursor-pointer"
-                    onClick={() => handleOpenDetail(item)}
+                    onClick={() => handleOpenCaseDetail(item)}
                   >
                     <div>
-                      {/* Ảnh bìa & Thông tin vị trí */}
+                      {/* Ảnh Thumbnail hoàn cảnh */}
                       <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                         {coverImage ? (
                           <img
@@ -659,20 +809,18 @@ export default function SocialWelfareList() {
                           </div>
                         )}
 
-                        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-bold text-rose-700 flex items-center gap-1 shadow-xs">
-                          <MapPin className="w-3 h-3" />
-                          <span>{item.village}</span>
+                        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-bold text-rose-700 flex items-center gap-1 shadow-xs max-w-[70%] truncate">
+                          <MapPin className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{item.village}</span>
                         </div>
 
-                        {/* File badge nếu có đính kèm file */}
                         {fileCount > 0 && (
                           <div className="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] font-medium text-white flex items-center gap-1 shadow-xs">
                             <FileText className="w-3 h-3 text-rose-300" />
-                            <span>{fileCount} tệp lưu trữ {pdfCount > 0 ? `(${pdfCount} PDF)` : ""}</span>
+                            <span>{fileCount} tệp {pdfCount > 0 ? `(${pdfCount} PDF)` : ""}</span>
                           </div>
                         )}
 
-                        {/* Nút Sửa / Xóa cho Admin trên từng thẻ */}
                         {isAdmin && (
                           <div
                             className="absolute top-3 right-3 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm p-1 rounded-lg"
@@ -682,7 +830,7 @@ export default function SocialWelfareList() {
                               type="button"
                               onClick={() => handleOpenEditCase(item)}
                               className="p-1.5 rounded bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition-colors shadow-xs cursor-pointer"
-                              title="Chỉnh sửa hoàn cảnh này"
+                              title="Chỉnh sửa"
                             >
                               <Edit3 className="w-3.5 h-3.5" />
                             </button>
@@ -690,7 +838,7 @@ export default function SocialWelfareList() {
                               type="button"
                               onClick={() => handleDeleteCase(item.id)}
                               className="p-1.5 rounded bg-white hover:bg-red-50 text-slate-700 hover:text-red-600 transition-colors shadow-xs cursor-pointer"
-                              title="Xóa hoàn cảnh này"
+                              title="Xóa"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -698,7 +846,7 @@ export default function SocialWelfareList() {
                         )}
                       </div>
 
-                      {/* Nội dung thông tin tóm tắt */}
+                      {/* Nội dung tóm tắt */}
                       <div className="p-5 space-y-3">
                         <div className="flex items-center justify-between">
                           <h3 className="font-bold text-base text-slate-900 leading-snug group-hover:text-rose-600 transition-colors">
@@ -713,7 +861,6 @@ export default function SocialWelfareList() {
                           {item.situation}
                         </p>
 
-                        {/* Số tiền trao */}
                         <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                           <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
                             <DollarSign className="w-3.5 h-3.5 text-rose-500" />
@@ -741,22 +888,12 @@ export default function SocialWelfareList() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleOpenDetail(item)}
+                        onClick={() => handleOpenCaseDetail(item)}
                         className="py-2 px-3 rounded-xl border border-rose-200 bg-white hover:bg-rose-50 text-rose-700 text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span>Xem đủ</span>
                       </button>
-                      {isAdmin && (
-                        <button
-                          type="button"
-                          onClick={() => handleOpenEditCase(item)}
-                          className="py-2 px-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
-                          title="Chỉnh sửa"
-                        >
-                          <Edit3 className="w-3.5 h-3.5" />
-                        </button>
-                      )}
                     </div>
                   </div>
                 );
@@ -765,89 +902,170 @@ export default function SocialWelfareList() {
           )
         )}
 
-        {/* Tab 2: Các Đợt Trao Quà An Sinh Đã Giải Ngân */}
+        {/* TAB 2: CÁC ĐỢT TRAO QUÀ THỰC TẾ (CÓ ẢNH THUMBNAIL, CHỌN NHIỀU THÔN, BẤM VÀO HIỆN RỘNG CHI TIẾT) */}
         {activeTab === "GIFTS" && (
           giftBatches.length === 0 ? (
-            <div className="bg-white p-8 rounded-2xl border border-rose-100 text-center space-y-2">
-              <Gift className="w-8 h-8 text-slate-300 mx-auto" />
-              <p className="text-sm font-semibold text-slate-700">Chưa ghi nhận đợt trao quà nào</p>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
-                Mọi khoản chi cứu trợ thực tế kèm biên bản nghiệm thu và chứng từ mộc đỏ sẽ được công khai minh bạch tại đây.
-              </p>
+            <div className="bg-white p-8 sm:p-12 rounded-3xl border border-rose-100 text-center space-y-4 shadow-xs">
+              <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto shadow-xs">
+                <Gift className="w-7 h-7" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base sm:text-lg font-extrabold text-slate-800">
+                  Chưa ghi nhận đợt trao quà nào
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-500 max-w-lg mx-auto leading-relaxed">
+                  Mọi khoản trao quà cứu trợ thực tế kèm ảnh chụp và biên bản nghiệm thu có xác nhận của UBMTTQ xã Ea Súp sẽ được lưu trữ minh bạch tại đây.
+                </p>
+              </div>
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={handleOpenAddGift}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-200 transition-all cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tạo đợt trao quà đầu tiên</span>
+                </button>
+              )}
             </div>
           ) : (
-            <div className="space-y-3">
-              {giftBatches.map((gift) => (
-                <div
-                  key={gift.id}
-                  className="bg-white p-5 rounded-2xl border border-rose-100 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-rose-300 transition-colors"
-                >
-                  <div className="space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                        Đã trao quà thực tế
-                      </span>
-                      <span className="text-slate-400 text-xs font-mono">• {formatDate(gift.date)}</span>
-                      <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[11px] font-medium flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-rose-500" />
-                        <span>{gift.village}</span>
-                      </span>
-                      <span className="text-[11px] text-slate-500 font-medium">
-                        ({gift.recipientCount} hộ thụ hưởng)
-                      </span>
-                    </div>
-                    <h4 className="text-sm font-bold text-slate-900">{gift.title}</h4>
-                    <p className="text-xs text-slate-500 flex items-center gap-1">
-                      <FileText className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{gift.proofNote}</span>
-                    </p>
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {giftBatches.map((gift) => {
+                const coverImage = gift.imageUrl || gift.files?.find((f) => f.type === "image")?.url || "";
+                const fileCount = gift.files?.length || 0;
+                const pdfCount = gift.files?.filter((f) => f.type === "pdf").length || 0;
 
-                  <div className="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
-                    <div className="text-left sm:text-right shrink-0">
-                      <div className="text-base sm:text-lg font-extrabold text-rose-700 font-mono">
-                        {formatVND(gift.amount)}
+                return (
+                  <div
+                    key={gift.id}
+                    onClick={() => handleOpenGiftDetail(gift)}
+                    className="bg-white rounded-2xl border border-rose-100 shadow-md hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group cursor-pointer"
+                  >
+                    <div>
+                      {/* ẢNH THUMBNAIL BÊN NGOÀI ĐƯỢC UP LÊN */}
+                      <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                        {coverImage ? (
+                          <img
+                            src={coverImage}
+                            alt={gift.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-gradient-to-br from-rose-50 to-pink-50/40">
+                            <Gift className="w-10 h-10 stroke-1 mb-1 text-rose-400" />
+                            <span className="text-[11px] font-medium text-slate-500">Đợt trao quà thực tế</span>
+                          </div>
+                        )}
+
+                        {/* Thôn / Buôn đã chọn (Có thể nhiều thôn) */}
+                        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-bold text-rose-700 flex items-center gap-1 shadow-xs max-w-[70%] truncate">
+                          <MapPin className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{gift.village}</span>
+                        </div>
+
+                        {/* Badge số file */}
+                        {fileCount > 0 && (
+                          <div className="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] font-medium text-white flex items-center gap-1 shadow-xs">
+                            <FileText className="w-3 h-3 text-rose-300" />
+                            <span>{fileCount} tệp {pdfCount > 0 ? `(${pdfCount} PDF)` : ""}</span>
+                          </div>
+                        )}
+
+                        {/* Nút sửa xóa cho Admin */}
+                        {isAdmin && (
+                          <div
+                            className="absolute top-3 right-3 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm p-1 rounded-lg"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEditGift(gift)}
+                              className="p-1.5 rounded bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition-colors shadow-xs cursor-pointer"
+                              title="Chỉnh sửa đợt trao quà"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteGift(gift.id)}
+                              className="p-1.5 rounded bg-white hover:bg-red-50 text-slate-700 hover:text-red-600 transition-colors shadow-xs cursor-pointer"
+                              title="Xóa đợt trao quà"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        )}
                       </div>
-                      <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-medium">
-                        <CheckCircle2 className="w-3 h-3" />
-                        <span>Chứng từ mộc đỏ đầy đủ</span>
-                      </span>
+
+                      {/* Nội dung đợt trao quà */}
+                      <div className="p-5 space-y-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                            Đã trao quà thực tế
+                          </span>
+                          <span className="text-slate-400 text-xs font-mono">• {formatDate(gift.date)}</span>
+                        </div>
+
+                        <h3 className="font-bold text-base text-slate-900 leading-snug group-hover:text-rose-600 transition-colors">
+                          {gift.title}
+                        </h3>
+
+                        <div className="flex items-center gap-3 text-xs text-slate-500">
+                          <span className="flex items-center gap-1">
+                            <Users className="w-3.5 h-3.5 text-rose-500" />
+                            <span>{gift.recipientCount} hộ thụ hưởng</span>
+                          </span>
+                        </div>
+
+                        <p className="text-xs text-slate-500 flex items-start gap-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                          <FileText className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
+                          <span className="line-clamp-2">{gift.proofNote}</span>
+                        </p>
+
+                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                          <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                            <DollarSign className="w-3.5 h-3.5 text-rose-500" />
+                            Số tiền trao:
+                          </span>
+                          <span className="font-extrabold text-rose-700 font-mono text-base">
+                            {formatVND(gift.amount)}
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Nút Sửa / Xóa đợt trao quà cho Admin */}
-                    {isAdmin && (
-                      <div className="flex items-center gap-1 pl-2 border-l border-slate-200">
-                        <button
-                          type="button"
-                          onClick={() => handleOpenEditGift(gift)}
-                          className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors cursor-pointer"
-                          title="Chỉnh sửa đợt trao quà"
-                        >
-                          <Edit3 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteGift(gift.id)}
-                          className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 transition-colors cursor-pointer"
-                          title="Xóa đợt trao quà"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    )}
+                    {/* Nút hành động */}
+                    <div
+                      className="p-3 bg-rose-50/40 border-t border-rose-100 flex items-center justify-between gap-2"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-semibold">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Mộc đỏ đầy đủ</span>
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => handleOpenGiftDetail(gift)}
+                        className="py-1.5 px-3 rounded-xl bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Xem đủ nội dung &amp; ảnh</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )
         )}
       </div>
 
-      {/* ================= MODAL XEM CHI TIẾT MỞ RỘNG (ĐẦY ĐỦ THÔNG TIN) ================= */}
+      {/* ================= MODAL XEM CHI TIẾT MỞ RỘNG HOÀN CẢNH KHÓ KHĂN ================= */}
       {detailCase && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95">
-            {/* Header Modal */}
             <div className="bg-gradient-to-r from-rose-600 to-pink-600 p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <Heart className="w-5 h-5 fill-white" />
@@ -871,9 +1089,7 @@ export default function SocialWelfareList() {
               </button>
             </div>
 
-            {/* Nội dung chi tiết cuộn được */}
             <div className="p-4 sm:p-6 overflow-y-auto space-y-5 text-slate-800">
-              {/* Thẻ số tiền trao nổi bật */}
               <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-50 via-pink-50 to-amber-50 border border-rose-200 flex items-center justify-between">
                 <div>
                   <span className="text-xs uppercase tracking-wider font-bold text-slate-500 block">
@@ -891,7 +1107,6 @@ export default function SocialWelfareList() {
                 </div>
               </div>
 
-              {/* Mô tả hoàn cảnh đầy đủ */}
               <div className="space-y-2">
                 <h4 className="text-xs uppercase font-extrabold text-slate-400 tracking-wider">
                   Mô tả hoàn cảnh gia đình:
@@ -901,12 +1116,12 @@ export default function SocialWelfareList() {
                 </div>
               </div>
 
-              {/* Hình ảnh và Thư viện ảnh */}
+              {/* Thư viện hình ảnh */}
               {(() => {
                 const imgFiles = detailCase.files?.filter((f) => f.type === "image") || [];
                 const allImages = [...(detailCase.imageUrl ? [detailCase.imageUrl] : []), ...imgFiles.map((f) => f.url)];
                 const uniqueImages = Array.from(new Set(allImages.filter(Boolean)));
-                const currentPreview = activePreviewImg || uniqueImages[0] || "";
+                const currentPreview = activeCasePreviewImg || uniqueImages[0] || "";
 
                 if (uniqueImages.length === 0) return null;
 
@@ -917,25 +1132,19 @@ export default function SocialWelfareList() {
                       <span>Hình ảnh thực tế ({uniqueImages.length} ảnh):</span>
                     </h4>
 
-                    {/* Preview ảnh lớn */}
                     {currentPreview && (
                       <div className="relative aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-xs">
-                        <img
-                          src={currentPreview}
-                          alt={detailCase.recipientName}
-                          className="w-full h-full object-cover"
-                        />
+                        <img src={currentPreview} alt={detailCase.recipientName} className="w-full h-full object-cover" />
                       </div>
                     )}
 
-                    {/* Danh sách ảnh thu nhỏ nếu có nhiều hơn 1 ảnh */}
                     {uniqueImages.length > 1 && (
                       <div className="flex items-center gap-2 overflow-x-auto py-1">
                         {uniqueImages.map((imgUrl, idx) => (
                           <button
                             key={idx}
                             type="button"
-                            onClick={() => setActivePreviewImg(imgUrl)}
+                            onClick={() => setActiveCasePreviewImg(imgUrl)}
                             className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
                               currentPreview === imgUrl ? "border-rose-600 scale-105 shadow-md" : "border-slate-200 opacity-70 hover:opacity-100"
                             }`}
@@ -949,7 +1158,7 @@ export default function SocialWelfareList() {
                 );
               })()}
 
-              {/* Chứng từ / File PDF đính kèm */}
+              {/* Danh sách PDF */}
               {(() => {
                 const pdfFiles = detailCase.files?.filter((f) => f.type === "pdf") || [];
                 if (pdfFiles.length === 0) return null;
@@ -971,12 +1180,8 @@ export default function SocialWelfareList() {
                               PDF
                             </div>
                             <div className="truncate">
-                              <span className="text-xs font-semibold text-slate-800 block truncate">
-                                {pdf.name}
-                              </span>
-                              <span className="text-[10px] text-slate-400">
-                                Chứng từ lưu trữ bền vững trên máy chủ
-                              </span>
+                              <span className="text-xs font-semibold text-slate-800 block truncate">{pdf.name}</span>
+                              <span className="text-[10px] text-slate-400">Lưu trữ vĩnh viễn trên máy chủ</span>
                             </div>
                           </div>
                           <a
@@ -996,7 +1201,6 @@ export default function SocialWelfareList() {
               })()}
             </div>
 
-            {/* Footer Modal */}
             <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
               <button
                 type="button"
@@ -1023,11 +1227,187 @@ export default function SocialWelfareList() {
         </div>
       )}
 
-      {/* ================= MODAL ỦNG HỘ VIETQR TỰ ĐỘNG THEO TỪNG HOÀN CẢNH ================= */}
+      {/* ================= MODAL XEM CHI TIẾT MỞ RỘNG ĐỢT TRAO QUÀ (ĐẦY ĐỦ HÌNH ẢNH & NỘI DUNG) ================= */}
+      {detailGift && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95">
+            <div className="bg-gradient-to-r from-rose-600 to-pink-600 p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                <Gift className="w-5 h-5 text-white" />
+                <div>
+                  <h3 className="font-bold text-base sm:text-lg leading-tight">
+                    {detailGift.title}
+                  </h3>
+                  <p className="text-rose-100 text-xs flex items-center gap-1 mt-0.5">
+                    <MapPin className="w-3 h-3 shrink-0" />
+                    <span>{detailGift.village}</span>
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDetailGift(null)}
+                className="p-1.5 rounded-full hover:bg-white/20 text-white transition-colors cursor-pointer"
+                title="Đóng"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-5 text-slate-800">
+              {/* Thẻ số tiền và quy mô */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200">
+                  <span className="text-xs uppercase tracking-wider font-bold text-slate-500 block">
+                    Số tiền trao thực tế
+                  </span>
+                  <span className="text-xl sm:text-2xl font-black text-rose-700 font-mono">
+                    {formatVND(detailGift.amount)}
+                  </span>
+                </div>
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
+                    <span>Quy mô đợt trao:</span>
+                    <span className="font-bold text-slate-900">{detailGift.recipientCount} hộ thụ hưởng</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-600 pt-1 border-t border-slate-200">
+                    <span>Ngày thực hiện:</span>
+                    <span className="font-mono text-slate-800">{formatDate(detailGift.date)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Danh sách các thôn buôn thụ hưởng */}
+              <div className="space-y-1.5">
+                <h4 className="text-xs uppercase font-extrabold text-slate-400 tracking-wider flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-rose-500" />
+                  <span>Địa bàn thôn / buôn thụ hưởng:</span>
+                </h4>
+                <div className="flex flex-wrap gap-1.5">
+                  {(detailGift.villages && detailGift.villages.length > 0
+                    ? detailGift.villages
+                    : detailGift.village.split(",").map((s) => s.trim())
+                  ).map((v, i) => (
+                    <span key={i} className="px-2.5 py-1 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold">
+                      {v}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Chứng từ / Biên bản nghiệm thu */}
+              <div className="space-y-1.5">
+                <h4 className="text-xs uppercase font-extrabold text-slate-400 tracking-wider flex items-center gap-1">
+                  <FileText className="w-3.5 h-3.5 text-rose-500" />
+                  <span>Biên bản nghiệm thu &amp; Chứng từ mộc đỏ:</span>
+                </h4>
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed font-medium">
+                  {detailGift.proofNote}
+                </div>
+              </div>
+
+              {/* Thư viện hình ảnh của đợt trao quà */}
+              {(() => {
+                const imgFiles = detailGift.files?.filter((f) => f.type === "image") || [];
+                const allImages = [...(detailGift.imageUrl ? [detailGift.imageUrl] : []), ...imgFiles.map((f) => f.url)];
+                const uniqueImages = Array.from(new Set(allImages.filter(Boolean)));
+                const currentPreview = activeGiftPreviewImg || uniqueImages[0] || "";
+
+                if (uniqueImages.length === 0) return null;
+
+                return (
+                  <div className="space-y-2">
+                    <h4 className="text-xs uppercase font-extrabold text-slate-400 tracking-wider flex items-center gap-1.5">
+                      <ImageIcon className="w-3.5 h-3.5 text-rose-500" />
+                      <span>Hình ảnh thực tế đợt trao quà ({uniqueImages.length} ảnh):</span>
+                    </h4>
+
+                    {currentPreview && (
+                      <div className="relative aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-xs">
+                        <img src={currentPreview} alt={detailGift.title} className="w-full h-full object-cover" />
+                      </div>
+                    )}
+
+                    {uniqueImages.length > 1 && (
+                      <div className="flex items-center gap-2 overflow-x-auto py-1">
+                        {uniqueImages.map((imgUrl, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setActiveGiftPreviewImg(imgUrl)}
+                            className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
+                              currentPreview === imgUrl ? "border-rose-600 scale-105 shadow-md" : "border-slate-200 opacity-70 hover:opacity-100"
+                            }`}
+                          >
+                            <img src={imgUrl} alt={`Ảnh ${idx + 1}`} className="w-full h-full object-cover" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Danh sách file PDF chứng từ của đợt trao quà */}
+              {(() => {
+                const pdfFiles = detailGift.files?.filter((f) => f.type === "pdf") || [];
+                if (pdfFiles.length === 0) return null;
+
+                return (
+                  <div className="space-y-2">
+                    <h4 className="text-xs uppercase font-extrabold text-slate-400 tracking-wider flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 text-rose-500" />
+                      <span>Hồ sơ chứng từ PDF đính kèm ({pdfFiles.length} file):</span>
+                    </h4>
+                    <div className="space-y-2">
+                      {pdfFiles.map((pdf, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-rose-300 transition-colors"
+                        >
+                          <div className="flex items-center gap-2.5 overflow-hidden">
+                            <div className="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0 font-bold text-xs">
+                              PDF
+                            </div>
+                            <div className="truncate">
+                              <span className="text-xs font-semibold text-slate-800 block truncate">{pdf.name}</span>
+                              <span className="text-[10px] text-slate-400">Chứng từ lưu trữ vĩnh viễn trên máy chủ</span>
+                            </div>
+                          </div>
+                          <a
+                            href={pdf.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs transition-colors shrink-0 cursor-pointer"
+                          >
+                            <span>Xem / Tải PDF</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end shrink-0">
+              <button
+                type="button"
+                onClick={() => setDetailGift(null)}
+                className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition-colors cursor-pointer"
+              >
+                Đóng lại
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= MODAL ỦNG HỘ VIETQR TỰ ĐỘNG ================= */}
       {donateCase && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95">
-            {/* Header */}
             <div className="bg-gradient-to-r from-rose-600 to-pink-600 p-4 text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <QrCode className="w-5 h-5" />
@@ -1048,7 +1428,6 @@ export default function SocialWelfareList() {
             </div>
 
             <div className="p-5 space-y-4 text-xs">
-              {/* Chọn mức ủng hộ nhanh */}
               <div>
                 <label className="block font-bold text-slate-700 uppercase mb-2 text-[11px]">
                   Chọn số tiền ủng hộ (VNĐ):
@@ -1071,7 +1450,6 @@ export default function SocialWelfareList() {
                 </div>
               </div>
 
-              {/* Mã VietQR tạo động theo số tiền và tên đối tượng */}
               <div className="p-3 bg-rose-50/50 rounded-2xl border border-rose-200 flex flex-col items-center text-center">
                 <div className="bg-white p-2.5 rounded-2xl shadow-sm border border-slate-200 max-w-[220px]">
                   <img
@@ -1085,7 +1463,6 @@ export default function SocialWelfareList() {
                 </p>
               </div>
 
-              {/* Thông tin tài khoản tiếp nhận chính thức */}
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2 font-medium">
                 <div className="flex items-center justify-between text-slate-700">
                   <span className="text-slate-500">Ngân hàng:</span>
@@ -1099,7 +1476,7 @@ export default function SocialWelfareList() {
                       type="button"
                       onClick={() => copyToClipboard("8630100930", "stk")}
                       className="p-1 hover:bg-slate-200 rounded text-slate-600 cursor-pointer"
-                      title="Sao chép số tài khoản"
+                      title="Sao chép STK"
                     >
                       {copiedStk ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
@@ -1139,11 +1516,10 @@ export default function SocialWelfareList() {
         </div>
       )}
 
-      {/* ================= MODAL CHỈNH SỬA / TẠO MỚI HOÀN CẢNH ================= */}
+      {/* ================= MODAL TẠO / SỬA HOÀN CẢNH KHÓ KHĂN ================= */}
       {isCaseModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 max-w-lg w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95">
-            {/* Header Form */}
             <div className="bg-gradient-to-r from-rose-600 to-pink-600 p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5" />
@@ -1160,7 +1536,6 @@ export default function SocialWelfareList() {
               </button>
             </div>
 
-            {/* Form inputs */}
             <form onSubmit={handleSaveCase} className="p-5 sm:p-6 space-y-4 text-xs overflow-y-auto">
               <div>
                 <label className="block font-bold text-slate-700 uppercase mb-1">
@@ -1176,40 +1551,55 @@ export default function SocialWelfareList() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 uppercase mb-1">
-                    Thôn / Buôn: *
+              {/* CHỌN NHIỀU THÔN / BUÔN */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="block font-bold text-slate-700 uppercase">
+                    Thôn / Buôn: * (Có thể chọn nhiều thôn/buôn)
                   </label>
-                  <select
-                    value={caseForm.village}
-                    onChange={(e) => setCaseForm({ ...caseForm, village: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 bg-white font-medium"
+                  <button
+                    type="button"
+                    onClick={handleSelectAllCaseVillages}
+                    className="text-[11px] font-semibold text-rose-600 hover:text-rose-700 cursor-pointer"
                   >
-                    {VILLAGES.map((v) => (
-                      <option key={v} value={v}>
-                        {v}
-                      </option>
-                    ))}
-                  </select>
+                    Chọn toàn xã (20 thôn)
+                  </button>
                 </div>
+                <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-2 bg-slate-50 rounded-xl border border-slate-200">
+                  {VILLAGES_LIST.map((v) => {
+                    const isSelected = caseForm.villages.includes(v);
+                    return (
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => handleToggleCaseVillage(v)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer ${
+                          isSelected
+                            ? "bg-rose-600 text-white shadow-xs"
+                            : "bg-white text-slate-600 border border-slate-200 hover:border-rose-300"
+                        }`}
+                      >
+                        {isSelected && <Check className="w-3 h-3" />}
+                        <span>{v}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
-                <div>
-                  <label className="block font-bold text-slate-700 uppercase mb-1">
-                    Số tiền trao (VNĐ): *
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="500000"
-                    required
-                    value={caseForm.amount}
-                    onChange={(e) =>
-                      setCaseForm({ ...caseForm, amount: Number(e.target.value) })
-                    }
-                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium font-mono"
-                  />
-                </div>
+              <div>
+                <label className="block font-bold text-slate-700 uppercase mb-1">
+                  Số tiền trao (VNĐ): *
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="500000"
+                  required
+                  value={caseForm.amount}
+                  onChange={(e) => setCaseForm({ ...caseForm, amount: Number(e.target.value) })}
+                  className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium font-mono"
+                />
               </div>
 
               <div>
@@ -1226,7 +1616,7 @@ export default function SocialWelfareList() {
                 />
               </div>
 
-              {/* KHU VỰC TẢI LÊN ẢNH VÀ CHỨNG TỪ PDF (TỐI ĐA 5 FILE) */}
+              {/* UPLOAD ẢNH VÀ FILE PDF */}
               <div className="p-3.5 rounded-2xl bg-rose-50/50 border border-rose-200 space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="block font-bold text-rose-900 uppercase text-[11px]">
@@ -1237,34 +1627,33 @@ export default function SocialWelfareList() {
                   </span>
                 </div>
 
-                {/* Nút bấm tải lên */}
                 <div>
                   <input
-                    ref={fileInputRef}
+                    ref={caseFileInputRef}
                     type="file"
                     multiple
                     accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
-                    onChange={handleFileUpload}
+                    onChange={handleCaseFileUpload}
                     className="hidden"
-                    disabled={isUploading || caseForm.files.length >= 5}
+                    disabled={isUploadingCase || caseForm.files.length >= 5}
                   />
 
                   <button
                     type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploading || caseForm.files.length >= 5}
+                    onClick={() => caseFileInputRef.current?.click()}
+                    disabled={isUploadingCase || caseForm.files.length >= 5}
                     className={`w-full py-2.5 px-3 rounded-xl border-2 border-dashed flex items-center justify-center gap-2 font-bold text-xs transition-all cursor-pointer ${
                       caseForm.files.length >= 5
                         ? "border-slate-300 bg-slate-100 text-slate-400 cursor-not-allowed"
-                        : isUploading
+                        : isUploadingCase
                         ? "border-amber-400 bg-amber-50 text-amber-700"
                         : "border-rose-300 bg-white hover:bg-rose-50 text-rose-700 shadow-2xs"
                     }`}
                   >
-                    {isUploading ? (
+                    {isUploadingCase ? (
                       <>
                         <span className="w-4 h-4 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
-                        <span>Đang tải tệp lên hệ thống máy chủ...</span>
+                        <span>Đang tải tệp lên máy chủ...</span>
                       </>
                     ) : (
                       <>
@@ -1278,91 +1667,38 @@ export default function SocialWelfareList() {
                     )}
                   </button>
 
-                  {uploadError && (
-                    <p className="text-[11px] text-red-600 font-medium mt-1">
-                      ⚠️ {uploadError}
-                    </p>
-                  )}
-                  <p className="text-[10px] text-slate-500 mt-1">
-                    Hỗ trợ tệp ảnh (JPG, PNG, WEBP) và chứng từ PDF (tối đa 15MB/tệp). Toàn bộ dữ liệu được lưu trữ vĩnh viễn trong máy chủ hệ thống.
-                  </p>
+                  {uploadErrorCase && <p className="text-[11px] text-red-600 font-medium mt-1">⚠️ {uploadErrorCase}</p>}
                 </div>
 
-                {/* Danh sách các file đã upload */}
                 {caseForm.files.length > 0 && (
                   <div className="space-y-1.5 pt-1">
-                    {caseForm.files.map((file, idx) => {
-                      const isCover = file.url === caseForm.imageUrl;
-                      return (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200 text-[11px]"
-                        >
-                          <div className="flex items-center gap-2 overflow-hidden">
-                            {file.type === "image" ? (
-                              <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 border border-slate-200">
-                                <img src={file.url} alt={file.name} className="w-full h-full object-cover" />
-                              </div>
-                            ) : (
-                              <div className="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0 font-bold text-[10px]">
-                                PDF
-                              </div>
-                            )}
-                            <div className="truncate">
-                              <span className="font-semibold text-slate-800 block truncate">
-                                {file.name}
-                              </span>
-                              <span className="text-[10px] text-slate-400">
-                                {file.type === "image" ? "Ảnh chụp" : "Tài liệu PDF"}
-                              </span>
+                    {caseForm.files.map((file, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200 text-[11px]">
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          {file.type === "image" ? (
+                            <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 border border-slate-200">
+                              <img src={file.url} alt={file.name} className="w-full h-full object-cover" />
                             </div>
-                          </div>
-
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            {file.type === "image" && (
-                              <button
-                                type="button"
-                                onClick={() => handleSetCoverImage(file.url)}
-                                className={`px-2 py-0.5 rounded text-[10px] font-semibold cursor-pointer ${
-                                  isCover
-                                    ? "bg-rose-600 text-white"
-                                    : "bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-600"
-                                }`}
-                              >
-                                {isCover ? "Ảnh đại diện" : "Đặt làm bìa"}
-                              </button>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveFile(idx)}
-                              className="p-1 rounded text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
-                              title="Xóa tệp này"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
+                          ) : (
+                            <div className="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0 font-bold text-[10px]">
+                              PDF
+                            </div>
+                          )}
+                          <span className="font-semibold text-slate-800 block truncate">{file.name}</span>
                         </div>
-                      );
-                    })}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCaseFile(idx)}
+                          className="p-1 rounded text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
-
-                {/* Nhập URL ảnh thủ công (tùy chọn dự phòng) */}
-                <div className="pt-2 border-t border-rose-200/60">
-                  <label className="block font-semibold text-slate-600 text-[10px] mb-1">
-                    Hoặc nhập trực tiếp URL đường dẫn ảnh:
-                  </label>
-                  <input
-                    type="text"
-                    value={caseForm.imageUrl}
-                    onChange={(e) => setCaseForm({ ...caseForm, imageUrl: e.target.value })}
-                    placeholder="https://... hoặc đường dẫn nội bộ"
-                    className="w-full p-2 rounded-lg border border-slate-200 bg-white focus:border-rose-500 font-mono text-[11px]"
-                  />
-                </div>
               </div>
 
-              {/* Nút lưu */}
               <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
                 <button
                   type="button"
@@ -1384,13 +1720,13 @@ export default function SocialWelfareList() {
         </div>
       )}
 
-      {/* ================= MODAL CHỈNH SỬA / TẠO MỚI ĐỢT TRAO QUÀ ================= */}
+      {/* ================= MODAL TẠO / SỬA ĐỢT TRAO QUÀ THỰC TẾ (HỖ TRỢ CHỌN NHIỀU THÔN & UP ẢNH/PDF) ================= */}
       {isGiftModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 max-w-lg w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95">
             <div className="bg-gradient-to-r from-rose-600 to-pink-600 p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
-                <Gift className="w-5 h-5" />
+                <Gift className="w-5 h-5 text-white" />
                 <h3 className="font-bold text-sm sm:text-base">
                   {editingGiftId ? "Chỉnh Sửa Đợt Trao Quà Thực Tế" : "Tạo Đợt Trao Quà Thực Tế Mới"}
                 </h3>
@@ -1405,6 +1741,7 @@ export default function SocialWelfareList() {
             </div>
 
             <form onSubmit={handleSaveGift} className="p-5 sm:p-6 space-y-4 text-xs overflow-y-auto">
+              {/* Tiêu đề */}
               <div>
                 <label className="block font-bold text-slate-700 uppercase mb-1">
                   Tiêu đề đợt trao quà: *
@@ -1419,24 +1756,49 @@ export default function SocialWelfareList() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 uppercase mb-1">
-                    Thôn / Buôn: *
+              {/* CHỌN NHIỀU THÔN / BUÔN MỘT LÚC */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="block font-bold text-slate-700 uppercase">
+                    Thôn / Buôn thụ hưởng: * (Có thể chọn nhiều thôn/buôn)
                   </label>
-                  <select
-                    value={giftForm.village}
-                    onChange={(e) => setGiftForm({ ...giftForm, village: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 bg-white font-medium"
+                  <button
+                    type="button"
+                    onClick={handleSelectAllGiftVillages}
+                    className="text-[11px] font-semibold text-rose-600 hover:text-rose-700 cursor-pointer"
                   >
-                    {VILLAGES.map((v) => (
-                      <option key={v} value={v}>
-                        {v}
-                      </option>
-                    ))}
-                  </select>
+                    Chọn toàn xã (20 thôn buôn)
+                  </button>
                 </div>
 
+                {/* Danh sách chip chọn nhiều thôn */}
+                <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                  {VILLAGES_LIST.map((v) => {
+                    const isSelected = giftForm.villages.includes(v);
+                    return (
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => handleToggleGiftVillage(v)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer ${
+                          isSelected
+                            ? "bg-rose-600 text-white shadow-xs"
+                            : "bg-white text-slate-600 border border-slate-200 hover:border-rose-300"
+                        }`}
+                      >
+                        {isSelected && <Check className="w-3 h-3" />}
+                        <span>{v}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-[10px] text-slate-500">
+                  Đã chọn {giftForm.villages.length} thôn/buôn: {giftForm.villages.join(", ")}
+                </p>
+              </div>
+
+              {/* Số hộ & Số tiền trao */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-700 uppercase mb-1">
                     Số hộ / người thụ hưởng: *
@@ -1446,15 +1808,11 @@ export default function SocialWelfareList() {
                     min="1"
                     required
                     value={giftForm.recipientCount}
-                    onChange={(e) =>
-                      setGiftForm({ ...giftForm, recipientCount: Number(e.target.value) })
-                    }
+                    onChange={(e) => setGiftForm({ ...giftForm, recipientCount: Number(e.target.value) })}
                     className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium"
                   />
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-700 uppercase mb-1">
                     Số tiền trao (VNĐ): *
@@ -1465,27 +1823,27 @@ export default function SocialWelfareList() {
                     step="500000"
                     required
                     value={giftForm.amount}
-                    onChange={(e) =>
-                      setGiftForm({ ...giftForm, amount: Number(e.target.value) })
-                    }
+                    onChange={(e) => setGiftForm({ ...giftForm, amount: Number(e.target.value) })}
                     className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 uppercase mb-1">
-                    Ngày thực hiện: *
-                  </label>
-                  <input
-                    type="date"
-                    required
-                    value={giftForm.date}
-                    onChange={(e) => setGiftForm({ ...giftForm, date: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium"
                   />
                 </div>
               </div>
 
+              {/* Ngày thực hiện */}
+              <div>
+                <label className="block font-bold text-slate-700 uppercase mb-1">
+                  Ngày thực hiện: *
+                </label>
+                <input
+                  type="date"
+                  required
+                  value={giftForm.date}
+                  onChange={(e) => setGiftForm({ ...giftForm, date: e.target.value })}
+                  className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium"
+                />
+              </div>
+
+              {/* Chứng từ / Biên bản nghiệm thu */}
               <div>
                 <label className="block font-bold text-slate-700 uppercase mb-1">
                   Chứng từ / Biên bản nghiệm thu: *
@@ -1500,6 +1858,115 @@ export default function SocialWelfareList() {
                 />
               </div>
 
+              {/* PHẦN UP HÌNH ẢNH, CHỨNG TỪ (FILE HÌNH ẢNH, PDF TỐI ĐA 5 FILE) */}
+              <div className="p-3.5 rounded-2xl bg-rose-50/50 border border-rose-200 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block font-bold text-rose-900 uppercase text-[11px]">
+                    Hình ảnh &amp; Chứng từ (File PDF) - Tối đa 5 file:
+                  </label>
+                  <span className="text-[11px] font-bold text-rose-600 font-mono">
+                    {giftForm.files.length}/5 file
+                  </span>
+                </div>
+
+                <div>
+                  <input
+                    ref={giftFileInputRef}
+                    type="file"
+                    multiple
+                    accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                    onChange={handleGiftFileUpload}
+                    className="hidden"
+                    disabled={isUploadingGift || giftForm.files.length >= 5}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => giftFileInputRef.current?.click()}
+                    disabled={isUploadingGift || giftForm.files.length >= 5}
+                    className={`w-full py-2.5 px-3 rounded-xl border-2 border-dashed flex items-center justify-center gap-2 font-bold text-xs transition-all cursor-pointer ${
+                      giftForm.files.length >= 5
+                        ? "border-slate-300 bg-slate-100 text-slate-400 cursor-not-allowed"
+                        : isUploadingGift
+                        ? "border-amber-400 bg-amber-50 text-amber-700"
+                        : "border-rose-300 bg-white hover:bg-rose-50 text-rose-700 shadow-2xs"
+                    }`}
+                  >
+                    {isUploadingGift ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
+                        <span>Đang tải tệp lên hệ thống máy chủ...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 text-rose-600" />
+                        <span>
+                          {giftForm.files.length >= 5
+                            ? "Đã đạt tối đa 5 file"
+                            : "Up ảnh, chứng từ (file PDF) vào hệ thống"}
+                        </span>
+                      </>
+                    )}
+                  </button>
+
+                  {uploadErrorGift && <p className="text-[11px] text-red-600 font-medium mt-1">⚠️ {uploadErrorGift}</p>}
+                  <p className="text-[10px] text-slate-500 mt-1">
+                    Ảnh đầu tiên sẽ làm ảnh thumbnail bên ngoài thẻ. Hỗ trợ ảnh JPG, PNG và file tài liệu PDF (tối đa 15MB/file).
+                  </p>
+                </div>
+
+                {/* Danh sách file đã upload */}
+                {giftForm.files.length > 0 && (
+                  <div className="space-y-1.5 pt-1">
+                    {giftForm.files.map((file, idx) => {
+                      const isCover = file.url === giftForm.imageUrl;
+                      return (
+                        <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200 text-[11px]">
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            {file.type === "image" ? (
+                              <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 border border-slate-200">
+                                <img src={file.url} alt={file.name} className="w-full h-full object-cover" />
+                              </div>
+                            ) : (
+                              <div className="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0 font-bold text-[10px]">
+                                PDF
+                              </div>
+                            )}
+                            <div className="truncate">
+                              <span className="font-semibold text-slate-800 block truncate">{file.name}</span>
+                              <span className="text-[10px] text-slate-400">{file.type === "image" ? "Ảnh chụp thực tế" : "Chứng từ PDF"}</span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {file.type === "image" && (
+                              <button
+                                type="button"
+                                onClick={() => setGiftForm((prev) => ({ ...prev, imageUrl: file.url }))}
+                                className={`px-2 py-0.5 rounded text-[10px] font-semibold cursor-pointer ${
+                                  isCover ? "bg-rose-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-600"
+                                }`}
+                              >
+                                {isCover ? "Ảnh bìa ngoài" : "Đặt làm thumbnail"}
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveGiftFile(idx)}
+                              className="p-1 rounded text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                              title="Xóa tệp này"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Nút lưu */}
               <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
                 <button
                   type="button"
