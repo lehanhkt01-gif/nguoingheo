@@ -101,8 +101,10 @@ export default function LiveLedgerTable() {
         }
 
         setTransactions(list);
-        setTotalCount(activeTab === "ALL" && json.pagination?.totalRecords ? json.pagination.totalRecords : list.length);
-        setTotalPages(Math.max(1, Math.ceil(list.length / 10)));
+        const totRecords = Number(json.pagination?.totalRecords ?? list.length);
+        const totPages = Number(json.pagination?.totalPages ?? Math.max(1, Math.ceil(totRecords / 10)));
+        setTotalCount(totRecords);
+        setTotalPages(totPages);
 
         if (json.summary) {
           const totalInVal = Number(json.summary.totalIn || 0);
@@ -340,7 +342,7 @@ export default function LiveLedgerTable() {
           </div>
 
           <span className="text-[11px] sm:text-xs text-slate-500 font-medium">
-            Hiển thị <strong>{displayTransactions.length}</strong> giao dịch ({activeTab === "ALL" ? "Tổng hợp" : activeTab === "IN" ? "Tiền vào" : "Tiền ra"})
+            Hiển thị <strong>{displayTransactions.length}</strong> / <strong>{totalCount}</strong> giao dịch ({activeTab === "ALL" ? "Tổng hợp" : activeTab === "IN" ? "Tiền vào" : "Tiền ra"})
           </span>
         </div>
 
@@ -362,13 +364,13 @@ export default function LiveLedgerTable() {
               {displayTransactions.length > 0 ? (
                 displayTransactions.map((t, idx) => {
                   const isOut = t.type === "OUT";
-                  // Đánh số thứ tự ngược từ tổng số giao dịch về 1 cho mỗi phần
-                  const stt = displayTransactions.length - idx;
+                  // Đánh số thứ tự tăng dần chuẩn: Trang 1 (#01 - #10), Trang 2 (#11 - #15)...
+                  const stt = (page - 1) * 10 + idx + 1;
                   const sttStr = String(stt).padStart(2, "0");
 
                   return (
                     <tr key={t.reference ? `${t.type}_${t.reference}` : `${t.id}_${idx}`} className="hover:bg-rose-50/30 transition-colors">
-                      {/* STT đếm ngược */}
+                      {/* STT tăng dần */}
                       <td className="py-3.5 px-3 text-center whitespace-nowrap">
                         <span
                           className={`inline-block px-2 py-0.5 rounded font-mono text-[11px] font-bold ${
@@ -457,21 +459,25 @@ export default function LiveLedgerTable() {
         {/* Phân Trang */}
         <div className="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 bg-slate-50/50">
           <div>
-            Hiển thị trang <strong>{page}</strong> trên tổng số <strong>{totalPages}</strong> trang
+            Hiển thị trang <strong>{page}</strong> trên tổng số <strong>{totalPages}</strong> trang (Tổng {totalCount} giao dịch)
           </div>
           <div className="flex items-center gap-1.5">
             <button
+              type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1 || loading}
-              className="p-1.5 rounded-lg border border-slate-200 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-lg border border-slate-200 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              title="Trang trước"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <span className="px-2 font-medium">Trang {page} / {totalPages}</span>
             <button
+              type="button"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages || loading}
-              className="p-1.5 rounded-lg border border-slate-200 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-lg border border-slate-200 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              title="Trang tiếp theo"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

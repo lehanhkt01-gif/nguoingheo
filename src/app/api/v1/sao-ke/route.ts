@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
           return true;
         })
         .sort((a, b) => new Date(b.transactionDateTime).getTime() - new Date(a.transactionDateTime).getTime());
-      totalRecords = items.length;
+      totalRecords = count;
     } else if (isIn) {
       const where: any = { status: "COMPLETED" };
       if (search) {
@@ -121,7 +121,7 @@ export async function GET(req: NextRequest) {
           return true;
         })
         .sort((a, b) => new Date(b.transactionDateTime).getTime() - new Date(a.transactionDateTime).getTime());
-      totalRecords = items.length;
+      totalRecords = count;
     } else {
       // ALL: gộp donations và disbursements
       const [donations, disbursements] = await Promise.all([
