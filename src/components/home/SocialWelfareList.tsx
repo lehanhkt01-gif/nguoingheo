@@ -706,24 +706,24 @@ export default function SocialWelfareList() {
             <button
               type="button"
               onClick={() => setActiveTab("CASES")}
-              className={`px-2 sm:px-4 py-2 rounded-lg transition-all text-center font-bold cursor-pointer shadow-xs ${
+              className={`px-2.5 sm:px-4 py-2 rounded-lg transition-all text-center font-bold cursor-pointer shadow-xs ${
                 activeTab === "CASES"
                   ? "bg-rose-600 text-white"
                   : "bg-emerald-600 text-white hover:bg-emerald-700"
               }`}
             >
-              Hoàn cảnh cần giúp ({cases.length})
+              CẦN GIÚP ĐỠ ({cases.length})
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("GIFTS")}
-              className={`px-2 sm:px-4 py-2 rounded-lg transition-all text-center font-bold cursor-pointer shadow-xs ${
+              className={`px-2.5 sm:px-4 py-2 rounded-lg transition-all text-center font-bold cursor-pointer shadow-xs ${
                 activeTab === "GIFTS"
                   ? "bg-rose-600 text-white"
                   : "bg-emerald-600 text-white hover:bg-emerald-700"
               }`}
             >
-              Đợt trao quà ({giftBatches.length})
+              ĐÃ TRAO/GIẢI NGÂN ({giftBatches.length})
             </button>
           </div>
         </div>
