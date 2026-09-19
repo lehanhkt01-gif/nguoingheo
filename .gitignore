@@ -39,3 +39,8 @@ next-env.d.ts
 # Docker SSL private keys
 docker/nginx/ssl/*.key
 docker/nginx/ssl/*.pem
+
+# Uploaded media & documents
+public/uploads/*
+!public/uploads/.gitkeep
+

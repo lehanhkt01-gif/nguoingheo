@@ -2,14 +2,24 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 
+export interface WelfareFileItem {
+  url: string;
+  name: string;
+  type: "image" | "pdf";
+  size?: number;
+}
+
 export interface WelfareCase {
   id: number;
   recipientName: string;
   village: string;
   situation: string;
-  targetAmount: number;
-  currentAmount: number;
-  imageUrl: string;
+  amount: number; // Số tiền trao
+  targetAmount?: number;
+  currentAmount?: number;
+  imageUrl?: string;
+  files?: WelfareFileItem[]; // Tối đa 5 file: ảnh hoặc PDF chứng từ
+  createdAt?: string;
 }
 
 export interface GiftBatch {
