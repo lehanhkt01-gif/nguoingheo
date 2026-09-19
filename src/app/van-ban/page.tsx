@@ -1,23 +1,35 @@
-import { FileText, Download, ShieldCheck, CheckCircle2 } from "lucide-react";
+import SocialWelfareList from "@/components/home/SocialWelfareList";
+import { FileText, Download, CheckCircle2 } from "lucide-react";
+
+export const dynamic = "force-dynamic";
+
+export const metadata = {
+  title: "Văn Bản & Pháp Lý - Hồ Sơ Đã Giải Ngân | Quỹ Vì Người Nghèo Xã Ea Súp",
+  description: "Hồ sơ các đợt trao quà, giải ngân có chứng từ nghiệm thu mộc đỏ và các căn cứ văn bản pháp quy của UBMTTQ Việt Nam xã Ea Súp.",
+};
 
 export default function VanBanPage() {
   return (
-    <div className="min-h-screen bg-slate-50 py-12">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-        <div className="text-center space-y-3">
+    <div className="min-h-screen bg-slate-50 py-4 sm:py-8 space-y-8 sm:space-y-12">
+      {/* 1. Nút văn bản & pháp lý: Sử dụng toàn bộ nội dung Đã trao / Giải ngân */}
+      <SocialWelfareList mode="GIFTS_ONLY" defaultTab="GIFTS" />
+
+      {/* 2. CĂN CỨ PHÁP LÝ & QUY CHẾ VẬN HÀNH CHÍNH THỨC */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 pt-6 border-t-2 border-slate-200">
+        <div className="text-center space-y-2 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold">
             <FileText className="w-3.5 h-3.5" />
-            <span>CĂN CỨ PHÁP LÝ & QUY CHẾ VẬN HÀNH</span>
+            <span>CĂN CỨ PHÁP LÝ &amp; QUY CHẾ VẬN HÀNH</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">
-            Hệ Thống Văn Bản Pháp Quy Quỹ "Vì Người Nghèo" Xã Ea Súp
-          </h1>
-          <p className="text-slate-600 text-sm max-w-2xl mx-auto">
+          <h2 className="text-xl sm:text-3xl font-extrabold text-slate-900 uppercase">
+            Hệ Thống Văn Bản Pháp Quy Quỹ &quot;Vì Người Nghèo&quot; Xã Ea Súp
+          </h2>
+          <p className="text-slate-600 text-xs sm:text-sm">
             Các văn bản ban hành chính thức của Ban Thường trực UBMTTQ Việt Nam xã Ea Súp, quy định rõ nguyên tắc quản lý, đối soát và giải ngân nguồn quỹ.
           </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-5xl mx-auto">
           {/* Văn bản 1: QĐ 13 */}
           <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
@@ -25,9 +37,9 @@ export default function VanBanPage() {
                 <span className="px-2.5 py-1 rounded text-xs font-bold bg-red-100 text-red-800">
                   QUYẾT ĐỊNH QUY CHẾ
                 </span>
-                <h2 className="text-xl font-bold text-slate-900 mt-2">
+                <h3 className="text-xl font-bold text-slate-900 mt-2">
                   Quyết định số 13/QĐ-MTTQ-BTT ngày 14/01/2026
-                </h2>
+                </h3>
                 <span className="text-xs text-slate-500">
                   Ban hành: Ban Thường trực UBMTTQ Việt Nam xã Ea Súp • Ký ban hành: Chủ tịch Lê Hồng Hạnh
                 </span>
@@ -43,7 +55,7 @@ export default function VanBanPage() {
 
             <div className="text-sm text-slate-700 space-y-3 leading-relaxed">
               <p>
-                <strong>Trích yếu:</strong> Ban hành Quy chế vận động, quản lý và sử dụng Quỹ "Vì người nghèo" xã Ea Súp, áp dụng thống nhất trên địa bàn 20 thôn buôn.
+                <strong>Trích yếu:</strong> Ban hành Quy chế vận động, quản lý và sử dụng Quỹ &quot;Vì người nghèo&quot; xã Ea Súp, áp dụng thống nhất trên địa bàn 20 thôn buôn.
               </p>
               <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2 text-xs">
                 <div className="font-bold text-slate-900">Các điểm cốt lõi trong quy chế:</div>
@@ -78,9 +90,9 @@ export default function VanBanPage() {
                 <span className="px-2.5 py-1 rounded text-xs font-bold bg-blue-100 text-blue-800">
                   QUYẾT ĐỊNH THÀNH LẬP
                 </span>
-                <h2 className="text-xl font-bold text-slate-900 mt-2">
+                <h3 className="text-xl font-bold text-slate-900 mt-2">
                   Quyết định số 12/QĐ-MTTQ-BTT ngày 14/01/2026
-                </h2>
+                </h3>
                 <span className="text-xs text-slate-500">
                   Ban hành: Ban Thường trực UBMTTQ Việt Nam xã Ea Súp
                 </span>
@@ -96,7 +108,7 @@ export default function VanBanPage() {
 
             <div className="text-sm text-slate-700 space-y-3 leading-relaxed">
               <p>
-                <strong>Trích yếu:</strong> Thành lập Ban Vận động Quỹ "Vì người nghèo" và Quỹ Cứu trợ xã Ea Súp gồm Thường trực Ban Vận động và 20 Trưởng ban Công tác Mặt trận thôn, buôn.
+                <strong>Trích yếu:</strong> Thành lập Ban Vận động Quỹ &quot;Vì người nghèo&quot; và Quỹ Cứu trợ xã Ea Súp gồm Thường trực Ban Vận động và 20 Trưởng ban Công tác Mặt trận thôn, buôn.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
                 <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">

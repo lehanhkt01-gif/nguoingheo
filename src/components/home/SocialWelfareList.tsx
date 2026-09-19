@@ -84,8 +84,18 @@ const VILLAGES_LIST = [
   "Thôn 17",
 ];
 
-export default function SocialWelfareList() {
-  const [activeTab, setActiveTab] = useState<"CASES" | "GIFTS">("CASES");
+export interface SocialWelfareListProps {
+  mode?: "ALL" | "CASES_ONLY" | "GIFTS_ONLY";
+  defaultTab?: "CASES" | "GIFTS";
+}
+
+export default function SocialWelfareList({
+  mode = "ALL",
+  defaultTab = "CASES",
+}: SocialWelfareListProps = {}) {
+  const [activeTab, setActiveTab] = useState<"CASES" | "GIFTS">(
+    mode === "CASES_ONLY" ? "CASES" : mode === "GIFTS_ONLY" ? "GIFTS" : defaultTab
+  );
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
@@ -690,42 +700,76 @@ export default function SocialWelfareList() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 sm:gap-4 border-b border-rose-100 pb-3 sm:pb-4">
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[11px] sm:text-xs font-semibold mb-1 sm:mb-2">
-              <Gift className="w-3.5 h-3.5 text-rose-600" />
-              <span>An Sinh Xã Hội 20 Thôn Buôn</span>
+              {mode === "GIFTS_ONLY" ? (
+                <>
+                  <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Hồ Sơ Thực Tế &amp; Văn Bản Pháp Lý</span>
+                </>
+              ) : mode === "CASES_ONLY" ? (
+                <>
+                  <Heart className="w-3.5 h-3.5 text-rose-600 fill-current" />
+                  <span>Nơi Gieo Hy Vọng • 20 Thôn Buôn Ea Súp</span>
+                </>
+              ) : (
+                <>
+                  <Gift className="w-3.5 h-3.5 text-rose-600" />
+                  <span>An Sinh Xã Hội 20 Thôn Buôn</span>
+                </>
+              )}
             </div>
             <h2 className="text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight uppercase">
-              DANH SÁCH CẦN GIÚP ĐỠ VÀ HỒ SƠ ĐÃ GIẢI NGÂN
+              {mode === "GIFTS_ONLY"
+                ? "HỒ SƠ ĐÃ TRAO / GIẢI NGÂN & NGHIỆM THU THỰC TẾ"
+                : mode === "CASES_ONLY"
+                ? "DANH SÁCH HOÀN CẢNH CẦN GIÚP ĐỠ"
+                : "DANH SÁCH CẦN GIÚP ĐỠ VÀ HỒ SƠ ĐÃ GIẢI NGÂN"}
             </h2>
             <p className="text-slate-600 text-xs sm:text-sm mt-0.5 sm:mt-1">
-              Khảo sát trực tiếp từ 20 thôn buôn xã Ea Súp. Ảnh thumbnail hiển thị rõ nét, bấm vào để mở rộng xem trọn vẹn hình ảnh và biên bản nghiệm thu PDF.
+              {mode === "GIFTS_ONLY"
+                ? "Hồ sơ các đợt trao quà, giải ngân có biên bản nghiệm thu, ảnh chụp thực tế và chứng từ mộc đỏ của UBMTTQ xã Ea Súp."
+                : mode === "CASES_ONLY"
+                ? "Thẩm định trực tiếp từ 20 thôn buôn xã Ea Súp. Bấm vào từng hoàn cảnh để xem hồ sơ và chung tay ủng hộ qua VietQR."
+                : "Khảo sát trực tiếp từ 20 thôn buôn xã Ea Súp. Ảnh thumbnail hiển thị rõ nét, bấm vào để mở rộng xem trọn vẹn hình ảnh và biên bản nghiệm thu PDF."}
             </p>
           </div>
 
           {/* Tab Chuyển Đổi */}
-          <div className="grid grid-cols-2 sm:inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 text-xs font-semibold w-full sm:w-auto gap-1">
-            <button
-              type="button"
-              onClick={() => setActiveTab("CASES")}
-              className={`px-2.5 sm:px-4 py-2 rounded-lg transition-all text-center font-bold cursor-pointer shadow-xs ${
-                activeTab === "CASES"
-                  ? "bg-rose-600 text-white"
-                  : "bg-emerald-600 text-white hover:bg-emerald-700"
-              }`}
-            >
-              CẦN GIÚP ĐỠ ({cases.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("GIFTS")}
-              className={`px-2.5 sm:px-4 py-2 rounded-lg transition-all text-center font-bold cursor-pointer shadow-xs ${
-                activeTab === "GIFTS"
-                  ? "bg-rose-600 text-white"
-                  : "bg-emerald-600 text-white hover:bg-emerald-700"
-              }`}
-            >
-              ĐÃ TRAO/GIẢI NGÂN ({giftBatches.length})
-            </button>
-          </div>
+          {mode === "ALL" ? (
+            <div className="grid grid-cols-2 sm:inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 text-xs font-semibold w-full sm:w-auto gap-1">
+              <button
+                type="button"
+                onClick={() => setActiveTab("CASES")}
+                className={`px-2.5 sm:px-4 py-2 rounded-lg transition-all text-center font-bold cursor-pointer shadow-xs ${
+                  activeTab === "CASES"
+                    ? "bg-rose-600 text-white"
+                    : "bg-emerald-600 text-white hover:bg-emerald-700"
+                }`}
+              >
+                CẦN GIÚP ĐỠ ({cases.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("GIFTS")}
+                className={`px-2.5 sm:px-4 py-2 rounded-lg transition-all text-center font-bold cursor-pointer shadow-xs ${
+                  activeTab === "GIFTS"
+                    ? "bg-rose-600 text-white"
+                    : "bg-emerald-600 text-white hover:bg-emerald-700"
+                }`}
+              >
+                ĐÃ TRAO/GIẢI NGÂN ({giftBatches.length})
+              </button>
+            </div>
+          ) : mode === "CASES_ONLY" ? (
+            <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-rose-600 text-white font-bold text-xs shadow-xs">
+              <Heart className="w-4 h-4 fill-white" />
+              <span>CẦN GIÚP ĐỠ ({cases.length} hoàn cảnh)</span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-xs">
+              <Gift className="w-4 h-4 text-white" />
+              <span>ĐÃ TRAO/GIẢI NGÂN ({giftBatches.length} đợt)</span>
+            </div>
+          )}
         </div>
 
         {/* Thanh công cụ Cán bộ Quản trị khi ĐÃ ĐĂNG NHẬP */}
