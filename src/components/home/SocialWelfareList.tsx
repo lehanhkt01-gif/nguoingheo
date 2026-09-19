@@ -1741,8 +1741,16 @@ export default function SocialWelfareList() {
                       <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200 text-[11px]">
                         <div className="flex items-center gap-2 overflow-hidden">
                           {file.type === "image" ? (
-                            <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 border border-slate-200">
-                              <img src={file.url} alt={file.name} className="w-full h-full object-cover" />
+                            <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 border border-slate-200 bg-slate-100 relative flex items-center justify-center">
+                              <ImageIcon className="w-4 h-4 text-slate-400 absolute" />
+                              <img
+                                src={file.url}
+                                alt={file.name}
+                                className="w-full h-full object-cover relative z-10"
+                                onError={(e) => {
+                                  (e.currentTarget as HTMLElement).style.display = "none";
+                                }}
+                              />
                             </div>
                           ) : (
                             <div className="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0 font-bold text-[10px]">
@@ -2022,8 +2030,16 @@ export default function SocialWelfareList() {
                         <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200 text-[11px]">
                           <div className="flex items-center gap-2 overflow-hidden">
                             {file.type === "image" ? (
-                              <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 border border-slate-200">
-                                <img src={file.url} alt={file.name} className="w-full h-full object-cover" />
+                              <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 border border-slate-200 bg-slate-100 relative flex items-center justify-center">
+                                <ImageIcon className="w-4 h-4 text-slate-400 absolute" />
+                                <img
+                                  src={file.url}
+                                  alt={file.name}
+                                  className="w-full h-full object-cover relative z-10"
+                                  onError={(e) => {
+                                    (e.currentTarget as HTMLElement).style.display = "none";
+                                  }}
+                                />
                               </div>
                             ) : (
                               <div className="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0 font-bold text-[10px]">

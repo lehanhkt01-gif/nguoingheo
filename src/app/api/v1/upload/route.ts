@@ -75,11 +75,17 @@ export async function POST(req: NextRequest) {
 
       try {
         fs.writeFileSync(targetFilePath, buffer);
+        try {
+          fs.chmodSync(targetFilePath, 0o666);
+        } catch {}
       } catch (writeErr: any) {
         if (writeErr.code === "EACCES") {
           try {
             fs.chmodSync(uploadDir, 0o777);
             fs.writeFileSync(targetFilePath, buffer);
+            try {
+              fs.chmodSync(targetFilePath, 0o666);
+            } catch {}
           } catch (retryErr) {
             console.error("Lỗi quyền ghi EACCES:", retryErr);
             throw new Error("Lỗi quyền ghi file trên máy chủ VPS (EACCES). Vui lòng chạy lệnh cấp quyền: chmod -R 777 public/uploads");
