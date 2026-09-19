@@ -48,7 +48,7 @@ export default function Header() {
     { href: "/", label: "Trang chủ" },
     { href: "/sao-ke", label: "Sao kê thời gian thực" },
     { href: "/chien-dich", label: "Nơi gieo hy vọng" },
-    { href: "/van-ban", label: "Văn bản & Pháp lý" },
+    { href: "/van-ban", label: "Gặt hái niềm tin" },
   ];
 
   return (

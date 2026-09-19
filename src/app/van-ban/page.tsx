@@ -4,7 +4,7 @@ import { FileText, Download, CheckCircle2 } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Văn Bản & Pháp Lý - Hồ Sơ Đã Giải Ngân | Quỹ Vì Người Nghèo Xã Ea Súp",
+  title: "Gặt Hái Niềm Tin - Hồ Sơ Đã Trao / Giải Ngân | Quỹ Vì Người Nghèo Xã Ea Súp",
   description: "Hồ sơ các đợt trao quà, giải ngân có chứng từ nghiệm thu mộc đỏ và các căn cứ văn bản pháp quy của UBMTTQ Việt Nam xã Ea Súp.",
 };
 

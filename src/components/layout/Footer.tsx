@@ -108,7 +108,7 @@ export default function Footer() {
           </div>
           <div className="flex items-center gap-4">
             <Link href="/sao-ke" className="hover:text-rose-400 transition-colors">Báo cáo Thu - Chi</Link>
-            <Link href="/van-ban" className="hover:text-rose-400 transition-colors">Văn bản Pháp lý</Link>
+            <Link href="/van-ban" className="hover:text-rose-400 transition-colors">Gặt hái niềm tin</Link>
             <Link href="/admin/login" className="hover:text-rose-400 transition-colors">Cổng Nội bộ</Link>
           </div>
         </div>
