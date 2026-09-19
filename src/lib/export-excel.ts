@@ -1,4 +1,5 @@
 import ExcelJS from "exceljs";
+import { cleanTransferContent, maskReference, extractDonorNameFromMemo } from "@/lib/utils";
 
 export interface TransactionExportRow {
   id: number;
@@ -97,13 +98,13 @@ export async function generateTransactionsExcel(
     dataRow.values = [
       idx + 1,
       new Date(r.transactionDateTime).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }),
-      r.reference || `TX-${r.id}`,
+      maskReference(r.reference || `TX-${r.id}`),
       isIncome ? "TIỀN VÀO (+)" : "TIỀN RA (-)",
       amountNum,
       r.runningBalance ? Number(r.runningBalance) : "",
-      r.description,
+      cleanTransferContent(r.description),
       r.campaignCode || "Chung Quỹ xã",
-      r.donorName || r.receiptNumber || "",
+      extractDonorNameFromMemo(r.donorName) || maskReference(r.receiptNumber) || "",
     ];
 
     dataRow.font = { name: "Arial", size: 10 };

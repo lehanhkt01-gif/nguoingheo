@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { formatVND, formatDate, cleanTransferContent } from "@/lib/utils";
+import { formatVND, formatDate, cleanTransferContent, maskReference } from "@/lib/utils";
 import {
   Search,
   ShieldCheck,
@@ -426,7 +426,7 @@ export default function LiveLedgerTable() {
 
                       {/* Mã giao dịch */}
                       <td className="py-3.5 px-4 font-mono text-[11px] text-slate-400 whitespace-nowrap">
-                        {t.reference}
+                        {maskReference(t.reference)}
                       </td>
 
                       {/* Trạng thái */}

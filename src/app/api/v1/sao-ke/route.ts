@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getLiveAccountBalance, triggerBackgroundAutoSync } from "@/lib/casso";
+import { cleanTransferContent } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -108,7 +109,7 @@ export async function GET(req: NextRequest) {
           reference: d.transactionId,
           type: "IN",
           amount: Number(d.amount),
-          description: d.description,
+          description: cleanTransferContent(d.description),
           transactionDateTime: d.transactionDate.toISOString(),
           donorName: d.donorName,
           campaign: d.campaign ? { title: d.campaign.title, code: "VNN", slug: "vnn" } : null,
@@ -142,7 +143,7 @@ export async function GET(req: NextRequest) {
         reference: d.transactionId,
         type: "IN",
         amount: Number(d.amount),
-        description: d.description,
+        description: cleanTransferContent(d.description),
         transactionDateTime: d.transactionDate.toISOString(),
         donorName: d.donorName,
         campaign: d.campaign ? { title: d.campaign.title, code: "VNN", slug: "vnn" } : null,

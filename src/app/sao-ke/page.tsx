@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { formatVND, formatDateTime, formatTimeAgo } from "@/lib/utils";
+import {
+  formatVND,
+  formatDateTime,
+  formatTimeAgo,
+  cleanTransferContent,
+  maskReference,
+  extractDonorNameFromMemo,
+} from "@/lib/utils";
 import {
   ShieldCheck,
   Download,
@@ -416,7 +423,7 @@ export default function SaoKePage() {
                           {/* Reference TID */}
                           <td className="p-3.5 whitespace-nowrap">
                             <span className="font-mono text-slate-700 bg-slate-100 px-2 py-1 rounded text-[11px]">
-                              {tx.reference || `TX-${tx.id}`}
+                              {maskReference(tx.reference || `TX-${tx.id}`)}
                             </span>
                             <div className="text-[10px] text-slate-400 mt-0.5">BIDV Ea Súp</div>
                           </td>
@@ -424,7 +431,7 @@ export default function SaoKePage() {
                           {/* Nội dung giao dịch */}
                           <td className="p-3.5">
                             <div className="text-slate-800 font-medium leading-relaxed">
-                              {tx.description}
+                              {cleanTransferContent(tx.description)}
                             </div>
                             <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
                               {tx.campaignCode && (
@@ -432,14 +439,18 @@ export default function SaoKePage() {
                                   #{tx.campaignCode}
                                 </span>
                               )}
-                              {tx.donorName && (
-                                <span className="text-[11px] text-slate-500">
-                                  Người gửi: <strong>{tx.donorName}</strong>
-                                </span>
-                              )}
+                              {(() => {
+                                const donor = extractDonorNameFromMemo(tx.donorName || "");
+                                if (!donor || donor === "BIDV") return null;
+                                return (
+                                  <span className="text-[11px] text-slate-500">
+                                    Người gửi: <strong>{donor}</strong>
+                                  </span>
+                                );
+                              })()}
                               {tx.receiptNumber && (
                                 <span className="text-[11px] text-red-700 font-mono">
-                                  {tx.receiptNumber}
+                                  {maskReference(tx.receiptNumber)}
                                 </span>
                               )}
                             </div>
