@@ -1,12 +1,16 @@
 import HeroBanner from "@/components/home/HeroBanner";
 import LiveLedgerTable from "@/components/home/LiveLedgerTable";
 import SocialWelfareList from "@/components/home/SocialWelfareList";
+import FloatingHearts from "@/components/home/FloatingHearts";
 
 export const dynamic = "force-dynamic";
 
 export default function HomePage() {
   return (
-    <div className="space-y-4 sm:space-y-6 pb-8 sm:pb-12">
+    <div className="space-y-4 sm:space-y-6 pb-8 sm:pb-12 relative">
+      {/* Hiệu ứng những trái tim hồng nhỏ bay lơ lửng từ dưới lên trên */}
+      <FloatingHearts />
+
       {/* 1. Hero Banner văn hóa Tây Nguyên Ea Súp tích hợp mã VietQR BIDV */}
       <HeroBanner />
 
@@ -18,3 +22,4 @@ export default function HomePage() {
     </div>
   );
 }
+
