@@ -1,100 +1,58 @@
 services:
+  # 1. Next.js 15 Standalone Web Application
   web:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: vinguoingheo_web
-    restart: always
+    restart: unless-stopped
     user: "0:0"
-    expose:
-      - "3000"
+    env_file:
+      - .env
     ports:
       - "3080:3000"
-    env_file:
-      - .env
     volumes:
+      - ./.env:/app/.env:ro
       - ./data:/app/data
       - ./public/uploads:/app/public/uploads
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-EaSupSecureDb2026}@db:5432/${DB_NAME:-vinguoingheo_db}?schema=public
+      - JWT_SECRET=${JWT_SECRET:-EaSup_Charity_JWT_Secret_Key_2026}
+      - NEXT_PUBLIC_BIDV_ACCOUNT=8630100930
+      - NEXT_PUBLIC_BIDV_BIN=970418
+      - NEXT_PUBLIC_ACCOUNT_NAME=UY BAN MTTQ VN XA EA SUP
+      - NEXT_PUBLIC_SITE_URL=https://nguoingheo.easupso.com
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
-      redis:
-        condition: service_started
     networks:
-      - vinguoingheo_net
+      - internal_net
 
-  postgres:
+  # 2. Cơ sở dữ liệu PostgreSQL 16
+  db:
     image: postgres:16-alpine
-    container_name: vinguoingheo_postgres
-    restart: always
-    env_file:
-      - .env
+    container_name: vinguoingheo_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-EaSupSecureDb2026}
+      POSTGRES_DB: ${DB_NAME:-vinguoingheo_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-vinguoingheo_db}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-vinguoingheo_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - vinguoingheo_net
+      - internal_net
 
-  redis:
-    image: redis:7-alpine
-    container_name: vinguoingheo_redis
-    restart: always
-    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
-    volumes:
-      - redis_data:/data
-    networks:
-      - vinguoingheo_net
-
-  # nginx service bị vô hiệu hóa vì VPS đã dùng Nginx Proxy Manager quản lý cổng 80/443
-  # Web app chạy tại cổng 3080 để Nginx Proxy Manager trỏ vào
-  # nginx:
-  #   image: nginx:alpine
-  #   container_name: vinguoingheo_nginx
-  #   restart: always
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   volumes:
-  #     - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-  #     - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
-  #     - ./docker/nginx/ssl:/etc/nginx/ssl:ro
-  #   depends_on:
-  #     - web
-  #   networks:
-  #     - vinguoingheo_net
-
-  backup:
-    image: postgres:16-alpine
-    container_name: vinguoingheo_backup
-    restart: always
-    env_file:
-      - .env
-    environment:
-      PGHOST: postgres
-      PGPORT: 5432
-    volumes:
-      - ./docker/backup/backup.sh:/backup.sh:ro
-      - /var/backups:/backups
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - |
-        chmod +x /backup.sh
-        echo "0 0 * * * /backup.sh >> /backups/backup.log 2>&1" > /var/spool/cron/crontabs/root
-        crond -f -l 2
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - vinguoingheo_net
-
+  # 3. Dozzle - Trình xem log container thời gian thực tại cổng 8899
   dozzle:
     image: amir20/dozzle:latest
     container_name: vinguoingheo_dozzle
-    restart: always
+    restart: unless-stopped
     ports:
       - "${DOZZLE_PORT:-8899}:8080"
     volumes:
@@ -102,16 +60,12 @@ services:
     environment:
       - DOZZLE_NO_ANALYTICS=true
     networks:
-      - vinguoingheo_net
-
-networks:
-  vinguoingheo_net:
-    driver: bridge
+      - internal_net
 
 volumes:
   postgres_data:
     driver: local
-  redis_data:
-    driver: local
-  backup_data:
-    driver: local
+
+networks:
+  internal_net:
+    driver: bridge
