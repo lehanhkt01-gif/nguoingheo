@@ -48,8 +48,8 @@ export default function HeroBanner() {
             <span className="truncate">Cổng Thông Tin An Sinh Xã Hội Xã Ea Súp</span>
           </div>
 
-          <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 leading-snug">
-            Chung tay vì người nghèo <br />
+          <h1 className="text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-snug">
+            <span className="text-emerald-700">Chung tay vì người nghèo</span> <br />
             <span className="bg-gradient-to-r from-rose-600 via-pink-600 to-rose-700 bg-clip-text text-transparent">
               Không để ai bị bỏ lại phía sau
             </span>
