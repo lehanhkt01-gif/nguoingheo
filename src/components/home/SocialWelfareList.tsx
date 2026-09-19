@@ -702,23 +702,25 @@ export default function SocialWelfareList() {
           </div>
 
           {/* Tab Chuyển Đổi */}
-          <div className="grid grid-cols-2 sm:inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 text-xs font-semibold w-full sm:w-auto">
+          <div className="grid grid-cols-2 sm:inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 text-xs font-semibold w-full sm:w-auto gap-1">
             <button
+              type="button"
               onClick={() => setActiveTab("CASES")}
-              className={`px-2 sm:px-4 py-2 rounded-lg transition-all text-center cursor-pointer ${
+              className={`px-2 sm:px-4 py-2 rounded-lg transition-all text-center font-bold cursor-pointer shadow-xs ${
                 activeTab === "CASES"
-                  ? "bg-rose-600 text-white shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-rose-600 text-white"
+                  : "bg-emerald-600 text-white hover:bg-emerald-700"
               }`}
             >
               Hoàn cảnh cần giúp ({cases.length})
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab("GIFTS")}
-              className={`px-2 sm:px-4 py-2 rounded-lg transition-all text-center cursor-pointer ${
+              className={`px-2 sm:px-4 py-2 rounded-lg transition-all text-center font-bold cursor-pointer shadow-xs ${
                 activeTab === "GIFTS"
-                  ? "bg-rose-600 text-white shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-rose-600 text-white"
+                  : "bg-emerald-600 text-white hover:bg-emerald-700"
               }`}
             >
               Đợt trao quà ({giftBatches.length})
