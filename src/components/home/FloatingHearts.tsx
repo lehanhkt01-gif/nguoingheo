@@ -5,12 +5,12 @@ import { useEffect, useState } from "react";
 interface HeartItem {
   id: number;
   left: number; // % from left
-  size: number; // px (lớn gấp 3 lần: 36px - 68px)
-  duration: number; // seconds
+  size: number; // px (36px - 68px)
+  duration: number; // seconds (7s - 13s)
   delay: number; // seconds
   sway: number; // px
   rotate: number; // deg
-  opacity: number;
+  maxOpacity: number;
   gradId: string;
 }
 
@@ -26,27 +26,27 @@ export default function FloatingHearts() {
   const [hearts, setHearts] = useState<HeartItem[]>([]);
 
   useEffect(() => {
-    // Tạo 26 trái tim lớn gấp 3 lần, bay từ dưới lên giữa màn hình rồi tan biến
-    const heartCount = 26;
+    // 28 trái tim với hiệu ứng ẩn hiện lấp lánh, bay lơ lửng từ dưới lên giữa trang
+    const heartCount = 28;
     const generated: HeartItem[] = [];
 
     for (let i = 0; i < heartCount; i++) {
       generated.push({
         id: i,
-        // Rải đều khắp màn hình (từ 3% đến 95%)
-        left: Math.round(((i + Math.random() * 0.85) / heartCount) * 92 + 4),
-        // Kích thước lớn gấp 3 lần: 36px đến 68px (so với 12-22px trước đây)
+        // Rải đều toàn bộ chiều ngang trang (3% đến 96%)
+        left: Math.round(((i + Math.random() * 0.8) / heartCount) * 93 + 3),
+        // Kích thước lớn rõ ràng: 36px đến 68px
         size: Math.floor(Math.random() * 32) + 36,
-        // Thời gian bay từ dưới lên đến giữa màn hình từ 6.5s đến 12s
-        duration: Math.round((6.5 + Math.random() * 5.5) * 10) / 10,
-        // Độ trễ ngẫu nhiên từ 0s đến 10s để các trái tim bay liên tục
-        delay: Math.round((Math.random() * 10) * 10) / 10,
-        // Lượn sóng nhẹ nhàng sang hai bên (-32px đến +32px)
-        sway: Math.round((Math.random() * 64) - 32),
-        // Góc xoay nhẹ từ -18deg đến +18deg
+        // Thời gian bay lơ lửng từ dưới lên giữa màn hình: 7.5s đến 13s
+        duration: Math.round((7.5 + Math.random() * 5.5) * 10) / 10,
+        // Độ trễ ngẫu nhiên từ 0s đến 11s
+        delay: Math.round((Math.random() * 11) * 10) / 10,
+        // Lượn sóng lơ lửng sang hai bên (-35px đến +35px)
+        sway: Math.round((Math.random() * 70) - 35),
+        // Góc xoay tự nhiên từ -18deg đến +18deg
         rotate: Math.round((Math.random() * 36) - 18),
-        // Độ rõ nét từ 0.6 đến 0.88
-        opacity: Math.round((0.65 + Math.random() * 0.25) * 100) / 100,
+        // Độ đậm cực đại khi "hiện": 0.75 đến 0.95
+        maxOpacity: Math.round((0.75 + Math.random() * 0.2) * 100) / 100,
         gradId: `grad-${i % GRADIENTS.length}`,
       });
     }
@@ -73,7 +73,7 @@ export default function FloatingHearts() {
               y2="100%"
             >
               <stop offset="0%" stopColor={g.start} />
-              <stop offset="55%" stopColor={g.mid} />
+              <stop offset="50%" stopColor={g.mid} />
               <stop offset="100%" stopColor={g.end} />
             </linearGradient>
           ))}
@@ -81,38 +81,53 @@ export default function FloatingHearts() {
       </svg>
 
       <style>{`
-        @keyframes floatToMidAndDissolve {
+        @keyframes floatAndShimmer {
           0% {
-            /* Xuất phát từ dưới đáy màn hình */
-            transform: translateY(105vh) translateX(0) scale(0.65) rotate(0deg);
+            /* Xuất phát dưới đáy trang */
+            transform: translateY(105vh) translateX(0) scale(0.65);
             opacity: 0;
-            filter: blur(0px) drop-shadow(0 4px 10px rgba(244, 63, 94, 0.25));
+            filter: drop-shadow(0 0 0px rgba(244, 63, 94, 0));
           }
+          /* Nhịp 1: Hiện lên rạng rỡ */
           15% {
-            /* Hiện rõ dần với nhịp đập phập phồng yêu thương */
-            opacity: var(--target-opacity, 0.85);
-            transform: translateY(88vh) translateX(var(--sway-px, 25px)) scale(0.95) rotate(var(--rot-deg, 12deg));
+            transform: translateY(92vh) translateX(var(--sway-px, 25px)) scale(1.08) rotate(var(--rot-deg, 12deg));
+            opacity: var(--max-op, 0.9);
+            filter: drop-shadow(0 4px 14px rgba(244, 63, 94, 0.55));
           }
-          40% {
-            /* Lượn sóng nhịp nhàng */
-            opacity: var(--target-opacity, 0.85);
-            transform: translateY(72vh) translateX(calc(var(--sway-px, 25px) * -1)) scale(1.06) rotate(calc(var(--rot-deg, 12deg) * -0.7));
+          /* Nhịp 1 (ẩn): Mờ dần (ẩn đi) */
+          28% {
+            transform: translateY(82vh) translateX(calc(var(--sway-px, 25px) * -0.5)) scale(0.85) rotate(calc(var(--rot-deg, 12deg) * -0.6));
+            opacity: 0.18;
+            filter: drop-shadow(0 2px 6px rgba(244, 63, 94, 0.15));
           }
-          65% {
-            /* Tiếp tục bay lên đến nửa dưới */
-            opacity: var(--target-opacity, 0.85);
-            transform: translateY(58vh) translateX(var(--sway-px, 25px)) scale(1.02) rotate(var(--rot-deg, 12deg));
+          /* Nhịp 2: Lại bừng sáng hiện rõ (nhịp đập trái tim) */
+          44% {
+            transform: translateY(72vh) translateX(calc(var(--sway-px, 25px) * -1)) scale(1.18) rotate(calc(var(--rot-deg, 12deg) * -0.9));
+            opacity: var(--max-op, 0.95);
+            filter: drop-shadow(0 6px 18px rgba(244, 63, 94, 0.7));
           }
-          82% {
-            /* Đến gần giữa màn hình: nở nhẹ, phát sáng lung linh chuẩn bị tan */
-            opacity: var(--target-opacity, 0.8);
-            transform: translateY(48vh) translateX(0) scale(1.18) rotate(0deg);
-            filter: blur(1px) drop-shadow(0 6px 20px rgba(244, 63, 94, 0.65));
+          /* Nhịp 2 (ẩn): Lại ẩn mờ dịu đi */
+          58% {
+            transform: translateY(63vh) translateX(calc(var(--sway-px, 25px) * 0.4)) scale(0.88) rotate(calc(var(--rot-deg, 12deg) * 0.4));
+            opacity: 0.22;
+            filter: drop-shadow(0 2px 8px rgba(244, 63, 94, 0.18));
           }
+          /* Nhịp 3: Hiện bừng sáng lung linh lần cuối */
+          75% {
+            transform: translateY(54vh) translateX(var(--sway-px, 25px)) scale(1.22) rotate(var(--rot-deg, 12deg));
+            opacity: var(--max-op, 0.95);
+            filter: drop-shadow(0 8px 24px rgba(244, 63, 94, 0.8));
+          }
+          /* Đến giữa trang: Mờ dần */
+          88% {
+            transform: translateY(48vh) translateX(0) scale(1.08) rotate(0deg);
+            opacity: 0.35;
+            filter: blur(2px) drop-shadow(0 4px 12px rgba(244, 63, 94, 0.3));
+          }
+          /* 100%: Tan biến hoàn toàn tại giữa trang (44vh) */
           100% {
-            /* Tan biến hoàn toàn tại giữa màn hình (42vh) */
+            transform: translateY(44vh) translateX(0) scale(1.42);
             opacity: 0;
-            transform: translateY(42vh) translateX(0) scale(1.42) rotate(calc(var(--rot-deg, 12deg) * 1.5));
             filter: blur(8px) drop-shadow(0 0 25px rgba(251, 113, 133, 0));
           }
         }
@@ -127,17 +142,17 @@ export default function FloatingHearts() {
             bottom: 0,
             width: `${h.size}px`,
             height: `${h.size}px`,
-            ["--target-opacity" as any]: h.opacity,
+            ["--max-op" as any]: h.maxOpacity,
             ["--sway-px" as any]: `${h.sway}px`,
             ["--rot-deg" as any]: `${h.rotate}deg`,
-            animation: `floatToMidAndDissolve ${h.duration}s cubic-bezier(0.25, 0.1, 0.25, 1) ${h.delay}s infinite`,
+            animation: `floatAndShimmer ${h.duration}s ease-in-out ${h.delay}s infinite`,
           }}
         >
           <svg
             viewBox="0 0 24 24"
             width="100%"
             height="100%"
-            className="transition-transform drop-shadow-md"
+            className="transition-transform"
           >
             {/* Hình trái tim gradient 3D */}
             <path
@@ -151,7 +166,7 @@ export default function FloatingHearts() {
               rx="3"
               ry="1.8"
               fill="#ffffff"
-              opacity="0.45"
+              opacity="0.5"
               transform="rotate(-25 7.5 7.5)"
             />
           </svg>
