@@ -892,7 +892,7 @@ export default function SocialWelfareList() {
                         <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                           <span className="text-xs text-slate-500 font-semibold flex items-center gap-1">
                             <DollarSign className="w-3.5 h-3.5 text-rose-500" />
-                            Số tiền trao:
+                            Số tiền dự kiến vận động:
                           </span>
                           <span className="font-extrabold text-rose-600 font-mono text-base">
                             {formatVND(amountValue)}
@@ -1121,7 +1121,7 @@ export default function SocialWelfareList() {
               <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-50 via-pink-50 to-amber-50 border border-rose-200 flex items-center justify-between">
                 <div>
                   <span className="text-xs uppercase tracking-wider font-bold text-slate-500 block">
-                    Số tiền trao
+                    Số tiền dự kiến vận động
                   </span>
                   <span className="text-xl sm:text-2xl font-black text-rose-600 font-mono">
                     {formatVND(detailCase.amount !== undefined ? detailCase.amount : (detailCase.currentAmount || 0))}
@@ -1579,30 +1579,30 @@ export default function SocialWelfareList() {
                 />
               </div>
 
-              {/* CHỌN NHIỀU THÔN / BUÔN */}
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <label className="block font-bold text-slate-700 uppercase">
-                    Thôn / Buôn: * (Có thể chọn nhiều thôn/buôn)
+              {/* CHỌN NHIỀU THÔN / BUÔN THU NHỎ GỌN GÀNG */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between gap-2">
+                  <label className="block font-bold text-slate-700 uppercase text-xs">
+                    Thôn / Buôn: * (Chọn một hoặc nhiều thôn)
                   </label>
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={handleToggleAllCaseVillages}
-                      className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                      className={`px-2 py-0.5 rounded-lg text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer ${
                         caseForm.villages.length === VILLAGES_LIST.length
-                          ? "bg-rose-600 text-white shadow-xs"
+                          ? "bg-rose-600 text-white shadow-2xs"
                           : "bg-rose-100 text-rose-800 hover:bg-rose-200"
                       }`}
                     >
-                      {caseForm.villages.length === VILLAGES_LIST.length && <Check className="w-3.5 h-3.5" />}
-                      <span>Tất cả các thôn (20 thôn)</span>
+                      {caseForm.villages.length === VILLAGES_LIST.length && <Check className="w-3 h-3" />}
+                      <span>Tất cả (20 thôn)</span>
                     </button>
                     {caseForm.villages.length > 0 && (
                       <button
                         type="button"
                         onClick={handleClearAllCaseVillages}
-                        className="px-2 py-1 rounded-xl text-[11px] font-semibold text-slate-500 hover:text-red-600 hover:bg-slate-100 cursor-pointer"
+                        className="px-1.5 py-0.5 rounded-md text-[10px] font-medium text-slate-500 hover:text-red-600 hover:bg-slate-100 cursor-pointer"
                       >
                         Bỏ chọn
                       </button>
@@ -1610,21 +1610,7 @@ export default function SocialWelfareList() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-2.5 bg-slate-50 rounded-xl border border-slate-200">
-                  {/* Nút tất cả các thôn đặt ngay vị trí đầu tiên */}
-                  <button
-                    type="button"
-                    onClick={handleToggleAllCaseVillages}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
-                      caseForm.villages.length === VILLAGES_LIST.length
-                        ? "bg-rose-600 text-white shadow-xs"
-                        : "bg-white text-rose-700 border-2 border-rose-300 hover:bg-rose-50"
-                    }`}
-                  >
-                    {caseForm.villages.length === VILLAGES_LIST.length && <Check className="w-3 h-3" />}
-                    <span>Tất cả các thôn</span>
-                  </button>
-
+                <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto p-1.5 bg-slate-50 rounded-xl border border-slate-200">
                   {VILLAGES_LIST.map((v) => {
                     const isSelected = caseForm.villages.includes(v);
                     return (
@@ -1632,13 +1618,13 @@ export default function SocialWelfareList() {
                         key={v}
                         type="button"
                         onClick={() => handleToggleCaseVillage(v)}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer ${
+                        className={`px-2 py-0.5 rounded-md text-[11px] font-medium transition-all flex items-center gap-0.5 cursor-pointer ${
                           isSelected
-                            ? "bg-rose-600 text-white shadow-xs"
-                            : "bg-white text-slate-600 border border-slate-200 hover:border-rose-300"
+                            ? "bg-rose-600 text-white font-bold shadow-2xs"
+                            : "bg-white text-slate-600 border border-slate-200 hover:border-rose-300 hover:text-rose-600"
                         }`}
                       >
-                        {isSelected && <Check className="w-3 h-3" />}
+                        {isSelected && <Check className="w-2.5 h-2.5" />}
                         <span>{v}</span>
                       </button>
                     );
@@ -1647,13 +1633,13 @@ export default function SocialWelfareList() {
                 <p className="text-[10px] text-slate-500">
                   {caseForm.villages.length === VILLAGES_LIST.length
                     ? "✓ Đang chọn: Tất cả các thôn (20 thôn buôn)"
-                    : `Đã chọn ${caseForm.villages.length} thôn/buôn: ${caseForm.villages.join(", ")}`}
+                    : `Đã chọn (${caseForm.villages.length}/20 thôn): ${caseForm.villages.join(", ")}`}
                 </p>
               </div>
 
               <div>
                 <label className="block font-bold text-slate-700 uppercase mb-1">
-                  Số tiền trao (VNĐ): *
+                  Số tiền dự kiến vận động (VNĐ): *
                 </label>
                 <input
                   type="number"
@@ -1662,7 +1648,7 @@ export default function SocialWelfareList() {
                   required
                   value={caseForm.amount === 0 ? "" : caseForm.amount}
                   onChange={(e) => setCaseForm({ ...caseForm, amount: e.target.value === "" ? 0 : Number(e.target.value) })}
-                  placeholder="Nhập số tiền trao bất kỳ (không giới hạn)..."
+                  placeholder="Nhập số tiền dự kiến vận động (không giới hạn)..."
                   className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium font-mono text-sm"
                 />
               </div>
@@ -1737,37 +1723,60 @@ export default function SocialWelfareList() {
 
                 {caseForm.files.length > 0 && (
                   <div className="space-y-1.5 pt-1">
-                    {caseForm.files.map((file, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200 text-[11px]">
-                        <div className="flex items-center gap-2 overflow-hidden">
-                          {file.type === "image" ? (
-                            <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 border border-slate-200 bg-slate-100 relative flex items-center justify-center">
-                              <ImageIcon className="w-4 h-4 text-slate-400 absolute" />
-                              <img
-                                src={file.url}
-                                alt={file.name}
-                                className="w-full h-full object-cover relative z-10"
-                                onError={(e) => {
-                                  (e.currentTarget as HTMLElement).style.display = "none";
-                                }}
-                              />
+                    {caseForm.files.map((file, idx) => {
+                      const isCover = file.url === caseForm.imageUrl;
+                      return (
+                        <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200 text-[11px]">
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            {file.type === "image" ? (
+                              <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 border border-slate-200 bg-slate-100 relative flex items-center justify-center">
+                                <ImageIcon className="w-4 h-4 text-slate-400 absolute" />
+                                <img
+                                  src={file.url}
+                                  alt={file.name}
+                                  className="w-full h-full object-cover relative z-10"
+                                  onError={(e) => {
+                                    (e.currentTarget as HTMLElement).style.display = "none";
+                                  }}
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0 font-bold text-[10px]">
+                                PDF
+                              </div>
+                            )}
+                            <div className="truncate">
+                              <span className="font-semibold text-slate-800 block truncate">{file.name}</span>
+                              <span className="text-[10px] text-slate-400">{file.type === "image" ? "Ảnh chụp thực tế" : "Chứng từ PDF"}</span>
                             </div>
-                          ) : (
-                            <div className="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0 font-bold text-[10px]">
-                              PDF
-                            </div>
-                          )}
-                          <span className="font-semibold text-slate-800 block truncate">{file.name}</span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {file.type === "image" && (
+                              <button
+                                type="button"
+                                onClick={() => setCaseForm((prev) => ({ ...prev, imageUrl: file.url }))}
+                                className={`px-2 py-0.5 rounded text-[10px] font-semibold cursor-pointer transition-colors ${
+                                  isCover
+                                    ? "bg-rose-600 text-white shadow-2xs font-bold"
+                                    : "bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-600 border border-slate-200"
+                                }`}
+                              >
+                                {isCover ? "★ Ảnh bìa ngoài" : "Chọn làm ảnh bìa"}
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveCaseFile(idx)}
+                              className="p-1 rounded text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                              title="Xóa tệp này"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveCaseFile(idx)}
-                          className="p-1 rounded text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1829,30 +1838,30 @@ export default function SocialWelfareList() {
                 />
               </div>
 
-              {/* CHỌN NHIỀU THÔN / BUÔN MỘT LÚC */}
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <label className="block font-bold text-slate-700 uppercase">
-                    Thôn / Buôn thụ hưởng: * (Có thể chọn nhiều thôn/buôn)
+              {/* CHỌN NHIỀU THÔN / BUÔN THU NHỎ GỌN GÀNG */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between gap-2">
+                  <label className="block font-bold text-slate-700 uppercase text-xs">
+                    Thôn / Buôn: * (Chọn một hoặc nhiều thôn)
                   </label>
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={handleToggleAllGiftVillages}
-                      className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                      className={`px-2 py-0.5 rounded-lg text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer ${
                         giftForm.villages.length === VILLAGES_LIST.length
-                          ? "bg-rose-600 text-white shadow-xs"
+                          ? "bg-rose-600 text-white shadow-2xs"
                           : "bg-rose-100 text-rose-800 hover:bg-rose-200"
                       }`}
                     >
-                      {giftForm.villages.length === VILLAGES_LIST.length && <Check className="w-3.5 h-3.5" />}
-                      <span>Tất cả các thôn (20 thôn)</span>
+                      {giftForm.villages.length === VILLAGES_LIST.length && <Check className="w-3 h-3" />}
+                      <span>Tất cả (20 thôn)</span>
                     </button>
                     {giftForm.villages.length > 0 && (
                       <button
                         type="button"
                         onClick={handleClearAllGiftVillages}
-                        className="px-2 py-1 rounded-xl text-[11px] font-semibold text-slate-500 hover:text-red-600 hover:bg-slate-100 cursor-pointer"
+                        className="px-1.5 py-0.5 rounded-md text-[10px] font-medium text-slate-500 hover:text-red-600 hover:bg-slate-100 cursor-pointer"
                       >
                         Bỏ chọn
                       </button>
@@ -1860,22 +1869,7 @@ export default function SocialWelfareList() {
                   </div>
                 </div>
 
-                {/* Danh sách chip chọn nhiều thôn */}
-                <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-2.5 bg-slate-50 rounded-xl border border-slate-200">
-                  {/* Nút tất cả các thôn đặt ngay vị trí đầu tiên */}
-                  <button
-                    type="button"
-                    onClick={handleToggleAllGiftVillages}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
-                      giftForm.villages.length === VILLAGES_LIST.length
-                        ? "bg-rose-600 text-white shadow-xs"
-                        : "bg-white text-rose-700 border-2 border-rose-300 hover:bg-rose-50"
-                    }`}
-                  >
-                    {giftForm.villages.length === VILLAGES_LIST.length && <Check className="w-3 h-3" />}
-                    <span>Tất cả các thôn</span>
-                  </button>
-
+                <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto p-1.5 bg-slate-50 rounded-xl border border-slate-200">
                   {VILLAGES_LIST.map((v) => {
                     const isSelected = giftForm.villages.includes(v);
                     return (
@@ -1883,13 +1877,13 @@ export default function SocialWelfareList() {
                         key={v}
                         type="button"
                         onClick={() => handleToggleGiftVillage(v)}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer ${
+                        className={`px-2 py-0.5 rounded-md text-[11px] font-medium transition-all flex items-center gap-0.5 cursor-pointer ${
                           isSelected
-                            ? "bg-rose-600 text-white shadow-xs"
-                            : "bg-white text-slate-600 border border-slate-200 hover:border-rose-300"
+                            ? "bg-rose-600 text-white font-bold shadow-2xs"
+                            : "bg-white text-slate-600 border border-slate-200 hover:border-rose-300 hover:text-rose-600"
                         }`}
                       >
-                        {isSelected && <Check className="w-3 h-3" />}
+                        {isSelected && <Check className="w-2.5 h-2.5" />}
                         <span>{v}</span>
                       </button>
                     );
@@ -1898,7 +1892,7 @@ export default function SocialWelfareList() {
                 <p className="text-[10px] text-slate-500">
                   {giftForm.villages.length === VILLAGES_LIST.length
                     ? "✓ Đang chọn: Tất cả các thôn (20 thôn buôn)"
-                    : `Đã chọn ${giftForm.villages.length} thôn/buôn: ${giftForm.villages.join(", ")}`}
+                    : `Đã chọn (${giftForm.villages.length}/20 thôn): ${giftForm.villages.join(", ")}`}
                 </p>
               </div>
 
@@ -2057,11 +2051,13 @@ export default function SocialWelfareList() {
                               <button
                                 type="button"
                                 onClick={() => setGiftForm((prev) => ({ ...prev, imageUrl: file.url }))}
-                                className={`px-2 py-0.5 rounded text-[10px] font-semibold cursor-pointer ${
-                                  isCover ? "bg-rose-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-600"
+                                className={`px-2 py-0.5 rounded text-[10px] font-semibold cursor-pointer transition-colors ${
+                                  isCover
+                                    ? "bg-rose-600 text-white shadow-2xs font-bold"
+                                    : "bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-600 border border-slate-200"
                                 }`}
                               >
-                                {isCover ? "Ảnh bìa ngoài" : "Đặt làm thumbnail"}
+                                {isCover ? "★ Ảnh bìa ngoài" : "Chọn làm ảnh bìa"}
                               </button>
                             )}
                             <button
