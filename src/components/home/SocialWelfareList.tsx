@@ -693,8 +693,8 @@ export default function SocialWelfareList() {
               <Gift className="w-3.5 h-3.5 text-rose-600" />
               <span>An Sinh Xã Hội 20 Thôn Buôn</span>
             </div>
-            <h2 className="text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-              Hồ Sơ Hoàn Cảnh Khó Khăn &amp; Các Đợt Trao Quà Thực Tế
+            <h2 className="text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight uppercase">
+              DANH SÁCH CẦN GIÚP ĐỠ VÀ HỒ SƠ ĐÃ GIẢI NGÂN
             </h2>
             <p className="text-slate-600 text-xs sm:text-sm mt-0.5 sm:mt-1">
               Khảo sát trực tiếp từ 20 thôn buôn xã Ea Súp. Ảnh thumbnail hiển thị rõ nét, bấm vào để mở rộng xem trọn vẹn hình ảnh và biên bản nghiệm thu PDF.
