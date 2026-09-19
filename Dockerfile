@@ -52,8 +52,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-# Tạo thư mục data lưu trữ runtime settings cho user nextjs
-RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
+# Tạo thư mục data và uploads lưu trữ runtime cho ứng dụng
+RUN mkdir -p /app/data /app/public/uploads && chown -R nextjs:nodejs /app/data /app/public/uploads && chmod -R 777 /app/data /app/public/uploads
 
 USER nextjs
 

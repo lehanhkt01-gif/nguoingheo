@@ -938,11 +938,12 @@ export default function CampaignsManager({ initialCampaigns }: CampaignsManagerP
                   <input
                     type="number"
                     min="0"
-                    step="500000"
+                    step="any"
                     required
-                    value={formData.amount}
-                    onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-mono font-medium"
+                    value={formData.amount === 0 ? "" : formData.amount}
+                    onChange={(e) => setFormData({ ...formData, amount: e.target.value === "" ? 0 : Number(e.target.value) })}
+                    placeholder="Nhập số tiền bất kỳ (VD: 770000000)..."
+                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-mono font-medium text-sm"
                   />
                 </div>
               </div>

@@ -310,8 +310,22 @@ export default function SocialWelfareList() {
     setCaseForm((prev) => ({
       ...prev,
       villages: [...VILLAGES_LIST],
-      village: "Toàn xã (20 thôn buôn)",
+      village: "Tất cả các thôn (20 thôn buôn)",
     }));
+  };
+
+  const handleToggleAllCaseVillages = () => {
+    setCaseForm((prev) => {
+      if (prev.villages.length === VILLAGES_LIST.length) {
+        return { ...prev, villages: ["Buôn A"], village: "Buôn A" };
+      } else {
+        return { ...prev, villages: [...VILLAGES_LIST], village: "Tất cả các thôn (20 thôn buôn)" };
+      }
+    });
+  };
+
+  const handleClearAllCaseVillages = () => {
+    setCaseForm((prev) => ({ ...prev, villages: [], village: "" }));
   };
 
   const handleCaseFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -495,6 +509,20 @@ export default function SocialWelfareList() {
       ...prev,
       villages: [...VILLAGES_LIST],
     }));
+  };
+
+  const handleToggleAllGiftVillages = () => {
+    setGiftForm((prev) => {
+      if (prev.villages.length === VILLAGES_LIST.length) {
+        return { ...prev, villages: ["Buôn A"] };
+      } else {
+        return { ...prev, villages: [...VILLAGES_LIST] };
+      }
+    });
+  };
+
+  const handleClearAllGiftVillages = () => {
+    setGiftForm((prev) => ({ ...prev, villages: [] }));
   };
 
   const handleGiftFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1552,20 +1580,51 @@ export default function SocialWelfareList() {
               </div>
 
               {/* CHỌN NHIỀU THÔN / BUÔN */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <label className="block font-bold text-slate-700 uppercase">
                     Thôn / Buôn: * (Có thể chọn nhiều thôn/buôn)
                   </label>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={handleToggleAllCaseVillages}
+                      className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                        caseForm.villages.length === VILLAGES_LIST.length
+                          ? "bg-rose-600 text-white shadow-xs"
+                          : "bg-rose-100 text-rose-800 hover:bg-rose-200"
+                      }`}
+                    >
+                      {caseForm.villages.length === VILLAGES_LIST.length && <Check className="w-3.5 h-3.5" />}
+                      <span>Tất cả các thôn (20 thôn)</span>
+                    </button>
+                    {caseForm.villages.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleClearAllCaseVillages}
+                        className="px-2 py-1 rounded-xl text-[11px] font-semibold text-slate-500 hover:text-red-600 hover:bg-slate-100 cursor-pointer"
+                      >
+                        Bỏ chọn
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                  {/* Nút tất cả các thôn đặt ngay vị trí đầu tiên */}
                   <button
                     type="button"
-                    onClick={handleSelectAllCaseVillages}
-                    className="text-[11px] font-semibold text-rose-600 hover:text-rose-700 cursor-pointer"
+                    onClick={handleToggleAllCaseVillages}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                      caseForm.villages.length === VILLAGES_LIST.length
+                        ? "bg-rose-600 text-white shadow-xs"
+                        : "bg-white text-rose-700 border-2 border-rose-300 hover:bg-rose-50"
+                    }`}
                   >
-                    Chọn toàn xã (20 thôn)
+                    {caseForm.villages.length === VILLAGES_LIST.length && <Check className="w-3 h-3" />}
+                    <span>Tất cả các thôn</span>
                   </button>
-                </div>
-                <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-2 bg-slate-50 rounded-xl border border-slate-200">
+
                   {VILLAGES_LIST.map((v) => {
                     const isSelected = caseForm.villages.includes(v);
                     return (
@@ -1585,6 +1644,11 @@ export default function SocialWelfareList() {
                     );
                   })}
                 </div>
+                <p className="text-[10px] text-slate-500">
+                  {caseForm.villages.length === VILLAGES_LIST.length
+                    ? "✓ Đang chọn: Tất cả các thôn (20 thôn buôn)"
+                    : `Đã chọn ${caseForm.villages.length} thôn/buôn: ${caseForm.villages.join(", ")}`}
+                </p>
               </div>
 
               <div>
@@ -1594,11 +1658,12 @@ export default function SocialWelfareList() {
                 <input
                   type="number"
                   min="0"
-                  step="500000"
+                  step="any"
                   required
-                  value={caseForm.amount}
-                  onChange={(e) => setCaseForm({ ...caseForm, amount: Number(e.target.value) })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium font-mono"
+                  value={caseForm.amount === 0 ? "" : caseForm.amount}
+                  onChange={(e) => setCaseForm({ ...caseForm, amount: e.target.value === "" ? 0 : Number(e.target.value) })}
+                  placeholder="Nhập số tiền trao bất kỳ (không giới hạn)..."
+                  className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium font-mono text-sm"
                 />
               </div>
 
@@ -1757,22 +1822,52 @@ export default function SocialWelfareList() {
               </div>
 
               {/* CHỌN NHIỀU THÔN / BUÔN MỘT LÚC */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <label className="block font-bold text-slate-700 uppercase">
                     Thôn / Buôn thụ hưởng: * (Có thể chọn nhiều thôn/buôn)
                   </label>
-                  <button
-                    type="button"
-                    onClick={handleSelectAllGiftVillages}
-                    className="text-[11px] font-semibold text-rose-600 hover:text-rose-700 cursor-pointer"
-                  >
-                    Chọn toàn xã (20 thôn buôn)
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={handleToggleAllGiftVillages}
+                      className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                        giftForm.villages.length === VILLAGES_LIST.length
+                          ? "bg-rose-600 text-white shadow-xs"
+                          : "bg-rose-100 text-rose-800 hover:bg-rose-200"
+                      }`}
+                    >
+                      {giftForm.villages.length === VILLAGES_LIST.length && <Check className="w-3.5 h-3.5" />}
+                      <span>Tất cả các thôn (20 thôn)</span>
+                    </button>
+                    {giftForm.villages.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleClearAllGiftVillages}
+                        className="px-2 py-1 rounded-xl text-[11px] font-semibold text-slate-500 hover:text-red-600 hover:bg-slate-100 cursor-pointer"
+                      >
+                        Bỏ chọn
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Danh sách chip chọn nhiều thôn */}
                 <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                  {/* Nút tất cả các thôn đặt ngay vị trí đầu tiên */}
+                  <button
+                    type="button"
+                    onClick={handleToggleAllGiftVillages}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                      giftForm.villages.length === VILLAGES_LIST.length
+                        ? "bg-rose-600 text-white shadow-xs"
+                        : "bg-white text-rose-700 border-2 border-rose-300 hover:bg-rose-50"
+                    }`}
+                  >
+                    {giftForm.villages.length === VILLAGES_LIST.length && <Check className="w-3 h-3" />}
+                    <span>Tất cả các thôn</span>
+                  </button>
+
                   {VILLAGES_LIST.map((v) => {
                     const isSelected = giftForm.villages.includes(v);
                     return (
@@ -1793,7 +1888,9 @@ export default function SocialWelfareList() {
                   })}
                 </div>
                 <p className="text-[10px] text-slate-500">
-                  Đã chọn {giftForm.villages.length} thôn/buôn: {giftForm.villages.join(", ")}
+                  {giftForm.villages.length === VILLAGES_LIST.length
+                    ? "✓ Đang chọn: Tất cả các thôn (20 thôn buôn)"
+                    : `Đã chọn ${giftForm.villages.length} thôn/buôn: ${giftForm.villages.join(", ")}`}
                 </p>
               </div>
 
@@ -1819,12 +1916,13 @@ export default function SocialWelfareList() {
                   </label>
                   <input
                     type="number"
-                    min="100000"
-                    step="500000"
+                    min="0"
+                    step="any"
                     required
-                    value={giftForm.amount}
-                    onChange={(e) => setGiftForm({ ...giftForm, amount: Number(e.target.value) })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium font-mono"
+                    value={giftForm.amount === 0 ? "" : giftForm.amount}
+                    onChange={(e) => setGiftForm({ ...giftForm, amount: e.target.value === "" ? 0 : Number(e.target.value) })}
+                    placeholder="Nhập số tiền bất kỳ (VD: 770000000)..."
+                    className="w-full p-2.5 rounded-xl border border-slate-300 focus:border-rose-500 font-medium font-mono text-sm"
                   />
                 </div>
               </div>

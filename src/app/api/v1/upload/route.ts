@@ -21,8 +21,13 @@ export async function POST(req: NextRequest) {
     }
 
     const uploadDir = path.join(process.cwd(), "public", "uploads");
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    try {
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true, mode: 0o777 });
+      }
+      fs.chmodSync(uploadDir, 0o777);
+    } catch (e) {
+      console.warn("Không thể chmod uploadDir:", e);
     }
 
     const savedFiles = [];
@@ -67,7 +72,22 @@ export async function POST(req: NextRequest) {
 
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      fs.writeFileSync(targetFilePath, buffer);
+
+      try {
+        fs.writeFileSync(targetFilePath, buffer);
+      } catch (writeErr: any) {
+        if (writeErr.code === "EACCES") {
+          try {
+            fs.chmodSync(uploadDir, 0o777);
+            fs.writeFileSync(targetFilePath, buffer);
+          } catch (retryErr) {
+            console.error("Lỗi quyền ghi EACCES:", retryErr);
+            throw new Error("Lỗi quyền ghi file trên máy chủ VPS (EACCES). Vui lòng chạy lệnh cấp quyền: chmod -R 777 public/uploads");
+          }
+        } else {
+          throw writeErr;
+        }
+      }
 
       savedFiles.push({
         url: `/uploads/${uniqueFileName}`,
