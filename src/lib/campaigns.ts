@@ -106,7 +106,7 @@ export function getCampaignsData(): CampaignsStoreData {
       const content = fs.readFileSync(targetPath, "utf-8");
       const parsed = JSON.parse(content);
       memoryCache = {
-        campaigns: Array.isArray(parsed.campaigns) && parsed.campaigns.length > 0 ? parsed.campaigns : INITIAL_CAMPAIGNS,
+        campaigns: Array.isArray(parsed.campaigns) ? parsed.campaigns : [],
         updatedAt: parsed.updatedAt || new Date().toISOString(),
       };
       return memoryCache;

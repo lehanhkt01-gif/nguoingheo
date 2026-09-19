@@ -18,14 +18,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { cases, gifts, action } = body;
 
-    if (action === "reset") {
+    if (action === "reset" || action === "clear_all") {
       const resetData = saveWelfareData({
-        cases: INITIAL_CASES,
-        gifts: INITIAL_GIFTS,
+        cases: [],
+        gifts: [],
       });
       return NextResponse.json({
         success: true,
-        message: "Đã khôi phục dữ liệu mẫu hệ thống thành công!",
+        message: "Đã xóa toàn bộ dữ liệu mẫu cũ khỏi hệ thống máy chủ!",
         data: resetData,
       });
     }

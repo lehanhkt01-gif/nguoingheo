@@ -28,35 +28,7 @@ export interface WelfareStoreData {
   updatedAt?: string;
 }
 
-export const INITIAL_CASES: WelfareCase[] = [
-  {
-    id: 1,
-    recipientName: "Trao quà 2230 hộ nghèo, cận nghèo",
-    village: "Buôn A",
-    situation: "Trao quà hộ gia đình nghèo, cận nghèo",
-    targetAmount: 80000000,
-    currentAmount: 0,
-    imageUrl: "/images/hero-charity-bg.jpg",
-  },
-  {
-    id: 2,
-    recipientName: "Hộ ông Nguyễn Văn Sáng",
-    village: "Thôn 5",
-    situation: "Gia đình có 2 con nhỏ, mẹ già ốm đau, thiếu tư liệu sản xuất và nhà ở kiên cố.",
-    targetAmount: 60000000,
-    currentAmount: 0,
-    imageUrl: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=80",
-  },
-  {
-    id: 3,
-    recipientName: "10 Hộ nghèo đồng bào dân tộc",
-    village: "Thôn 14 & Thôn 12",
-    situation: "Hỗ trợ bò cái giống sinh sản địa phương nhằm tạo sinh kế thoát nghèo bền vững lâu dài.",
-    targetAmount: 50000000,
-    currentAmount: 0,
-    imageUrl: "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=800&auto=format&fit=crop&q=80",
-  },
-];
+export const INITIAL_CASES: WelfareCase[] = [];
 
 export const INITIAL_GIFTS: GiftBatch[] = [];
 
@@ -108,8 +80,8 @@ export function getWelfareData(): WelfareStoreData {
       const content = fs.readFileSync(targetPath, "utf-8");
       const parsed = JSON.parse(content);
       memoryCache = {
-        cases: Array.isArray(parsed.cases) && parsed.cases.length > 0 ? parsed.cases : INITIAL_CASES,
-        gifts: Array.isArray(parsed.gifts) ? parsed.gifts : INITIAL_GIFTS,
+        cases: Array.isArray(parsed.cases) ? parsed.cases : [],
+        gifts: Array.isArray(parsed.gifts) ? parsed.gifts : [],
         updatedAt: parsed.updatedAt || new Date().toISOString(),
       };
       return memoryCache;

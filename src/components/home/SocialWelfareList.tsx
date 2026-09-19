@@ -60,35 +60,7 @@ const VILLAGES = [
   "Thôn 17",
 ];
 
-const DEFAULT_CASES: WelfareCase[] = [
-  {
-    id: 1,
-    recipientName: "Trao quà 2230 hộ nghèo, cận nghèo",
-    village: "Buôn A",
-    situation: "Trao quà hộ gia đình nghèo, cận nghèo",
-    targetAmount: 80000000,
-    currentAmount: 0,
-    imageUrl: "/images/hero-charity-bg.jpg",
-  },
-  {
-    id: 2,
-    recipientName: "Hộ ông Nguyễn Văn Sáng",
-    village: "Thôn 5",
-    situation: "Gia đình có 2 con nhỏ, mẹ già ốm đau, thiếu tư liệu sản xuất và nhà ở kiên cố.",
-    targetAmount: 60000000,
-    currentAmount: 0,
-    imageUrl: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=80",
-  },
-  {
-    id: 3,
-    recipientName: "10 Hộ nghèo đồng bào dân tộc",
-    village: "Thôn 14 & Thôn 12",
-    situation: "Hỗ trợ bò cái giống sinh sản địa phương nhằm tạo sinh kế thoát nghèo bền vững lâu dài.",
-    targetAmount: 50000000,
-    currentAmount: 0,
-    imageUrl: "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=800&auto=format&fit=crop&q=80",
-  },
-];
+const DEFAULT_CASES: WelfareCase[] = [];
 
 const DEFAULT_GIFT_BATCHES: GiftBatch[] = [];
 
@@ -137,38 +109,29 @@ export default function SocialWelfareList() {
     return () => window.removeEventListener("storage", checkAuth);
   }, []);
 
-  // Tải dữ liệu: ưu tiên dữ liệu từ Hệ Thống máy chủ Backend, kết hợp localStorage
+  // Tải dữ liệu chuẩn từ Hệ Thống máy chủ Backend (Xóa bỏ hoàn toàn cache dữ liệu rác cũ)
   useEffect(() => {
+    // Xóa bộ nhớ đệm trình duyệt cũ nếu có chứa dữ liệu mẫu
     try {
-      const storedCases = localStorage.getItem("vinguoingheo_cases");
-      if (storedCases) {
-        const parsed = JSON.parse(storedCases);
-        if (Array.isArray(parsed) && parsed.length > 0) setCases(parsed);
-      }
-      const storedGifts = localStorage.getItem("vinguoingheo_gifts");
-      if (storedGifts) {
-        const parsed = JSON.parse(storedGifts);
-        if (Array.isArray(parsed)) setGiftBatches(parsed);
+      const oldCached = localStorage.getItem("vinguoingheo_cases");
+      if (oldCached && (oldCached.includes("photo-1542601906990") || oldCached.includes("Bà Y Thị"))) {
+        localStorage.removeItem("vinguoingheo_cases");
       }
     } catch {}
 
-    // Truy vấn dữ liệu lưu trữ từ Hệ Thống máy chủ
+    // Truy vấn dữ liệu thực tế từ Hệ Thống máy chủ
     fetch("/api/v1/welfare")
       .then((r) => r.json())
       .then((res) => {
         if (res.success && res.data) {
-          if (Array.isArray(res.data.cases) && res.data.cases.length > 0) {
-            setCases(res.data.cases);
-            try {
-              localStorage.setItem("vinguoingheo_cases", JSON.stringify(res.data.cases));
-            } catch {}
-          }
-          if (Array.isArray(res.data.gifts)) {
-            setGiftBatches(res.data.gifts);
-            try {
-              localStorage.setItem("vinguoingheo_gifts", JSON.stringify(res.data.gifts));
-            } catch {}
-          }
+          const serverCases = Array.isArray(res.data.cases) ? res.data.cases : [];
+          const serverGifts = Array.isArray(res.data.gifts) ? res.data.gifts : [];
+          setCases(serverCases);
+          setGiftBatches(serverGifts);
+          try {
+            localStorage.setItem("vinguoingheo_cases", JSON.stringify(serverCases));
+            localStorage.setItem("vinguoingheo_gifts", JSON.stringify(serverGifts));
+          } catch {}
         }
       })
       .catch((err) => console.warn("Không thể tải dữ liệu an sinh từ API máy chủ:", err));
@@ -334,36 +297,41 @@ export default function SocialWelfareList() {
   };
 
   // Khôi phục mặc định
-  const handleResetDefaults = async () => {
-    if (window.confirm("Khôi phục danh sách hoàn cảnh về dữ liệu chuẩn của hệ thống?")) {
+  // Xóa toàn bộ dữ liệu mẫu cũ để bắt đầu cập nhật dữ liệu thực tế
+  const handleClearAllData = async () => {
+    if (
+      window.confirm(
+        "CẢNH BÁO XÓA DỮ LIỆU RÁC:\n\nQuý vị có chắc chắn muốn XÓA SẠCH TOÀN BỘ dữ liệu mẫu cũ (Bà Y Thị, bò giống, v.v.) để bắt đầu nhập dữ liệu thực tế mới?\n\nThao tác này sẽ làm sạch hoàn toàn hệ thống và trình duyệt."
+      )
+    ) {
       try {
         setIsSaving(true);
         const res = await fetch("/api/v1/welfare", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "reset" }),
+          body: JSON.stringify({ action: "clear_all" }),
         });
         const resData = await res.json();
-        if (resData.success && resData.data) {
-          setCases(resData.data.cases);
-          setGiftBatches(resData.data.gifts);
+        if (resData.success) {
+          setCases([]);
+          setGiftBatches([]);
           try {
-            localStorage.setItem("vinguoingheo_cases", JSON.stringify(resData.data.cases));
-            localStorage.setItem("vinguoingheo_gifts", JSON.stringify(resData.data.gifts));
+            localStorage.removeItem("vinguoingheo_cases");
+            localStorage.removeItem("vinguoingheo_gifts");
           } catch {}
-          setSaveStatus("Đã khôi phục dữ liệu chuẩn hệ thống!");
-          setTimeout(() => setSaveStatus(null), 4000);
-          return;
+          setSaveStatus("Đã xóa sạch toàn bộ dữ liệu mẫu cũ!");
+          setTimeout(() => setSaveStatus(null), 5000);
         }
       } catch (e) {
-        console.error("Lỗi reset dữ liệu an sinh:", e);
+        console.error("Lỗi xóa dữ liệu:", e);
       } finally {
         setIsSaving(false);
       }
-
-      updateCases(DEFAULT_CASES);
-      updateGifts(DEFAULT_GIFT_BATCHES);
     }
+  };
+
+  const handleResetDefaults = async () => {
+    handleClearAllData();
   };
 
   return (
@@ -462,11 +430,12 @@ export default function SocialWelfareList() {
 
               <button
                 type="button"
-                onClick={handleResetDefaults}
-                title="Khôi phục dữ liệu chuẩn hệ thống"
-                className="p-2 rounded-xl border border-rose-200 bg-white hover:bg-rose-100 text-slate-600 text-xs transition-colors cursor-pointer"
+                onClick={handleClearAllData}
+                title="Xóa toàn bộ dữ liệu mẫu cũ"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-red-200 bg-white hover:bg-red-50 text-red-600 text-xs font-bold transition-colors cursor-pointer shadow-xs"
               >
-                <RotateCcw className="w-4 h-4" />
+                <Trash2 className="w-4 h-4" />
+                <span>Xóa sạch dữ liệu mẫu cũ</span>
               </button>
             </div>
           </div>
@@ -474,7 +443,32 @@ export default function SocialWelfareList() {
 
         {/* Tab 1: Các Hoàn Cảnh Cần Giúp Đỡ */}
         {activeTab === "CASES" && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          cases.length === 0 ? (
+            <div className="bg-white p-8 sm:p-12 rounded-3xl border border-rose-100 text-center space-y-4 shadow-xs">
+              <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto shadow-xs">
+                <Heart className="w-7 h-7" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base sm:text-lg font-extrabold text-slate-800">
+                  Hệ thống đã dọn sạch toàn bộ dữ liệu mẫu cũ
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-500 max-w-lg mx-auto leading-relaxed">
+                  Hiện chưa có hoàn cảnh nào. Quý Cán bộ hãy bấm nút <strong>&quot;Tạo hoàn cảnh mới&quot;</strong> ở trên để bắt đầu cập nhật hồ sơ các hộ gia đình thực tế từ 20 thôn buôn.
+                </p>
+              </div>
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={handleOpenAddCase}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-200 transition-all cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tạo hoàn cảnh thực tế đầu tiên</span>
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             {cases.map((item) => {
               const percent = Math.min(100, Math.round((item.currentAmount / item.targetAmount) * 100));
               return (
@@ -575,7 +569,8 @@ export default function SocialWelfareList() {
               );
             })}
           </div>
-        )}
+        )
+      )}
 
         {/* Tab 2: Các Đợt Trao Quà An Sinh Đã Giải Ngân */}
         {activeTab === "GIFTS" && (
