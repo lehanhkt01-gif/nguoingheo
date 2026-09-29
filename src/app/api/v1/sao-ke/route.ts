@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getLiveAccountBalance, triggerBackgroundAutoSync } from "@/lib/casso";
 import { cleanTransferContent } from "@/lib/utils";
+import { syncWelfareGiftsToDisbursements } from "@/lib/welfare";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -10,6 +11,8 @@ export async function GET(req: NextRequest) {
   try {
     // Tự động kiểm tra và đồng bộ giao dịch mới từ Casso trong nền (100% tự động)
     triggerBackgroundAutoSync().catch(() => {});
+    // Đồng bộ các đợt giải ngân / trao quà từ hệ thống an sinh vào sổ sao kê
+    syncWelfareGiftsToDisbursements().catch(() => {});
 
     const { searchParams } = new URL(req.url);
     const rawType = searchParams.get("type")?.trim().toUpperCase() || "ALL";

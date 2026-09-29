@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getWelfareData, saveWelfareData, INITIAL_CASES, INITIAL_GIFTS } from "@/lib/welfare";
+import {
+  getWelfareData,
+  saveWelfareData,
+  syncWelfareGiftsToDisbursements,
+  clearWelfareDisbursements,
+  INITIAL_CASES,
+  INITIAL_GIFTS,
+} from "@/lib/welfare";
 
 export async function GET() {
   try {
     const data = getWelfareData();
+    // Đảm bảo dữ liệu Đợt trao quà được đồng bộ sang Disbursement
+    syncWelfareGiftsToDisbursements(data.gifts).catch((err) => {
+      console.warn("Background welfare sync warning:", err);
+    });
     return NextResponse.json({
       success: true,
       data,
@@ -23,9 +34,10 @@ export async function POST(req: NextRequest) {
         cases: [],
         gifts: [],
       });
+      await clearWelfareDisbursements();
       return NextResponse.json({
         success: true,
-        message: "Đã xóa toàn bộ dữ liệu mẫu cũ khỏi hệ thống máy chủ!",
+        message: "Đã xóa toàn bộ dữ liệu mẫu cũ và làm sạch sổ chi giải ngân!",
         data: resetData,
       });
     }
@@ -35,9 +47,14 @@ export async function POST(req: NextRequest) {
       gifts: Array.isArray(gifts) ? gifts : undefined,
     });
 
+    // Tự động đồng bộ ngay lập tức vào bảng Disbursement để Tiền ra (-) cập nhật thời gian thực
+    if (Array.isArray(gifts)) {
+      await syncWelfareGiftsToDisbursements(updated.gifts);
+    }
+
     return NextResponse.json({
       success: true,
-      message: "Đã lưu vào hệ thống máy chủ thành công!",
+      message: "Đã lưu vào hệ thống máy chủ và cập nhật sổ tiền ra thành công!",
       data: updated,
     });
   } catch (error: any) {
@@ -45,3 +62,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 }
+

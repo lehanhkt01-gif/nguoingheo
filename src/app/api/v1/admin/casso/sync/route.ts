@@ -195,10 +195,12 @@ export async function POST(req: NextRequest) {
     const liveAccount = accRes.success ? accRes.account : null;
 
     const message =
-      processResult.inserted > 0
-        ? `Đã dọn sạch số liệu ảo cũ và nạp ${processResult.inserted} giao dịch thực tế từ Casso (+${new Intl.NumberFormat(
+      processResult.inserted > 0 || (processResult as any).insertedOut > 0
+        ? `Đồng bộ thành công từ Casso: ${processResult.inserted} giao dịch tiền vào (+${new Intl.NumberFormat(
             "vi-VN"
-          ).format(processResult.totalAmountAdded)} đ) vào sao kê!`
+          ).format(processResult.totalAmountAdded)} đ) và ${(processResult as any).insertedOut || 0} giao dịch tiền ra (-${new Intl.NumberFormat(
+            "vi-VN"
+          ).format((processResult as any).totalOutAmountAdded || 0)} đ)!`
         : body.action === "clean_and_sync"
         ? `Đã xóa sạch toàn bộ số liệu ảo cũ! Hiện tại tài khoản BIDV ${config.accountNumber} trên Casso chưa phát sinh giao dịch mới (toàn bộ bảng thống kê và số dư đã về 0 đ chuẩn xác).`
         : `Đồng bộ hoàn tất: Toàn bộ ${processResult.processed} giao dịch đã được đối soát khớp lệnh 100% với tài khoản BIDV ${config.accountNumber}!`;
@@ -209,9 +211,11 @@ export async function POST(req: NextRequest) {
       stats: {
         totalFetched: txRes.records.length,
         insertedCount: processResult.inserted,
+        insertedOutCount: (processResult as any).insertedOut || 0,
         skippedDuplicateCount: processResult.skippedDuplicate,
         skippedOtherAccount: processResult.skippedOtherAccount,
         totalAmountAdded: processResult.totalAmountAdded,
+        totalOutAmountAdded: (processResult as any).totalOutAmountAdded || 0,
         liveBalance: liveAccount?.balance ?? null,
         syncTimestamp: new Date().toISOString(),
       },

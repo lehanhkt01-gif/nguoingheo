@@ -440,6 +440,14 @@ export default function SaoKePage() {
                                 </span>
                               )}
                               {(() => {
+                                if (!isIncome) {
+                                  if (!tx.donorName) return null;
+                                  return (
+                                    <span className="text-[11px] text-slate-500">
+                                      Thụ hưởng: <strong className="text-slate-800">{tx.donorName}</strong>
+                                    </span>
+                                  );
+                                }
                                 const donor = extractDonorNameFromMemo(tx.donorName || "");
                                 if (!donor || donor === "BIDV") return null;
                                 return (

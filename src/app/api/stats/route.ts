@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getLiveAccountBalance } from "@/lib/casso";
+import { syncWelfareGiftsToDisbursements } from "@/lib/welfare";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET() {
   try {
+    // Đảm bảo dữ liệu Đợt trao quà từ an sinh xã hội luôn được đồng bộ sang Disbursement
+    await syncWelfareGiftsToDisbursements().catch(() => {});
+
     const [donationsAgg, disbursementsAgg, campaignsCount, liveAccountBalance] = await Promise.all([
       prisma.donation.aggregate({
         where: { status: "COMPLETED" },

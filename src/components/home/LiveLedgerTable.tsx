@@ -406,9 +406,18 @@ export default function LiveLedgerTable() {
 
                       {/* Nội dung chuyển khoản - Lọc sạch tiền tố tự sinh của ngân hàng và mã trace số đuôi */}
                       <td className="py-3.5 px-4 min-w-[240px] sm:min-w-[320px] font-bold text-slate-900 leading-snug">
-                        {isOut
-                          ? (t.donorName || cleanTransferContent(t.description))
-                          : cleanTransferContent(t.description || t.donorName)}
+                        {isOut ? (
+                          <div>
+                            <div>{t.donorName || cleanTransferContent(t.description)}</div>
+                            {t.description && t.description !== t.donorName && (
+                              <div className="text-[11px] font-normal text-slate-500 mt-0.5">
+                                {cleanTransferContent(t.description)}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          cleanTransferContent(t.description || t.donorName)
+                        )}
                       </td>
 
                       {/* Số tiền */}

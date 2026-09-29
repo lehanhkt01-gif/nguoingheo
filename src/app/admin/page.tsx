@@ -71,10 +71,13 @@ export default function AdminDashboardPage() {
     totalDisbursed: 0,
     netBalance: 0,
     donationCount: 0,
+    disbursementCount: 0,
     activeCampaigns: 0,
   });
 
+  const [activeTableTab, setActiveTableTab] = useState<"IN" | "OUT">("IN");
   const [donations, setDonations] = useState<any[]>([]);
+  const [disbursements, setDisbursements] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [villageFilter, setVillageFilter] = useState("ALL");
 
@@ -90,11 +93,22 @@ export default function AdminDashboardPage() {
   };
 
   const loadDonations = () => {
-    fetch("/api/donations?limit=20")
+    fetch("/api/donations?limit=50")
       .then((r) => r.json())
       .then((d) => {
         if (d.success) {
           setDonations(d.data);
+        }
+      })
+      .catch(() => {});
+  };
+
+  const loadDisbursements = () => {
+    fetch("/api/v1/admin/disbursements?limit=50")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success) {
+          setDisbursements(d.data || []);
         }
       })
       .catch(() => {});
@@ -146,12 +160,14 @@ export default function AdminDashboardPage() {
     // Tải dữ liệu ban đầu
     loadStats();
     loadDonations();
+    loadDisbursements();
     loadCassoInfo();
 
     // Tự động làm mới dữ liệu thời gian thực mỗi 15 giây
     const autoRefreshInterval = setInterval(() => {
       loadStats();
       loadDonations();
+      loadDisbursements();
       loadCassoInfo();
     }, 15000);
 
@@ -198,6 +214,7 @@ export default function AdminDashboardPage() {
         setSyncSuccess(data.message);
         loadStats();
         loadDonations();
+        loadDisbursements();
         loadCassoInfo();
         setTimeout(() => setSyncSuccess(null), 8000);
       } else {
@@ -238,6 +255,7 @@ export default function AdminDashboardPage() {
         setSyncSuccess(data.message || "Đã xóa sạch số liệu ảo và cập nhật số liệu mới từ Casso!");
         loadStats();
         loadDonations();
+        loadDisbursements();
         loadCassoInfo();
         setTimeout(() => setSyncSuccess(null), 10000);
       } else {
@@ -379,6 +397,23 @@ export default function AdminDashboardPage() {
     const matchVillage =
       villageFilter === "ALL" ||
       d.description?.toLowerCase().includes(villageFilter.toLowerCase());
+
+    return matchSearch && matchVillage;
+  });
+
+  const filteredDisbursements = disbursements.filter((d) => {
+    const q = search.toLowerCase();
+    const matchSearch =
+      !q ||
+      d.recipientName?.toLowerCase().includes(q) ||
+      d.notes?.toLowerCase().includes(q) ||
+      d.village?.toLowerCase().includes(q) ||
+      String(d.id).includes(q);
+
+    const matchVillage =
+      villageFilter === "ALL" ||
+      d.village?.toLowerCase().includes(villageFilter.toLowerCase()) ||
+      d.notes?.toLowerCase().includes(villageFilter.toLowerCase());
 
     return matchSearch && matchVillage;
   });
@@ -558,18 +593,25 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Card 3: Đã giải ngân */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+          <div
+            onClick={() => setActiveTableTab("OUT")}
+            className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-2 cursor-pointer hover:border-rose-400 hover:shadow-sm transition-all group"
+            title="Nhấn để xem bảng chi tiết các đợt giải ngân / tiền ra"
+          >
             <div className="flex items-center justify-between text-slate-500">
-              <span className="text-xs font-bold uppercase tracking-wider">Đã Chi Giải Ngân</span>
-              <div className="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center">
+              <span className="text-xs font-bold uppercase tracking-wider group-hover:text-rose-600 transition-colors">
+                Đã Chi Giải Ngân
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center group-hover:scale-105 transition-transform">
                 <ArrowDownRight className="w-4 h-4" />
               </div>
             </div>
             <div className="text-2xl font-extrabold text-rose-600 tracking-tight font-mono">
               -{formatVND(stats.totalDisbursed)}
             </div>
-            <div className="text-[11px] text-slate-500 pt-1 border-t border-slate-100">
-              Nhà ĐĐK, bò giống, trợ cấp bão lụt
+            <div className="text-[11px] text-slate-500 pt-1 border-t border-slate-100 flex items-center justify-between">
+              <span>{stats.disbursementCount || disbursements.length} đợt hỗ trợ</span>
+              <span className="text-rose-600 font-semibold group-hover:underline">Xem sổ chi →</span>
             </div>
           </div>
 
@@ -915,15 +957,43 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Bảng Quản Lý Danh Sách Ủng Hộ */}
+        {/* Bảng Quản Lý Danh Sách Giao Dịch Thu / Chi */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
+              <div className="inline-flex rounded-xl bg-slate-100 p-1 mb-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveTableTab("IN")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activeTableTab === "IN"
+                      ? "bg-white text-emerald-800 shadow-xs"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  Tiền Vào / Tiếp Nhận ({donations.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTableTab("OUT")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activeTableTab === "OUT"
+                      ? "bg-white text-rose-800 shadow-xs"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  Tiền Ra / Giải Ngân ({disbursements.length})
+                </button>
+              </div>
               <h3 className="font-bold text-sm text-slate-900">
-                Danh Sách Giao Dịch Tiếp Nhận Tiền Vào (Donations)
+                {activeTableTab === "IN"
+                  ? "Danh Sách Giao Dịch Tiếp Nhận Tiền Vào (Donations)"
+                  : "Danh Sách Giao Dịch Tiền Ra / Đã Giải Ngân (Disbursements)"}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Cập nhật tự động từ cổng Casso Banking Webhook V2 và Casso Open API.
+                {activeTableTab === "IN"
+                  ? "Cập nhật tự động từ cổng Casso Banking Webhook V2 và Casso Open API."
+                  : "Tổng hợp từ các đợt giải ngân, trao quà an sinh xã hội và giao dịch tiền ra BIDV."}
               </p>
             </div>
 
@@ -933,7 +1003,7 @@ export default function AdminDashboardPage() {
                 <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Tìm tên, mã giao dịch..."
+                  placeholder={activeTableTab === "IN" ? "Tìm tên, mã giao dịch..." : "Tìm tên hộ, nội dung, thôn..."}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 focus:border-rose-600 focus:ring-1 focus:ring-rose-600 bg-slate-50/50"
@@ -949,66 +1019,162 @@ export default function AdminDashboardPage() {
                 <option value="Buôn A">Buôn A</option>
                 <option value="Buôn B">Buôn B</option>
                 <option value="Buôn C">Buôn C</option>
-                <option value="Thôn 14">Thôn 14</option>
+                <option value="Buôn A2">Buôn A2</option>
+                <option value="Buôn Drai">Buôn Drai</option>
+                <option value="Buôn Cổng">Buôn Cổng</option>
+                <option value="Thôn 1">Thôn 1</option>
+                <option value="Thôn 2">Thôn 2</option>
+                <option value="Thôn 3">Thôn 3</option>
+                <option value="Thôn 4">Thôn 4</option>
+                <option value="Thôn 5">Thôn 5</option>
+                <option value="Thôn 6">Thôn 6</option>
+                <option value="Thôn 7">Thôn 7</option>
+                <option value="Thôn 8">Thôn 8</option>
+                <option value="Thôn 9">Thôn 9</option>
+                <option value="Thôn 10">Thôn 10</option>
+                <option value="Thôn 11">Thôn 11</option>
                 <option value="Thôn 12">Thôn 12</option>
+                <option value="Thôn 13">Thôn 13</option>
+                <option value="Thôn 14">Thôn 14</option>
+                <option value="Thôn 15">Thôn 15</option>
+                <option value="Thôn 16">Thôn 16</option>
+                <option value="Thôn 17">Thôn 17</option>
               </select>
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
-                  <th className="p-3.5">Mã Giao Dịch</th>
-                  <th className="p-3.5">Thời Gian</th>
-                  <th className="p-3.5">Nhà Hảo Tâm</th>
-                  <th className="p-3.5">Nội Dung Chuyển Khoản</th>
-                  <th className="p-3.5 text-right">Số Tiền (VNĐ)</th>
-                  <th className="p-3.5 text-center">Trạng Thái</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredDonations.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="p-6 text-center text-slate-500">
-                      Không tìm thấy giao dịch nào phù hợp.
-                    </td>
+            {activeTableTab === "IN" ? (
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                    <th className="p-3.5">Mã Giao Dịch</th>
+                    <th className="p-3.5">Thời Gian</th>
+                    <th className="p-3.5">Nhà Hảo Tâm</th>
+                    <th className="p-3.5">Nội Dung Chuyển Khoản</th>
+                    <th className="p-3.5 text-right">Số Tiền (VNĐ)</th>
+                    <th className="p-3.5 text-center">Trạng Thái</th>
                   </tr>
-                ) : (
-                  filteredDonations.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="p-3.5 font-mono font-bold text-slate-800">
-                        {item.transactionId}
-                      </td>
-                      <td className="p-3.5 text-slate-500 whitespace-nowrap">
-                        {new Date(item.transactionDate).toLocaleDateString("vi-VN", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                        })}
-                      </td>
-                      <td className="p-3.5 font-bold text-slate-900">
-                        {cleanTransferContent(item.donorName)}
-                      </td>
-                      <td className="p-3.5 text-slate-700 max-w-xs truncate" title={item.description}>
-                        {cleanTransferContent(item.description)}
-                      </td>
-                      <td className="p-3.5 text-right font-mono font-bold text-emerald-600 whitespace-nowrap">
-                        +{formatVND(item.amount)}
-                      </td>
-                      <td className="p-3.5 text-center whitespace-nowrap">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                          Đã ghi có
-                        </span>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredDonations.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="p-6 text-center text-slate-500">
+                        Không tìm thấy giao dịch tiền vào nào phù hợp.
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : (
+                    filteredDonations.map((item) => (
+                      <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="p-3.5 font-mono font-bold text-slate-800">
+                          {item.transactionId}
+                        </td>
+                        <td className="p-3.5 text-slate-500 whitespace-nowrap">
+                          {new Date(item.transactionDate).toLocaleDateString("vi-VN", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          })}
+                        </td>
+                        <td className="p-3.5 font-bold text-slate-900">
+                          {cleanTransferContent(item.donorName)}
+                        </td>
+                        <td className="p-3.5 text-slate-700 max-w-xs truncate" title={item.description}>
+                          {cleanTransferContent(item.description)}
+                        </td>
+                        <td className="p-3.5 text-right font-mono font-bold text-emerald-600 whitespace-nowrap">
+                          +{formatVND(item.amount)}
+                        </td>
+                        <td className="p-3.5 text-center whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            Đã ghi có
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-rose-50/60 text-slate-700 font-semibold border-b border-rose-200">
+                    <th className="p-3.5">Mã Phiếu Chi</th>
+                    <th className="p-3.5">Thời Gian</th>
+                    <th className="p-3.5">Đối Tượng Thụ Hưởng</th>
+                    <th className="p-3.5">Địa Bàn / Thôn Buôn</th>
+                    <th className="p-3.5">Nội Dung &amp; Ghi Chú</th>
+                    <th className="p-3.5 text-right">Số Tiền Chi (VNĐ)</th>
+                    <th className="p-3.5 text-center">Chứng Từ</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredDisbursements.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="p-8 text-center text-slate-500 space-y-2">
+                        <p>Chưa có giao dịch tiền ra / giải ngân nào.</p>
+                        <Link
+                          href="/#an-sinh"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold hover:bg-rose-100 transition-colors"
+                        >
+                          <Gift className="w-3.5 h-3.5" />
+                          <span>Tạo đợt trao quà / giải ngân mới tại đây</span>
+                        </Link>
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredDisbursements.map((item) => (
+                      <tr key={item.id} className="hover:bg-rose-50/30 transition-colors">
+                        <td className="p-3.5 font-mono font-bold text-rose-800">
+                          {`PC-${String(item.id).padStart(4, "0")}`}
+                        </td>
+                        <td className="p-3.5 text-slate-500 whitespace-nowrap font-mono">
+                          {new Date(item.date).toLocaleDateString("vi-VN", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          })}
+                        </td>
+                        <td className="p-3.5 font-bold text-slate-900">
+                          {item.recipientName}
+                        </td>
+                        <td className="p-3.5 text-slate-600">
+                          <span className="inline-block px-2 py-0.5 bg-slate-100 rounded text-[11px] font-medium text-slate-700">
+                            {item.village}
+                          </span>
+                        </td>
+                        <td className="p-3.5 text-slate-700 max-w-xs truncate" title={item.notes}>
+                          {item.notes || "Chi hỗ trợ"}
+                        </td>
+                        <td className="p-3.5 text-right font-mono font-bold text-rose-600 whitespace-nowrap">
+                          -{formatVND(item.amount)}
+                        </td>
+                        <td className="p-3.5 text-center whitespace-nowrap">
+                          {item.proofImageUrl ? (
+                            <a
+                              href={item.proofImageUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition-colors"
+                            >
+                              <Eye className="w-3 h-3" />
+                              <span>Xem chứng từ</span>
+                            </a>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600">
+                              Chứng từ lưu trữ
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </main>

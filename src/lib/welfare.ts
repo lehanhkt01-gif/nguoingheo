@@ -138,3 +138,102 @@ export function saveWelfareData(data: Partial<WelfareStoreData>): WelfareStoreDa
 
   return updated;
 }
+
+/**
+ * Đồng bộ danh sách Đợt trao quà (gifts trong welfare_data.json) vào bảng Disbursement trong PostgreSQL.
+ * Giúp các thông số Tiền ra (-), Đã giải ngân, Sao kê tab Tiền ra luôn cập nhật tức thời 100%.
+ */
+export async function syncWelfareGiftsToDisbursements(inputGifts?: GiftBatch[]): Promise<number> {
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    const gifts = inputGifts !== undefined ? inputGifts : (getWelfareData().gifts || []);
+    const validGiftIds = new Set(gifts.map((g) => g.id));
+
+    // 1. Lấy tất cả disbursements do welfare gifts đồng bộ vào
+    const existingWelfareDisbursements = await prisma.disbursement.findMany({
+      where: {
+        notes: {
+          contains: "[Đợt trao quà #",
+        },
+      },
+    });
+
+    // 2. Xóa các đợt trao quà đã bị xóa khỏi gifts
+    for (const d of existingWelfareDisbursements) {
+      const match = d.notes?.match(/\[Đợt trao quà #(\d+)\]/);
+      if (match && match[1]) {
+        const giftId = Number(match[1]);
+        if (!validGiftIds.has(giftId)) {
+          await prisma.disbursement.delete({ where: { id: d.id } });
+        }
+      }
+    }
+
+    // 3. Upsert các gift hiện có vào disbursement
+    let syncedCount = 0;
+    for (const g of gifts) {
+      const tag = `[Đợt trao quà #${g.id}]`;
+      const proofUrl = g.imageUrl || (Array.isArray(g.files) && g.files[0]?.url) || null;
+      const noteText = `${tag} ${g.proofNote || g.title || ""}${g.recipientCount ? ` (${g.recipientCount} hộ thụ hưởng)` : ""}`.trim();
+      const villageText = g.village || (Array.isArray(g.villages) && g.villages.join(", ")) || "Xã Ea Súp";
+      const dateVal = g.date ? new Date(g.date) : new Date();
+
+      const existing = await prisma.disbursement.findFirst({
+        where: {
+          notes: {
+            contains: tag,
+          },
+        },
+      });
+
+      if (existing) {
+        await prisma.disbursement.update({
+          where: { id: existing.id },
+          data: {
+            recipientName: g.title,
+            village: villageText,
+            amount: Number(g.amount) || 0,
+            proofImageUrl: proofUrl,
+            date: !isNaN(dateVal.getTime()) ? dateVal : new Date(),
+            notes: noteText,
+          },
+        });
+      } else {
+        await prisma.disbursement.create({
+          data: {
+            recipientName: g.title,
+            village: villageText,
+            amount: Number(g.amount) || 0,
+            proofImageUrl: proofUrl,
+            date: !isNaN(dateVal.getTime()) ? dateVal : new Date(),
+            notes: noteText,
+          },
+        });
+      }
+      syncedCount++;
+    }
+
+    return syncedCount;
+  } catch (err) {
+    console.error("Lỗi đồng bộ Đợt trao quà vào Disbursement:", err);
+    return 0;
+  }
+}
+
+/**
+ * Xóa toàn bộ các bản ghi Disbursement do Đợt trao quà tạo ra
+ */
+export async function clearWelfareDisbursements(): Promise<void> {
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    await prisma.disbursement.deleteMany({
+      where: {
+        notes: {
+          contains: "[Đợt trao quà #",
+        },
+      },
+    });
+  } catch (err) {
+    console.error("Lỗi xóa Đợt trao quà trong Disbursement:", err);
+  }
+}

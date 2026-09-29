@@ -287,17 +287,21 @@ export async function processCassoTransactions(
 ): Promise<{
   processed: number;
   inserted: number;
+  insertedOut: number;
   skippedDuplicate: number;
   skippedOtherAccount: number;
   skippedZeroOrNegative: number;
   insertedDonationIds: number[];
   totalAmountAdded: number;
+  totalOutAmountAdded: number;
 }> {
   let inserted = 0;
+  let insertedOut = 0;
   let skippedDuplicate = 0;
   let skippedOtherAccount = 0;
   let skippedZeroOrNegative = 0;
   let totalAmountAdded = 0;
+  let totalOutAmountAdded = 0;
   const insertedDonationIds: number[] = [];
 
   const cleanExpectedAcc = cleanEnvString(expectedAccount) || "8630100930";
@@ -311,31 +315,15 @@ export async function processCassoTransactions(
       continue;
     }
 
-    // 2. Chỉ nạp giao dịch TIỀN VÀO (Ủng hộ, amount > 0)
+    // 2. Kiểm tra số tiền giao dịch
     const rawAmount = Number(item.amount || 0);
-    if (rawAmount <= 0) {
-      console.log(`[Casso] Bỏ qua giao dịch tiền ra/bằng 0: ${rawAmount} (Mã: ${item.id || item.tid})`);
+    if (rawAmount === 0) {
+      console.log(`[Casso] Bỏ qua giao dịch 0 đ: (Mã: ${item.id || item.tid})`);
       skippedZeroOrNegative++;
       continue;
     }
 
-    // 3. Cơ chế Idempotency: Khóa định danh giao dịch
     const transactionId = String(item.id || item.tid || item.reference || `TX-${Date.now()}`);
-
-    const existing = await prisma.donation.findUnique({
-      where: { transactionId },
-    });
-
-    if (existing) {
-      console.log(`[Casso] Giao dịch ${transactionId} đã tồn tại trong CSDL, bỏ qua ghi đè.`);
-      skippedDuplicate++;
-      continue;
-    }
-
-    // 4. Bóc tách tên nhà hảo tâm và nội dung
-    const desc = String(item.description || "").trim();
-    const donorName = extractDonorName(desc, item.corresponsive_name);
-    const amount = rawAmount;
 
     // Thời gian giao dịch
     let txDate = new Date();
@@ -347,51 +335,106 @@ export async function processCassoTransactions(
       }
     }
 
-    // 5. Lưu vào CSDL
-    const donation = await prisma.donation.create({
-      data: {
-        transactionId,
-        donorName,
-        amount,
-        description: desc || `Ủng hộ qua chuyển khoản BIDV ${cleanExpectedAcc}`,
-        transactionDate: txDate,
-        status: "COMPLETED",
-      },
-    });
+    const desc = String(item.description || "").trim();
+    const isOutflow = rawAmount < 0 || (item as any).type === "OUT" || (item as any).type === "DEBIT";
 
-    insertedDonationIds.push(donation.id);
-    inserted++;
-    totalAmountAdded += amount;
+    if (isOutflow) {
+      // 3a. GIAO DỊCH TIỀN RA (Giải ngân, chi hỗ trợ, thanh toán qua ngân hàng BIDV)
+      const absAmount = Math.abs(rawAmount);
 
-    // 6. Cập nhật tiến độ chiến dịch an sinh xã hội đang kích hoạt
-    try {
-      const activeCampaign = await prisma.campaign.findFirst({
-        where: { status: "ACTIVE" },
+      // Chống trùng lặp theo mã định danh giao dịch Casso
+      const existingDisbursement = await prisma.disbursement.findFirst({
+        where: {
+          notes: {
+            contains: transactionId,
+          },
+        },
       });
 
-      if (activeCampaign) {
-        await prisma.campaign.update({
-          where: { id: activeCampaign.id },
-          data: {
-            currentAmount: {
-              increment: amount,
-            },
-          },
-        });
+      if (existingDisbursement) {
+        console.log(`[Casso] Giao dịch tiền ra ${transactionId} đã tồn tại trong CSDL, bỏ qua ghi đè.`);
+        skippedDuplicate++;
+        continue;
       }
-    } catch (campErr) {
-      console.error("[Casso] Lỗi cập nhật chiến dịch:", campErr);
+
+      const recipient = item.corresponsive_name || extractDonorName(desc, undefined) || "Đơn vị / Hộ thụ hưởng xã Ea Súp";
+
+      await prisma.disbursement.create({
+        data: {
+          recipientName: recipient,
+          village: "Xã Ea Súp",
+          amount: absAmount,
+          proofImageUrl: null,
+          date: txDate,
+          notes: `[Casso BIDV: ${transactionId}] ${desc || "Chi hoạt động an sinh xã hội qua BIDV 8630100930"}`,
+        },
+      });
+
+      insertedOut++;
+      totalOutAmountAdded += absAmount;
+      console.log(`[Casso] ✅ Đã nạp giao dịch TIỀN RA (-): ${absAmount} đ (Mã: ${transactionId})`);
+    } else {
+      // 3b. GIAO DỊCH TIỀN VÀO (Ủng hộ, amount > 0)
+      const existing = await prisma.donation.findUnique({
+        where: { transactionId },
+      });
+
+      if (existing) {
+        console.log(`[Casso] Giao dịch ${transactionId} đã tồn tại trong CSDL, bỏ qua ghi đè.`);
+        skippedDuplicate++;
+        continue;
+      }
+
+      const donorName = extractDonorName(desc, item.corresponsive_name);
+      const amount = rawAmount;
+
+      const donation = await prisma.donation.create({
+        data: {
+          transactionId,
+          donorName,
+          amount,
+          description: desc || `Ủng hộ qua chuyển khoản BIDV ${cleanExpectedAcc}`,
+          transactionDate: txDate,
+          status: "COMPLETED",
+        },
+      });
+
+      insertedDonationIds.push(donation.id);
+      inserted++;
+      totalAmountAdded += amount;
+
+      // Cập nhật tiến độ chiến dịch an sinh xã hội đang kích hoạt
+      try {
+        const activeCampaign = await prisma.campaign.findFirst({
+          where: { status: "ACTIVE" },
+        });
+
+        if (activeCampaign) {
+          await prisma.campaign.update({
+            where: { id: activeCampaign.id },
+            data: {
+              currentAmount: {
+                increment: amount,
+              },
+            },
+          });
+        }
+      } catch (campErr) {
+        console.error("[Casso] Lỗi cập nhật chiến dịch:", campErr);
+      }
     }
   }
 
   return {
     processed: items.length,
     inserted,
+    insertedOut,
     skippedDuplicate,
     skippedOtherAccount,
     skippedZeroOrNegative,
     insertedDonationIds,
     totalAmountAdded,
+    totalOutAmountAdded,
   };
 }
 
