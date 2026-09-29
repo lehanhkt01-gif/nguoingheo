@@ -5,6 +5,12 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Mốc thời gian bắt đầu tính tổng số tiền ra (giải ngân): Từ ngày 29/09/2026 00:00:00 (GMT+7)
+ * Toàn bộ các giao dịch tiền ra trước thời điểm này sẽ không được tính vào tổng số tiền ra.
+ */
+export const DISBURSEMENT_START_DATE = new Date("2026-09-29T00:00:00+07:00");
+
 export function formatVND(amount: number | string | bigint | null | undefined): string {
   if (amount === null || amount === undefined) return "0 đ";
   const num = typeof amount === "bigint" ? Number(amount) : Number(amount);

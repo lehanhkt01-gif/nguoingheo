@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateNghiDinh30Report } from "@/lib/export-docx";
+import { DISBURSEMENT_START_DATE } from "@/lib/utils";
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,6 +16,11 @@ export async function GET(req: NextRequest) {
         _count: true,
       }),
       prisma.disbursement.aggregate({
+        where: {
+          date: {
+            gte: DISBURSEMENT_START_DATE,
+          },
+        },
         _sum: { amount: true },
         _count: true,
       }),

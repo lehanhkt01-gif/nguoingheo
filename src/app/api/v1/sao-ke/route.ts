@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getLiveAccountBalance, triggerBackgroundAutoSync } from "@/lib/casso";
-import { cleanTransferContent } from "@/lib/utils";
+import { cleanTransferContent, DISBURSEMENT_START_DATE } from "@/lib/utils";
 import { syncWelfareGiftsToDisbursements } from "@/lib/welfare";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
     const limit = Math.min(100, Math.max(10, parseInt(searchParams.get("limit") || "20")));
 
-    // 1. Thống kê tổng hợp toàn bộ tài khoản BIDV 8630100930
+    // 1. Thống kê tổng hợp toàn bộ tài khoản BIDV 8630100930 (Tiền ra chỉ tính từ 29/09/2026 trở về sau)
     const [statsIn, statsOut, liveAccountBalance] = await Promise.all([
       prisma.donation.aggregate({
         where: { status: "COMPLETED" },
@@ -30,6 +30,11 @@ export async function GET(req: NextRequest) {
         _count: true,
       }),
       prisma.disbursement.aggregate({
+        where: {
+          date: {
+            gte: DISBURSEMENT_START_DATE,
+          },
+        },
         _sum: { amount: true },
         _count: true,
       }),
@@ -46,12 +51,20 @@ export async function GET(req: NextRequest) {
     let totalRecords = 0;
 
     if (isOut) {
-      const where: any = {};
+      const where: any = {
+        date: {
+          gte: DISBURSEMENT_START_DATE,
+        },
+      };
       if (search) {
-        where.OR = [
-          { recipientName: { contains: search, mode: "insensitive" } },
-          { village: { contains: search, mode: "insensitive" } },
-          { notes: { contains: search, mode: "insensitive" } },
+        where.AND = [
+          {
+            OR: [
+              { recipientName: { contains: search, mode: "insensitive" } },
+              { village: { contains: search, mode: "insensitive" } },
+              { notes: { contains: search, mode: "insensitive" } },
+            ],
+          },
         ];
       }
       const [disbursements, count] = await Promise.all([
@@ -136,6 +149,11 @@ export async function GET(req: NextRequest) {
           include: { campaign: { select: { title: true } } },
         }),
         prisma.disbursement.findMany({
+          where: {
+            date: {
+              gte: DISBURSEMENT_START_DATE,
+            },
+          },
           orderBy: { date: "desc" },
           take: 100,
         }),

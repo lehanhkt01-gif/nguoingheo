@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateTransactionsExcel } from "@/lib/export-excel";
+import { DISBURSEMENT_START_DATE } from "@/lib/utils";
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,6 +16,11 @@ export async function GET(req: NextRequest) {
         take: 1000,
       }),
       prisma.disbursement.findMany({
+        where: {
+          date: {
+            gte: DISBURSEMENT_START_DATE,
+          },
+        },
         orderBy: { date: "desc" },
         take: 1000,
       }),

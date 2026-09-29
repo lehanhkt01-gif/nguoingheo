@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { DISBURSEMENT_START_DATE } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -11,13 +12,21 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get("search")?.trim() || "";
     const village = searchParams.get("village")?.trim() || "";
 
-    const where: any = {};
+    const where: any = {
+      date: {
+        gte: DISBURSEMENT_START_DATE,
+      },
+    };
 
     if (search) {
-      where.OR = [
-        { recipientName: { contains: search, mode: "insensitive" } },
-        { village: { contains: search, mode: "insensitive" } },
-        { notes: { contains: search, mode: "insensitive" } },
+      where.AND = [
+        {
+          OR: [
+            { recipientName: { contains: search, mode: "insensitive" } },
+            { village: { contains: search, mode: "insensitive" } },
+            { notes: { contains: search, mode: "insensitive" } },
+          ],
+        },
       ];
     }
 

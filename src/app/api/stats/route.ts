@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getLiveAccountBalance } from "@/lib/casso";
 import { syncWelfareGiftsToDisbursements } from "@/lib/welfare";
+import { DISBURSEMENT_START_DATE } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -18,6 +19,11 @@ export async function GET() {
         _count: true,
       }),
       prisma.disbursement.aggregate({
+        where: {
+          date: {
+            gte: DISBURSEMENT_START_DATE,
+          },
+        },
         _sum: { amount: true },
         _count: true,
       }),

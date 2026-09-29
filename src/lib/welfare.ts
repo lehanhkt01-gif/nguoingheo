@@ -146,6 +146,7 @@ export function saveWelfareData(data: Partial<WelfareStoreData>): WelfareStoreDa
 export async function syncWelfareGiftsToDisbursements(inputGifts?: GiftBatch[]): Promise<number> {
   try {
     const { prisma } = await import("@/lib/prisma");
+    const { DISBURSEMENT_START_DATE } = await import("@/lib/utils");
     const gifts = inputGifts !== undefined ? inputGifts : (getWelfareData().gifts || []);
     const validGiftIds = new Set(gifts.map((g) => g.id));
 
@@ -169,7 +170,7 @@ export async function syncWelfareGiftsToDisbursements(inputGifts?: GiftBatch[]):
       }
     }
 
-    // 3. Upsert các gift hiện có vào disbursement
+    // 3. Upsert các gift hiện có vào disbursement (chỉ tính từ ngày 29/09/2026 trở về sau)
     let syncedCount = 0;
     for (const g of gifts) {
       const tag = `[Đợt trao quà #${g.id}]`;
@@ -185,6 +186,14 @@ export async function syncWelfareGiftsToDisbursements(inputGifts?: GiftBatch[]):
           },
         },
       });
+
+      // Bỏ qua các đợt trao quà trước ngày 29/09/2026
+      if (!isNaN(dateVal.getTime()) && dateVal.getTime() < DISBURSEMENT_START_DATE.getTime()) {
+        if (existing) {
+          await prisma.disbursement.delete({ where: { id: existing.id } });
+        }
+        continue;
+      }
 
       if (existing) {
         await prisma.disbursement.update({

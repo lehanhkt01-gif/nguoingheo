@@ -6,6 +6,7 @@ import {
   extractDonorNameFromMemo,
   maskReference,
   maskAccountNumber,
+  DISBURSEMENT_START_DATE,
 } from "@/lib/utils";
 
 export { cleanTransferContent, maskReference, maskAccountNumber };
@@ -341,6 +342,13 @@ export async function processCassoTransactions(
     if (isOutflow) {
       // 3a. GIAO DỊCH TIỀN RA (Giải ngân, chi hỗ trợ, thanh toán qua ngân hàng BIDV)
       const absAmount = Math.abs(rawAmount);
+
+      // Chỉ tính và nạp các giao dịch tiền ra từ ngày 29/09/2026 trở về sau
+      if (txDate.getTime() < DISBURSEMENT_START_DATE.getTime()) {
+        console.log(`[Casso] Bỏ qua giao dịch tiền ra trước ngày 29/09/2026: ${absAmount} đ (Mã: ${transactionId})`);
+        skippedZeroOrNegative++;
+        continue;
+      }
 
       // Chống trùng lặp theo mã định danh giao dịch Casso
       const existingDisbursement = await prisma.disbursement.findFirst({
