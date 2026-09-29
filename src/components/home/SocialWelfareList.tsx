@@ -93,9 +93,8 @@ export default function SocialWelfareList({
   mode = "ALL",
   defaultTab = "CASES",
 }: SocialWelfareListProps = {}) {
-  const [activeTab, setActiveTab] = useState<"CASES" | "GIFTS">(
-    mode === "CASES_ONLY" ? "CASES" : mode === "GIFTS_ONLY" ? "GIFTS" : defaultTab
-  );
+  const showCases = mode === "ALL" || mode === "CASES_ONLY";
+  const showGifts = mode === "ALL" || mode === "GIFTS_ONLY";
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
@@ -733,31 +732,23 @@ export default function SocialWelfareList({
             </p>
           </div>
 
-          {/* Tab Chuyển Đổi */}
+          {/* Huy hiệu số lượng & Điều hướng nhanh */}
           {mode === "ALL" ? (
-            <div className="grid grid-cols-2 sm:inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 text-xs font-semibold w-full sm:w-auto gap-1">
-              <button
-                type="button"
-                onClick={() => setActiveTab("CASES")}
-                className={`px-2.5 sm:px-4 py-2 rounded-lg transition-all text-center font-bold cursor-pointer shadow-xs ${
-                  activeTab === "CASES"
-                    ? "bg-rose-600 text-white"
-                    : "bg-emerald-600 text-white hover:bg-emerald-700"
-                }`}
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <a
+                href="#danh-sach-can-giup-do"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs transition-colors"
               >
-                CẦN GIÚP ĐỠ ({cases.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab("GIFTS")}
-                className={`px-2.5 sm:px-4 py-2 rounded-lg transition-all text-center font-bold cursor-pointer shadow-xs ${
-                  activeTab === "GIFTS"
-                    ? "bg-rose-600 text-white"
-                    : "bg-emerald-600 text-white hover:bg-emerald-700"
-                }`}
+                <Heart className="w-3.5 h-3.5 fill-white" />
+                <span>CẦN GIÚP ĐỠ ({cases.length})</span>
+              </a>
+              <a
+                href="#ho-so-da-giai-ngan"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-colors"
               >
-                ĐÃ TRAO/GIẢI NGÂN ({giftBatches.length})
-              </button>
+                <Gift className="w-3.5 h-3.5 text-white" />
+                <span>ĐÃ TRAO/GIẢI NGÂN ({giftBatches.length})</span>
+              </a>
             </div>
           ) : mode === "CASES_ONLY" ? (
             <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-rose-600 text-white font-bold text-xs shadow-xs">
@@ -803,7 +794,7 @@ export default function SocialWelfareList({
                 </div>
               )}
 
-              {activeTab === "CASES" ? (
+              {showCases && (
                 <button
                   type="button"
                   onClick={handleOpenAddCase}
@@ -812,11 +803,13 @@ export default function SocialWelfareList({
                   <Plus className="w-4 h-4" />
                   <span>Tạo hoàn cảnh mới</span>
                 </button>
-              ) : (
+              )}
+
+              {showGifts && (
                 <button
                   type="button"
                   onClick={handleOpenAddGift}
-                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm shadow-rose-200 transition-all cursor-pointer"
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm shadow-emerald-200 transition-all cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tạo đợt trao quà mới</span>
@@ -826,8 +819,25 @@ export default function SocialWelfareList({
           </div>
         )}
 
-        {/* TAB 1: CÁC HOÀN CẢNH KHÓ KHĂN CẦN GIÚP ĐỠ */}
-        {activeTab === "CASES" && (
+        {/* PHẦN 1: CÁC HOÀN CẢNH KHÓ KHĂN CẦN GIÚP ĐỠ */}
+        {showCases && (
+          <div id="danh-sach-can-giup-do" className="space-y-4">
+            {mode === "ALL" && (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pt-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-5 rounded-full bg-rose-600" />
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight uppercase flex items-center gap-2">
+                    <span>1. Các trường hợp cần giúp đỡ</span>
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 font-sans lowercase">
+                      {cases.length} hoàn cảnh
+                    </span>
+                  </h3>
+                </div>
+                <span className="text-xs text-slate-500 font-medium pl-4 sm:pl-0">
+                  Thẩm định trực tiếp từ 20 thôn buôn • Bấm ủng hộ qua VietQR
+                </span>
+              </div>
+            )}
           cases.length === 0 ? (
             <div className="bg-white p-8 sm:p-12 rounded-3xl border border-rose-100 text-center space-y-4 shadow-xs">
               <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto shadow-xs">
@@ -980,12 +990,44 @@ export default function SocialWelfareList({
                 );
               })}
             </div>
-          )
-        )}
+          )}
+        </div>
+      )}
 
-        {/* TAB 2: CÁC ĐỢT TRAO QUÀ THỰC TẾ (CÓ ẢNH THUMBNAIL, CHỌN NHIỀU THÔN, BẤM VÀO HIỆN RỘNG CHI TIẾT) */}
-        {activeTab === "GIFTS" && (
-          giftBatches.length === 0 ? (
+      {/* PHẦN 2: HỒ SƠ ĐÃ TRAO / ĐÃ GIẢI NGÂN THỰC TẾ (HIỂN THỊ MẶC ĐỊNH NGAY PHÍA DƯỚI) */}
+      {showGifts && (
+        <div
+          id="ho-so-da-giai-ngan"
+          className={`space-y-4 ${
+            showCases && mode === "ALL"
+              ? "pt-8 sm:pt-10 border-t-2 border-rose-100"
+              : ""
+          }`}
+        >
+          {mode === "ALL" && (
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-5 rounded-full bg-emerald-600" />
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight uppercase flex items-center gap-2">
+                    <span>2. Hồ sơ đã trao / Đã giải ngân</span>
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-sans lowercase">
+                      {giftBatches.length} đợt
+                    </span>
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-500 mt-1 pl-4 sm:pl-0">
+                  Biên bản nghiệm thu, ảnh chụp trao quà trực tiếp và chứng từ mộc đỏ của UBMTTQ Việt Nam xã Ea Súp.
+                </p>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shrink-0 self-start sm:self-auto">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Minh bạch 100% chứng từ mộc đỏ</span>
+              </div>
+            </div>
+          )}
+
+          {giftBatches.length === 0 ? (
             <div className="bg-white p-8 sm:p-12 rounded-3xl border border-rose-100 text-center space-y-4 shadow-xs">
               <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto shadow-xs">
                 <Gift className="w-7 h-7" />
@@ -1145,8 +1187,9 @@ export default function SocialWelfareList({
                 );
               })}
             </div>
-          )
-        )}
+          )}
+        </div>
+      )}
       </div>
 
       {/* ================= MODAL XEM CHI TIẾT MỞ RỘNG HOÀN CẢNH KHÓ KHĂN ================= */}
