@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatVND } from "@/lib/utils";
 import { JournalisticArticle } from "@/lib/articles";
@@ -25,11 +25,19 @@ import {
   X,
   Maximize2,
   Smartphone,
-  Facebook,
   MessageCircle,
   Clock,
   Sparkles,
 } from "lucide-react";
+
+// Icon Facebook SVG chuẩn không phụ thuộc vào thư viện bên ngoài
+function FacebookIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+    </svg>
+  );
+}
 
 interface Props {
   article: JournalisticArticle;
@@ -41,42 +49,58 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
   const [showQrModal, setShowQrModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [activeLightboxImg, setActiveLightboxImg] = useState<string | null>(null);
+  const [currentUrl, setCurrentUrl] = useState<string>(article?.shareUrl || "");
+
+  // Đồng bộ URL client an toàn sau khi mount để tránh lệch hydration SSR
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCurrentUrl(window.location.href);
+    }
+  }, []);
 
   // Cấu hình VietQR ủng hộ tự động nếu là hoàn cảnh khó khăn
   const bidvAccount = process.env.NEXT_PUBLIC_BIDV_ACCOUNT || "8630100930";
   const bidvBin = process.env.NEXT_PUBLIC_BIDV_BIN || "970418";
   const accountName = process.env.NEXT_PUBLIC_ACCOUNT_NAME || "UY BAN MTTQ VN XA EA SUP";
-  const transferContent = `HO TRO ${article.rawId} ${article.beneficiaryName || "EASUP"}`.slice(0, 35);
+  const transferContent = `HO TRO ${article?.rawId || ""} ${article?.beneficiaryName || "EASUP"}`.slice(0, 35);
   const vietQrUrl = `https://img.vietqr.io/image/${bidvBin}-${bidvAccount}-compact2.png?amount=0&addInfo=${encodeURIComponent(
     transferContent
   )}&accountName=${encodeURIComponent(accountName)}`;
 
-  const currentUrl = typeof window !== "undefined" ? window.location.href : article.shareUrl;
+  const shareTargetUrl = currentUrl || article?.shareUrl || "https://nguoingheo.easupso.com";
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(currentUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 3000);
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(shareTargetUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    }
   };
 
   const handleShareFacebook = () => {
-    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
-    window.open(url, "_blank", "width=600,height=450");
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareTargetUrl)}`;
+    if (typeof window !== "undefined") {
+      window.open(url, "_blank", "width=600,height=450");
+    }
   };
 
   const handleShareZalo = () => {
-    const url = `https://sp.zalo.me/share_inline?link=${encodeURIComponent(currentUrl)}`;
-    window.open(url, "_blank", "width=600,height=450");
+    const url = `https://sp.zalo.me/share_inline?link=${encodeURIComponent(shareTargetUrl)}`;
+    if (typeof window !== "undefined") {
+      window.open(url, "_blank", "width=600,height=450");
+    }
   };
 
   const handlePrint = () => {
-    window.print();
+    if (typeof window !== "undefined") {
+      window.print();
+    }
   };
 
   return (
     <article className="min-h-screen bg-slate-50 text-slate-800 pb-16">
       {/* 1. THANH TIÊU ĐỀ HÀNH CHÍNH & BREADCRUMBS BÁO CHÍ */}
-      <div className="bg-white border-b border-rose-100 shadow-2xs">
+      <div className="bg-white border-b border-rose-100 shadow-xs">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
           <nav className="flex items-center gap-2 text-slate-500 overflow-x-auto whitespace-nowrap">
             <Link href="/" className="hover:text-rose-700 transition-colors font-medium flex items-center gap-1">
@@ -110,9 +134,14 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-white p-1 border border-rose-100 shadow-xs flex items-center justify-center shrink-0">
                 <img
-                  src="/images/logo-mttq.png"
+                  src="/logo-mttq.png"
                   alt="Ủy ban MTTQ Việt Nam"
                   className="w-full h-full object-contain"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = "/favicon.png";
+                  }}
                 />
               </div>
               <div>
@@ -196,14 +225,14 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
                 <span>Zalo</span>
               </button>
 
-              {/* Nút Chia sẻ Facebook */}
+              {/* Nút Chia sẻ Facebook (Dùng custom FacebookIcon SVG an toàn tuyệt đối) */}
               <button
                 type="button"
                 onClick={handleShareFacebook}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1877F2] hover:bg-[#166fe5] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
                 title="Chia sẻ lên Facebook cá nhân hoặc Fanpage"
               >
-                <Facebook className="w-3.5 h-3.5" />
+                <FacebookIcon className="w-3.5 h-3.5 fill-white" />
                 <span>Facebook</span>
               </button>
 
@@ -268,16 +297,18 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
           <div className="space-y-2">
             <div className="relative rounded-2xl overflow-hidden bg-slate-100 max-h-[500px] border border-slate-200 group">
               <img
-                src={article.imageUrl}
+                src={article.imageUrl || "/hero-charity-bg.jpg"}
                 alt={article.title}
                 className="w-full h-full object-cover max-h-[500px]"
-                onError={(e: any) => {
-                  e.target.src = "/images/hero-charity-bg.jpg";
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = "/hero-charity-bg.jpg";
                 }}
               />
               <button
                 type="button"
-                onClick={() => setActiveLightboxImg(article.imageUrl)}
+                onClick={() => setActiveLightboxImg(article.imageUrl || "/hero-charity-bg.jpg")}
                 className="absolute bottom-3 right-3 p-2 rounded-xl bg-black/60 hover:bg-black/80 text-white backdrop-blur-xs transition-colors cursor-pointer"
                 title="Xem ảnh cỡ lớn"
               >
@@ -303,7 +334,7 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
               <div>
                 <span className="text-[11px] text-slate-500 font-semibold uppercase block">Kinh phí dự kiến vận động</span>
                 <span className="text-lg font-extrabold text-rose-600 font-mono block mt-0.5">
-                  {formatVND(article.amount || 0)} đ
+                  {formatVND(article.amount || 0)}
                 </span>
               </div>
             </div>
@@ -314,7 +345,7 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
               <div>
                 <span className="text-[11px] text-emerald-700 font-semibold uppercase block">Số tiền trao thực tế</span>
                 <span className="text-lg font-extrabold text-emerald-700 font-mono block mt-0.5">
-                  {formatVND(article.amount || 0)} đ
+                  {formatVND(article.amount || 0)}
                 </span>
               </div>
               <div>
@@ -351,6 +382,11 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
                       src={img}
                       alt={`Ảnh phóng sự ${idx + 1}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = "/hero-charity-bg.jpg";
+                      }}
                     />
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
                       <Maximize2 className="w-5 h-5" />
@@ -417,6 +453,11 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
                     src={vietQrUrl}
                     alt="VietQR BIDV Tiếp Nhận Ủng Hộ"
                     className="w-full aspect-square object-contain mx-auto rounded-lg"
+                    onError={(e) => {
+                      const target = e.currentTarget as HTMLImageElement;
+                      target.onerror = null;
+                      target.src = "/hero-charity-bg.jpg";
+                    }}
                   />
                   <span className="text-[10px] text-slate-500 font-semibold block">
                     Quét VietQR trên app ngân hàng
@@ -491,13 +532,18 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
                 <Link
                   key={item.id}
                   href={`/tin-tuc/${item.id}`}
-                  className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition-all group flex flex-col justify-between"
+                  className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition-all group flex flex-col justify-between"
                 >
                   <div className="aspect-[16/10] overflow-hidden bg-slate-100 relative">
                     <img
-                      src={item.imageUrl}
+                      src={item.imageUrl || "/hero-charity-bg.jpg"}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = "/hero-charity-bg.jpg";
+                      }}
                     />
                     <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-slate-900/80 text-white">
                       {item.categoryLabel}
@@ -556,9 +602,14 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
               <div className="rounded-2xl border border-slate-300 overflow-hidden bg-white shadow-sm">
                 <div className="aspect-[12/6.3] bg-slate-200 overflow-hidden relative">
                   <img
-                    src={article.imageUrl}
+                    src={article.imageUrl || "/hero-charity-bg.jpg"}
                     alt={article.title}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.currentTarget as HTMLImageElement;
+                      target.onerror = null;
+                      target.src = "/hero-charity-bg.jpg";
+                    }}
                   />
                   <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/60 text-[10px] text-white font-mono">
                     1200 x 630 HD
@@ -617,7 +668,7 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 inline-block">
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(
-                  currentUrl
+                  shareTargetUrl
                 )}`}
                 alt="QR Code bài báo"
                 className="w-48 h-48 mx-auto rounded-lg"

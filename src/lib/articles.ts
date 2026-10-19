@@ -32,8 +32,9 @@ export interface JournalisticArticle {
   shareUrl: string;
 }
 
-function sanitizeSlug(text: string): string {
-  return text
+function sanitizeSlug(text?: string | null): string {
+  if (!text) return "an-sinh-ea-sup";
+  return String(text)
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -43,87 +44,93 @@ function sanitizeSlug(text: string): string {
 }
 
 export function caseToArticle(item: WelfareCase): JournalisticArticle {
-  const images = item.files?.filter((f) => f.type === "image").map((f) => f.url) || [];
+  const images = (item.files || []).filter((f) => f && f.type === "image").map((f) => f.url);
   if (item.imageUrl && !images.includes(item.imageUrl)) {
     images.unshift(item.imageUrl);
   }
   if (images.length === 0) {
-    images.push("/images/hero-charity-bg.jpg");
+    images.push("/hero-charity-bg.jpg");
   }
 
-  const title = `Kêu gọi ủng hộ hoàn cảnh khó khăn: ${item.recipientName} tại ${item.village}`;
-  const sapo = `UBMTTQ Việt Nam xã Ea Súp kêu gọi các cơ quan, tổ chức, nhà hảo tâm trong và ngoài huyện chung tay giúp đỡ hộ gia đình ${item.recipientName} (${item.village}) có hoàn cảnh đặc biệt khó khăn, nhà ở tạm bợ dột nát.`;
+  const recipientName = item.recipientName || "Hộ nghèo cần giúp đỡ";
+  const rawVillage = item.village || "Xã Ea Súp";
+  const title = `Kêu gọi ủng hộ hoàn cảnh khó khăn: ${recipientName} tại ${rawVillage}`;
+  const sapo = `UBMTTQ Việt Nam xã Ea Súp kêu gọi các cơ quan, tổ chức, nhà hảo tâm trong và ngoài huyện chung tay giúp đỡ hộ gia đình ${recipientName} (${rawVillage}) có hoàn cảnh đặc biệt khó khăn, nhà ở tạm bợ dột nát.`;
+  const amount = Number(item.amount) || Number(item.targetAmount) || 0;
 
   return {
     id: `case-${item.id}`,
     rawId: item.id,
     type: "CASE",
-    slug: `hoan-canh-${item.id}-${sanitizeSlug(item.recipientName)}`,
+    slug: `hoan-canh-${item.id}-${sanitizeSlug(recipientName)}`,
     title,
     sapo,
-    content: item.situation,
+    content: item.situation || "Thông tin hoàn cảnh đang được xác minh và cập nhật từ ban tự quản thôn buôn.",
     category: "HOAN_CANH",
     categoryLabel: "Hoàn cảnh cần giúp đỡ",
     categoryBadgeColor: "rose",
-    village: item.village,
-    villages: [item.village],
+    village: rawVillage,
+    villages: [rawVillage],
     date: item.createdAt ? item.createdAt.slice(0, 10) : "2026-02-01",
     authorName: "Ban Thường trực UBMTTQ xã Ea Súp",
     authorTitle: "Cơ quan thẩm định & phê duyệt hồ sơ",
     signerName: "Đ/c Lê Hồng Hạnh",
     signerTitle: "Chủ tịch UBMTTQ Việt Nam xã Ea Súp - Trưởng ban Vận động Quỹ",
-    imageUrl: images[0],
+    imageUrl: images[0] || "/hero-charity-bg.jpg",
     images,
-    files: item.files || [],
-    amount: item.amount,
-    targetAmount: item.targetAmount || item.amount,
-    beneficiaryName: item.recipientName,
-    views: 350 + (Number(item.id) || 1) * 37,
+    files: Array.isArray(item.files) ? item.files : [],
+    amount,
+    targetAmount: Number(item.targetAmount) || amount,
+    beneficiaryName: recipientName,
+    views: 350 + (Number(item.id) % 1000 || 1) * 5,
     readingTimeMinutes: 3,
     shareUrl: `https://nguoingheo.easupso.com/tin-tuc/case-${item.id}`,
   };
 }
 
 export function giftToArticle(item: GiftBatch): JournalisticArticle {
-  const images = item.files?.filter((f) => f.type === "image").map((f) => f.url) || [];
+  const images = (item.files || []).filter((f) => f && f.type === "image").map((f) => f.url);
   if (item.imageUrl && !images.includes(item.imageUrl)) {
     images.unshift(item.imageUrl);
   }
   if (images.length === 0) {
-    images.push("/images/hero-charity-bg.jpg");
+    images.push("/hero-charity-bg.jpg");
   }
 
-  const villages = item.villages && item.villages.length > 0
+  const rawVillage = item.village || "Toàn xã Ea Súp";
+  const villages = Array.isArray(item.villages) && item.villages.length > 0
     ? item.villages
-    : item.village.split(",").map((s) => s.trim());
+    : rawVillage.split(",").map((s) => s.trim()).filter(Boolean);
 
-  const sapo = `Ban Thường trực UBMTTQ Việt Nam xã Ea Súp tổ chức đợt trao quà an sinh xã hội thực tế cho ${item.recipientCount} hộ thụ hưởng tại địa bàn ${item.village}. Toàn bộ kinh phí được giải ngân từ Quỹ Vì Người Nghèo và đối soát công khai 100% kèm chứng từ mộc đỏ.`;
+  const title = item.title || "Đợt trao quà an sinh xã hội thực tế tại Ea Súp";
+  const recipientCount = Number(item.recipientCount) || 1;
+  const sapo = `Ban Thường trực UBMTTQ Việt Nam xã Ea Súp tổ chức đợt trao quà an sinh xã hội thực tế cho ${recipientCount} hộ thụ hưởng tại địa bàn ${rawVillage}. Toàn bộ kinh phí được giải ngân từ Quỹ Vì Người Nghèo và đối soát công khai 100% kèm chứng từ mộc đỏ.`;
 
   return {
     id: `gift-${item.id}`,
     rawId: item.id,
     type: "GIFT",
-    slug: `ho-so-trao-qua-${item.id}-${sanitizeSlug(item.title)}`,
-    title: item.title,
+    slug: `ho-so-trao-qua-${item.id}-${sanitizeSlug(title)}`,
+    title,
     sapo,
-    content: item.proofNote || `Hoàn tất trao tận tay ${item.recipientCount} phần quà ý nghĩa cho các hộ nghèo, khó khăn tại ${item.village}.`,
+    content: item.proofNote || `Hoàn tất trao tận tay ${recipientCount} phần quà ý nghĩa cho các hộ nghèo, khó khăn tại ${rawVillage}.`,
     category: "TRAO_QUA",
     categoryLabel: "Hồ sơ đã trao / Đã giải ngân",
     categoryBadgeColor: "emerald",
-    village: item.village,
+    village: rawVillage,
     villages,
-    date: item.date || "2026-02-05",
+    date: item.date || (item.createdAt ? item.createdAt.slice(0, 10) : "2026-02-05"),
     authorName: "Ban Vận động Quỹ Vì Người Nghèo xã Ea Súp",
     authorTitle: "Đơn vị chủ trì trao quà & lập biên bản",
     signerName: "Đ/c Lê Hồng Hạnh",
     signerTitle: "Chủ tịch UBMTTQ Việt Nam xã Ea Súp",
-    imageUrl: images[0],
+    imageUrl: images[0] || "/hero-charity-bg.jpg",
     images,
-    files: item.files || [],
-    amount: item.amount,
-    recipientCount: item.recipientCount,
-    proofNote: item.proofNote,
-    views: 420 + (Number(item.id) || 1) * 45,
+    files: Array.isArray(item.files) ? item.files : [],
+    amount: Number(item.amount) || 0,
+    recipientCount,
+    proofNote: item.proofNote || "",
+    views: 420 + (Number(item.id) % 1000 || 1) * 7,
     readingTimeMinutes: 4,
     shareUrl: `https://nguoingheo.easupso.com/tin-tuc/gift-${item.id}`,
   };
@@ -138,16 +145,18 @@ export function postToArticle(item: PostItem): JournalisticArticle {
   };
 
   const meta = categoryLabels[item.category] || { label: "Tin tức an sinh", color: "blue" };
+  const title = item.title || "Thông tin an sinh xã hội xã Ea Súp";
+  const content = item.content || "Nội dung đang được cập nhật.";
 
   return {
     id: `post-${item.id}`,
     rawId: item.id,
     type: "POST",
-    slug: `tin-tuc-${item.id}-${sanitizeSlug(item.title)}`,
-    title: item.title,
-    sapo: item.summary || item.content.slice(0, 160) + "...",
-    content: item.content,
-    category: item.category,
+    slug: `tin-tuc-${item.id}-${sanitizeSlug(title)}`,
+    title,
+    sapo: item.summary || content.slice(0, 160) + "...",
+    content,
+    category: item.category || "TIN_TUC",
     categoryLabel: meta.label,
     categoryBadgeColor: meta.color,
     village: item.village || "Toàn xã Ea Súp",
@@ -156,11 +165,11 @@ export function postToArticle(item: PostItem): JournalisticArticle {
     authorTitle: "Chủ tịch UBMTTQ Việt Nam xã Ea Súp",
     signerName: "Đ/c Lê Hồng Hạnh",
     signerTitle: "Chủ tịch UBMTTQ Việt Nam xã Ea Súp",
-    imageUrl: item.imageUrl || "/images/hero-charity-bg.jpg",
-    images: [item.imageUrl || "/images/hero-charity-bg.jpg"],
+    imageUrl: item.imageUrl || "/hero-charity-bg.jpg",
+    images: [item.imageUrl || "/hero-charity-bg.jpg"],
     files: [],
     views: item.views || 180,
-    readingTimeMinutes: Math.max(2, Math.round(item.content.length / 400)),
+    readingTimeMinutes: Math.max(2, Math.round(content.length / 400)),
     shareUrl: `https://nguoingheo.easupso.com/tin-tuc/post-${item.id}`,
   };
 }
@@ -179,21 +188,22 @@ export function getAllArticles(): JournalisticArticle[] {
 }
 
 export function getArticleById(id: string): JournalisticArticle | null {
+  if (!id) return null;
   const cleanId = decodeURIComponent(id).trim();
 
   // 1. Nếu bắt đầu bằng case- hoặc số thuộc cases
   if (cleanId.startsWith("case-")) {
-    const rawNum = Number(cleanId.replace("case-", ""));
+    const rawNum = cleanId.replace("case-", "");
     const welfare = getWelfareData();
-    const found = welfare.cases.find((c) => c.id === rawNum);
+    const found = (welfare.cases || []).find((c) => String(c.id) === rawNum);
     if (found) return caseToArticle(found);
   }
 
   // 2. Nếu bắt đầu bằng gift-
   if (cleanId.startsWith("gift-")) {
-    const rawNum = Number(cleanId.replace("gift-", ""));
+    const rawNum = cleanId.replace("gift-", "");
     const welfare = getWelfareData();
-    const found = welfare.gifts.find((g) => g.id === rawNum);
+    const found = (welfare.gifts || []).find((g) => String(g.id) === rawNum);
     if (found) return giftToArticle(found);
   }
 
@@ -201,15 +211,16 @@ export function getArticleById(id: string): JournalisticArticle | null {
   if (cleanId.startsWith("post-")) {
     const rawPostId = cleanId.replace("post-", "");
     const postsStore = getPostsData();
-    const found = postsStore.posts.find((p) => p.id === rawPostId || `post_${p.id}` === cleanId);
+    const found = (postsStore.posts || []).find((p) => String(p.id) === rawPostId || `post_${p.id}` === cleanId);
     if (found) return postToArticle(found);
   }
 
   // 4. Tìm kiếm tự do theo id trong tất cả articles
   const all = getAllArticles();
-  const directMatch = all.find((a) => a.id === cleanId || String(a.rawId) === cleanId || a.slug === cleanId);
+  const directMatch = all.find(
+    (a) => a.id === cleanId || String(a.rawId) === cleanId || a.slug === cleanId
+  );
   if (directMatch) return directMatch;
 
-  // 5. Nếu chưa có dữ liệu nào khớp (ví dụ người dùng mở một ID mẫu)
   return null;
 }

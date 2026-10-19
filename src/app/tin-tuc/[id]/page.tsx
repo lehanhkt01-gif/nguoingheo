@@ -21,10 +21,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://nguoingheo.easupso.com";
-  const fullArticleUrl = `${siteUrl}/tin-tuc/${encodeURIComponent(article.id)}`;
-  const absoluteImageUrl = article.imageUrl.startsWith("http")
-    ? article.imageUrl
-    : `${siteUrl}${article.imageUrl}`;
+  const rawImg = article.imageUrl || "/hero-charity-bg.jpg";
+  const absoluteImageUrl = rawImg.startsWith("http")
+    ? rawImg
+    : `${siteUrl}${rawImg.startsWith("/") ? "" : "/"}${rawImg}`;
 
   return {
     title: `${article.title} | Quỹ Vì Người Nghèo Ea Súp`,
