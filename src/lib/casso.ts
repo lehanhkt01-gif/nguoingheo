@@ -311,7 +311,6 @@ export async function processCassoTransactions(
     // 1. Kiểm tra tài khoản tiếp nhận duy nhất BIDV 8630100930
     const itemAcc = cleanEnvString(item.accountNumber || item.bank_sub_acc_id || item.subAccId);
     if (itemAcc && itemAcc !== cleanExpectedAcc) {
-      console.log(`[Casso] Bỏ qua giao dịch của tài khoản khác: ${itemAcc} (Kỳ vọng: ${cleanExpectedAcc})`);
       skippedOtherAccount++;
       continue;
     }
@@ -319,7 +318,6 @@ export async function processCassoTransactions(
     // 2. Kiểm tra số tiền giao dịch
     const rawAmount = Number(item.amount || 0);
     if (rawAmount === 0) {
-      console.log(`[Casso] Bỏ qua giao dịch 0 đ: (Mã: ${item.id || item.tid})`);
       skippedZeroOrNegative++;
       continue;
     }
@@ -345,7 +343,6 @@ export async function processCassoTransactions(
 
       // Chỉ tính và nạp các giao dịch tiền ra từ ngày 29/09/2026 trở về sau
       if (txDate.getTime() < DISBURSEMENT_START_DATE.getTime()) {
-        console.log(`[Casso] Bỏ qua giao dịch tiền ra trước ngày 29/09/2026: ${absAmount} đ (Mã: ${transactionId})`);
         skippedZeroOrNegative++;
         continue;
       }
@@ -360,7 +357,6 @@ export async function processCassoTransactions(
       });
 
       if (existingDisbursement) {
-        console.log(`[Casso] Giao dịch tiền ra ${transactionId} đã tồn tại trong CSDL, bỏ qua ghi đè.`);
         skippedDuplicate++;
         continue;
       }
@@ -388,7 +384,6 @@ export async function processCassoTransactions(
       });
 
       if (existing) {
-        console.log(`[Casso] Giao dịch ${transactionId} đã tồn tại trong CSDL, bỏ qua ghi đè.`);
         skippedDuplicate++;
         continue;
       }
@@ -410,6 +405,7 @@ export async function processCassoTransactions(
       insertedDonationIds.push(donation.id);
       inserted++;
       totalAmountAdded += amount;
+      console.log(`[Casso] ✅ Đã nạp giao dịch TIỀN VÀO (+): ${amount} đ (Mã: ${transactionId})`);
 
       // Cập nhật tiến độ chiến dịch an sinh xã hội đang kích hoạt
       try {
@@ -431,6 +427,10 @@ export async function processCassoTransactions(
         console.error("[Casso] Lỗi cập nhật chiến dịch:", campErr);
       }
     }
+  }
+
+  if (inserted > 0 || insertedOut > 0) {
+    console.log(`[Casso] Đã nạp thành công: ${inserted} tiền vào (+), ${insertedOut} tiền ra (-)`);
   }
 
   return {

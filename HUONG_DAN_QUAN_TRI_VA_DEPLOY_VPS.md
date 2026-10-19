@@ -133,10 +133,13 @@ chmod -R 777 data/
 # 4. Build lại và khởi chạy lại container web trong nền (không làm gián đoạn database)
 docker compose up -d --build web
 
-# 5. Kiểm tra log khởi động của ứng dụng
-docker compose logs -f --tail=50 web
+# 5. Kiểm tra trạng thái container (in ra kết quả và kết thúc ngay lập tức):
+docker compose ps
+docker compose logs --tail=20 web
 ```
-*(Nhấn `Ctrl + C` để thoát khỏi màn hình xem log sau khi thấy ứng dụng báo `Ready in ...ms`).*
+> [!TIP]
+> - Nếu bạn chạy `docker compose logs -f`, màn hình sẽ ở chế độ **theo dõi trực tiếp (Follow)** nên con trỏ sẽ không tự dừng. Để thoát về dấu nhắc lệnh `root@vps:~#`, bạn chỉ cần nhấn tổ hợp phím **`Ctrl + C`**.
+> - Để xem trạng thái mà lệnh tự thoát ngay, luôn dùng `docker compose ps` hoặc `docker compose logs --tail=20 web` (không có cờ `-f`).
 
 ---
 
