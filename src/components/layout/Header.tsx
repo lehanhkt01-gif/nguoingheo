@@ -49,6 +49,7 @@ export default function Header() {
     { href: "/sao-ke", label: "Sao kê thời gian thực" },
     { href: "/chien-dich", label: "Nơi gieo hy vọng" },
     { href: "/van-ban", label: "Gặt hái niềm tin" },
+    { href: "/tin-tuc", label: "Bản tin an sinh" },
   ];
 
   return (

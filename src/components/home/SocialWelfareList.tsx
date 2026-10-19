@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { formatVND, formatDate } from "@/lib/utils";
 import {
   Heart,
@@ -23,7 +24,8 @@ import {
   DollarSign,
   Calendar,
   Users,
-  Check
+  Check,
+  Newspaper
 } from "lucide-react";
 
 export interface WelfareFileItem {
@@ -944,9 +946,13 @@ export default function SocialWelfareList({
                           <h3 className="font-bold text-base text-slate-900 leading-snug group-hover:text-rose-600 transition-colors">
                             {item.recipientName}
                           </h3>
-                          <span className="text-[10px] text-rose-600 bg-rose-50 px-2 py-0.5 rounded font-semibold border border-rose-200">
-                            Chi tiết &raquo;
-                          </span>
+                          <Link
+                            href={`/tin-tuc/case-${item.id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-[10px] text-rose-600 bg-rose-50 hover:bg-rose-100 px-2 py-0.5 rounded font-semibold border border-rose-200 transition-colors"
+                          >
+                            Bản tin báo chí &raquo;
+                          </Link>
                         </div>
 
                         <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
@@ -1134,7 +1140,13 @@ export default function SocialWelfareList({
                           <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                             Đã trao quà thực tế
                           </span>
-                          <span className="text-slate-400 text-xs font-mono">• {formatDate(gift.date)}</span>
+                          <Link
+                            href={`/tin-tuc/gift-${gift.id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-[10px] text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded font-semibold border border-emerald-200 transition-colors"
+                          >
+                            Bản tin báo chí &raquo;
+                          </Link>
                         </div>
 
                         <h3 className="font-bold text-base text-slate-900 leading-snug group-hover:text-rose-600 transition-colors">
@@ -1342,14 +1354,23 @@ export default function SocialWelfareList({
               })()}
             </div>
 
-            <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
-              <button
-                type="button"
-                onClick={() => setDetailCase(null)}
-                className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-white transition-colors cursor-pointer"
-              >
-                Đóng lại
-              </button>
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setDetailCase(null)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-white transition-colors cursor-pointer"
+                >
+                  Đóng lại
+                </button>
+                <Link
+                  href={`/tin-tuc/case-${detailCase.id}`}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs border border-rose-200 transition-colors"
+                >
+                  <Newspaper className="w-4 h-4 text-rose-600" />
+                  <span>Mở dạng bài báo &amp; Chia sẻ</span>
+                </Link>
+              </div>
 
               <button
                 type="button"
@@ -1542,7 +1563,15 @@ export default function SocialWelfareList({
               })()}
             </div>
 
-            <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end shrink-0">
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0 gap-2">
+              <Link
+                href={`/tin-tuc/gift-${detailGift.id}`}
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs border border-emerald-200 transition-colors"
+              >
+                <Newspaper className="w-4 h-4 text-emerald-600" />
+                <span>Mở bản tin báo chí &amp; Chia sẻ</span>
+              </Link>
+
               <button
                 type="button"
                 onClick={() => setDetailGift(null)}

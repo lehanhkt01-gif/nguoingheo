@@ -48,6 +48,37 @@
 
 ---
 
+### 4. Hệ Thống Bản Tin Báo Chí An Sinh Chuẩn Hệ Sinh Thái `easupso.com`
+- **Mục tiêu:** Chuyển đổi toàn bộ các trường hợp cần giúp đỡ, đợt giải ngân trao quà và thông báo của MTTQ thành các bài viết phóng sự báo chí điện tử trang trọng, có thể đọc trọn vẹn nội dung, chia sẻ đa nền tảng và hỗ trợ chế độ review trước khi chia sẻ.
+- **Vị trí tệp mã nguồn:**
+  - Logic hợp nhất dữ liệu: `src/lib/articles.ts` (Tự động chuẩn hóa `WelfareCase`, `GiftBatch`, `PostItem` thành cấu trúc bài báo phóng sự).
+  - Giao diện bài báo điện tử: `src/components/news/ArticleDetailView.tsx`
+  - Trang trung tâm tin tức: `src/app/tin-tuc/page.tsx`
+  - Trang chi tiết bài báo theo ID: `src/app/tin-tuc/[id]/page.tsx` (Tự động sinh Meta Tags: `og:title`, `og:image`, `og:description`, `article` phục vụ Zalo / Facebook Crawler).
+- **Các tính năng nổi bật:**
+  1. 📰 **Giao diện bài báo chuẩn hệ sinh thái Ea Súp Số:**
+     - Tiêu đề hành chính Masthead: *UBMTTQ Việt Nam Xã Ea Súp - Ban Vận Động Quỹ Vì Người Nghèo*.
+     - Dải thông tin xuất bản: Ngày đăng, Người ký duyệt, Địa bàn thôn buôn, Thời gian đọc, Lượt xem.
+     - Khối Tóm tắt đầu bài báo (Sapo) trang trọng có viền gradient nổi bật.
+     - Ảnh phóng sự hiện trường (Lead photo) kèm chú thích và hỗ trợ Lightbox phóng to ảnh HD.
+     - Toàn văn phóng sự chi tiết kèm thư viện ảnh và danh sách tệp đính kèm / chứng từ PDF mộc đỏ.
+     - Widget tiếp nhận ủng hộ tự động VietQR Napas 247 BIDV 8630100930 đối với các hoàn cảnh khó khăn.
+     - Hộp xác thực công khai 100% kèm chữ ký số hóa của Chủ tịch UBMTTQ Việt Nam xã Ea Súp (Đ/c Lê Hồng Hạnh).
+  2. 🌐 **Chia sẻ đa nền tảng tiện lợi (Multi-Platform Sharing):**
+     - **Chia sẻ Zalo:** Mở trực tiếp hộp thoại chia sẻ Zalo đến bạn bè hoặc nhóm cộng đồng.
+     - **Chia sẻ Facebook:** Mở cửa sổ chia sẻ lên trang cá nhân hoặc Fanpage chính thống.
+     - **Quét mã QR Code:** Hiển thị popup chứa mã QR sinh tự động để người dân quét đọc nhanh bằng camera điện thoại hoặc Zalo.
+     - **Sao chép liên kết:** Sao chép đường dẫn bài báo vào Clipboard kèm thông báo trực quan.
+     - **In ấn & Lưu PDF:** Nút in ấn chuẩn định dạng tài liệu lưu trữ báo cáo.
+  3. 🔍 **Chế độ Review Mạng Xã Hội (Social Preview Mode):**
+     - Nút *"Chế độ Review"* trên thanh công cụ mở popup mô phỏng thực tế hình ảnh thẻ hiển thị (Open Graph Share Card 1200x630) trên bảng tin Facebook và tin nhắn Zalo.
+     - Giúp cán bộ kiểm tra trước tiêu đề, hình ảnh đại diện, mô tả tóm tắt và tên miền `nguoingheo.easupso.com` trước khi phát hành rộng rãi.
+  4. 🔗 **Liên kết xuyên suốt từ trang chủ:**
+     - Các thẻ hoàn cảnh và đợt trao quà trên trang chủ, `/chien-dich`, `/van-ban` đều có nút *"Bản tin báo chí »"*.
+     - Trong modal xem chi tiết hoàn cảnh và đợt trao quà, bổ sung nút bấm *"Mở dạng bài báo & Chia sẻ"* dẫn trực tiếp sang giao diện báo chí hoàn chỉnh.
+
+---
+
 ## II. BẢN ĐỒ VỊ TRÍ TỆP & CẤU TRÚC LƯU TRỮ
 
 ```
@@ -61,12 +92,21 @@
 ├── src/
 │   ├── app/
 │   │   ├── admin/page.tsx            # Bảng điều khiển quản trị 3 Tab
+│   │   ├── tin-tuc/
+│   │   │   ├── page.tsx              # Trung tâm bản tin báo chí an sinh
+│   │   │   └── [id]/page.tsx         # Trang đọc toàn bộ bài báo + Open Graph Meta
 │   │   ├── api/admin/login/route.ts  # Xác thực đăng nhập cán bộ đa tài khoản
 │   │   ├── api/admin/me/route.ts     # Trả về thông tin cán bộ theo phiên đăng nhập
 │   │   └── api/v1/admin/
 │   │       ├── officers/route.ts     # API Thêm, Xóa, Đổi mật khẩu cán bộ
 │   │       └── posts/route.ts        # API Đăng bài, Xóa bài viết an sinh
+│   ├── components/
+│   │   ├── home/SocialWelfareList.tsx# Thẻ hoàn cảnh & đợt trao quà kèm nút liên kết bài báo
+│   │   ├── layout/Header.tsx         # Menu điều hướng bổ sung mục "Bản tin an sinh"
+│   │   └── news/
+│   │       └── ArticleDetailView.tsx # Giao diện bài báo phóng sự, chia sẻ & review
 │   └── lib/
+│       ├── articles.ts               # Bộ chuyển đổi & truy xuất bài báo phóng sự
 │       ├── officers.ts               # Xử lý dữ liệu cán bộ quản lý
 │       └── posts.ts                  # Xử lý dữ liệu bài đăng an sinh
 ├── docker-compose.yml                # File điều phối Docker (Web, Postgres, Redis, Nginx)
