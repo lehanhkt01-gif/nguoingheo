@@ -1,0 +1,44 @@
+{
+  "officers": [
+    {
+      "id": "1",
+      "username": "admin_easup",
+      "password": "EaSup@Admin2026!",
+      "fullName": "Đ/c Lê Hồng Hạnh",
+      "title": "Chủ tịch UBMTTQ Việt Nam xã Ea Súp",
+      "phone": "0888.023.023",
+      "role": "ADMIN",
+      "canPost": true,
+      "canDelete": true,
+      "canManageOfficers": true,
+      "createdAt": "2026-01-01T08:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "username": "nguyenbaban",
+      "password": "EaSup@2026",
+      "fullName": "Đ/c Nguyễn Bá Bân",
+      "title": "Phó Ban Vận Động Quỹ",
+      "phone": "0912.345.678",
+      "role": "OFFICER",
+      "canPost": true,
+      "canDelete": true,
+      "canManageOfficers": false,
+      "createdAt": "2026-01-14T08:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "username": "nguyenthimien",
+      "password": "EaSup@2026",
+      "fullName": "Đ/c Nguyễn Thị Miên",
+      "title": "Phó Ban Thường Trực MTTQ",
+      "phone": "0987.654.321",
+      "role": "OFFICER",
+      "canPost": true,
+      "canDelete": false,
+      "canManageOfficers": false,
+      "createdAt": "2026-01-14T08:00:00.000Z"
+    }
+  ],
+  "updatedAt": "2026-10-19T09:37:49.889Z"
+}

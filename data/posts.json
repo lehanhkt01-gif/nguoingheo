@@ -1,0 +1,53 @@
+{
+  "posts": [
+    {
+      "id": "post_1",
+      "title": "Kế hoạch cao điểm Vận động ủng hộ Quỹ 'Vì người nghèo' năm 2026 xã Ea Súp",
+      "category": "THONG_BAO",
+      "categoryLabel": "Thông báo Mặt trận",
+      "summary": "Ban Thường trực UBMTTQ Việt Nam xã Ea Súp triển khai kế hoạch cao điểm vận động Quỹ năm 2026 tới toàn thể cán bộ, nhân dân và doanh nghiệp.",
+      "content": "Căn cứ Quyết định số 13/QĐ-MTTQ-BTT của Ban Thường trực UBMTTQ Việt Nam xã Ea Súp, Ban vận động Quỹ thông báo triển khai tháng cao điểm quyên góp hỗ trợ hộ nghèo, hộ cận nghèo có hoàn cảnh đặc biệt khó khăn trên địa bàn 20 thôn buôn. Toàn bộ tiền ủng hộ được tiếp nhận qua tài khoản BIDV 8630100930 và đối soát sao kê tự động 100% thời gian thực.",
+      "authorName": "Đ/c Lê Hồng Hạnh",
+      "authorUsername": "admin_easup",
+      "village": "Toàn xã Ea Súp",
+      "imageUrl": "/images/hero-charity-bg.jpg",
+      "date": "2026-01-15",
+      "views": 128,
+      "status": "PUBLISHED",
+      "createdAt": "2026-01-15T08:00:00.000Z"
+    },
+    {
+      "id": "post_2",
+      "title": "Khảo sát và khởi công 02 căn nhà Đại đoàn kết tại Buôn Drai và Thôn 5",
+      "category": "HOAN_CANH",
+      "categoryLabel": "Hoàn cảnh an sinh",
+      "summary": "Đoàn công tác UBMTTQ xã do Chủ tịch Lê Hồng Hạnh dẫn đầu đã tiến hành nghiệm thu hiện trạng và quyết định hỗ trợ khởi công nhà ở cho 2 hộ khó khăn.",
+      "content": "Qua rà soát thực tế tại Buôn Drai và Thôn 5, gia đình ông Y'Khen Niê và bà Trần Thị Mai có nhà ở dột nát nghiêm trọng, thuộc diện hộ nghèo neo đơn. Ban vận động Quỹ Vì Người Nghèo xã Ea Súp đã quyết định phân bổ kinh phí hỗ trợ 50.000.000 đ/căn từ nguồn quỹ vận động.",
+      "authorName": "Đ/c Nguyễn Bá Bân",
+      "authorUsername": "nguyenbaban",
+      "village": "Buôn Drai & Thôn 5",
+      "imageUrl": "/images/hero-charity-bg.jpg",
+      "date": "2026-02-02",
+      "views": 95,
+      "status": "PUBLISHED",
+      "createdAt": "2026-02-02T09:30:00.000Z"
+    },
+    {
+      "id": "post_3",
+      "title": "Báo cáo công khai kết quả trao tặng 50 suất quà an sinh cho đồng bào khó khăn",
+      "category": "TRAO_QUA",
+      "categoryLabel": "Đợt trao quà",
+      "summary": "Hoàn thành trao tận tay 50 phần quà nhu yếu phẩm và tiền mặt cho các hộ gia đình chính sách, đồng bào dân tộc thiểu số nghèo.",
+      "content": "Chiều ngày 05/02/2026, tại Hội trường UBND xã Ea Súp, Ban Vận động Quỹ đã phối hợp với các nhà hảo tâm tổ chức trao tặng 50 suất quà, mỗi suất trị giá 500.000 đ tiền mặt cùng phần quà thiết yếu. Danh sách đã được đại diện 20 thôn buôn ký nhận đầy đủ.",
+      "authorName": "Đ/c Nguyễn Thị Miên",
+      "authorUsername": "nguyenthimien",
+      "village": "Toàn xã",
+      "imageUrl": "/images/logo-mttq.png",
+      "date": "2026-02-05",
+      "views": 142,
+      "status": "PUBLISHED",
+      "createdAt": "2026-02-05T14:00:00.000Z"
+    }
+  ],
+  "updatedAt": "2026-10-19T09:38:00.430Z"
+}
