@@ -97,6 +97,39 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
     }
   };
 
+  // Chuẩn hóa gọi Web Share API hệ thống (navigator.share) hiển thị khay chia sẻ OS (Zalo, Messenger, Facebook,...)
+  const handleSystemShare = async () => {
+    const shareData = {
+      title: article.title,
+      text: article.sapo ? `${article.sapo}\n` : `${article.title}\n`,
+      url: shareTargetUrl,
+    };
+
+    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+      try {
+        if (typeof navigator.canShare === "function") {
+          if (navigator.canShare(shareData)) {
+            await navigator.share(shareData);
+            return;
+          }
+        } else {
+          await navigator.share(shareData);
+          return;
+        }
+      } catch (err: any) {
+        // Nếu người dùng đóng khay chia sẻ hệ thống (hủy thao tác)
+        if (err?.name === "AbortError") {
+          return;
+        }
+        console.warn("Lỗi Web Share API, chuyển sang mở bảng dự phòng:", err);
+      }
+    }
+
+    // Dự phòng khi trình duyệt PC hoặc môi trường không hỗ trợ Web Share API
+    setShareTab("social");
+    setShowShareModal(true);
+  };
+
   return (
     <article className="min-h-screen bg-slate-50 text-slate-800 pb-16">
       {/* 1. THANH TIÊU ĐỀ HÀNH CHÍNH & BREADCRUMBS BÁO CHÍ */}
@@ -206,19 +239,16 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
             </div>
           </div>
 
-          {/* 3. NÚT CHIA SẺ ĐA NỀN TẢNG DUY NHẤT */}
+          {/* 3. NÚT CHIA SẺ HỆ THỐNG DUY NHẤT (WEB SHARE API) */}
           <div className="pt-2 flex items-center justify-start">
             <button
               type="button"
-              onClick={() => {
-                setShareTab("social");
-                setShowShareModal(true);
-              }}
-              className="inline-flex items-center gap-2.5 px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-200 hover:shadow-lg hover:shadow-rose-300 transition-all duration-200 cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
-              title="Chia sẻ bài báo đa nền tảng (Zalo, Facebook, QR Code, In/PDF...)"
+              onClick={handleSystemShare}
+              className="inline-flex items-center gap-2.5 px-6 py-2.5 sm:px-7 sm:py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-200 hover:shadow-lg hover:shadow-rose-300 transition-all duration-200 cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
+              title="Chia sẻ bài báo qua khay chia sẻ hệ thống (Zalo, Facebook, Tin nhắn...)"
             >
               <Share2 className="w-4 h-4 text-white" />
-              <span>Chia sẻ đa nền tảng</span>
+              <span>Chia sẻ</span>
             </button>
           </div>
         </div>
@@ -454,6 +484,21 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
               <div className="text-[10px] text-slate-400 italic">(Đã ký duyệt và số hóa lưu trữ)</div>
             </div>
           </div>
+
+          {/* Nút chia sẻ ở cuối bài báo phục vụ độc giả sau khi đọc xong */}
+          <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <span className="text-xs text-slate-500 italic">
+              Bài viết ý nghĩa? Hãy cùng chia sẻ để lan tỏa thông điệp an sinh xã hội:
+            </span>
+            <button
+              type="button"
+              onClick={handleSystemShare}
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-200 hover:shadow-lg transition-all cursor-pointer"
+            >
+              <Share2 className="w-4 h-4 text-white" />
+              <span>Chia sẻ</span>
+            </button>
+          </div>
         </div>
 
         {/* 7. TIN TỨC & BÀI BÁO AN SINH LIÊN QUAN */}
@@ -528,7 +573,7 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
                   <Share2 className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm sm:text-base leading-tight">Chia sẻ đa nền tảng</h3>
+                  <h3 className="font-bold text-sm sm:text-base leading-tight">Chia sẻ bài báo</h3>
                   <p className="text-[11px] text-white/80">Lan tỏa bài báo an sinh xã hội tới cộng đồng</p>
                 </div>
               </div>
@@ -646,22 +691,14 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
                   </div>
 
                   {/* Native Web Share nếu thiết bị hỗ trợ (di động) */}
-                  {typeof navigator !== "undefined" && typeof (navigator as any).share === "function" && (
+                  {typeof navigator !== "undefined" && typeof navigator.share === "function" && (
                     <button
                       type="button"
-                      onClick={() => {
-                        try {
-                          (navigator as any).share({
-                            title: article.title,
-                            text: article.sapo,
-                            url: shareTargetUrl,
-                          }).catch(() => {});
-                        } catch {}
-                      }}
+                      onClick={handleSystemShare}
                       className="w-full py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-colors flex items-center justify-center gap-2 border border-rose-200 cursor-pointer"
                     >
                       <Share2 className="w-4 h-4" />
-                      <span>Mở chia sẻ hệ thống (Zalo, Messenger, Tin nhắn, Gmail...)</span>
+                      <span>Mở khay chia sẻ hệ thống (Zalo, Messenger, Tin nhắn, Gmail...)</span>
                     </button>
                   )}
 

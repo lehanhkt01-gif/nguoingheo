@@ -186,12 +186,15 @@ sudo bash deploy-vps.sh
 
 ## V. NHẬT KÝ NÂNG CẤP GIAO DIỆN (BẢN TIN BÁO CHÍ)
 
-### Cập nhật ngày 20/10/2026: Rút gọn thanh chia sẻ thành 1 nút duy nhất
-- **Yêu cầu:** Toàn bộ phần thanh chia sẻ bài báo (vốn có 6 nút riêng lẻ gây rối mắt) được thu gọn lại thành **1 nút bấm duy nhất**: `[ Chia sẻ đa nền tảng ]`.
+### Cập nhật ngày 20/10/2026: Nâng cấp nút "Chia sẻ" chuẩn Web Share API hệ thống
+- **Yêu cầu:** Đổi nhãn nút từ "Chia sẻ đa nền tảng" thành chữ **"Chia sẻ"**. Nâng cấp cơ chế chia sẻ để khi nhấn nút sẽ gọi trực tiếp chuẩn **Web Share API (`navigator.share`)** của hệ điều hành (mở khay chia sẻ trực tiếp như Zalo, Messenger, Facebook, SMS, Gmail trên Android / iOS).
 - **Cơ chế hoạt động:**
-  - Khi người đọc hoặc cán bộ bấm vào nút `[ Chia sẻ đa nền tảng ]`, một cửa sổ tương tác (Modal) hiện đại xuất hiện với đầy đủ tiện ích:
-    1. **Tab Mạng xã hội:** Nút chia sẻ Zalo, Facebook, Chia sẻ hệ điều hành (Native Share), Sao chép liên kết, In bài báo/xuất PDF.
-    2. **Tab Mã QR:** Tạo mã QR thời gian thực để người dân dùng camera điện thoại hoặc Zalo quét đọc nhanh.
-    3. **Tab Chế độ Review:** Xem trước thẻ Open Graph 1200x630 hiển thị trên bảng tin mạng xã hội.
+  1. Khi người dùng bấm nút **[ 🔗 Chia sẻ ]**:
+     - Hệ thống gọi `navigator.share({ title, text, url })`.
+     - Trên thiết bị di động (Android / iOS / Safari / Chrome / Zalo App), khay chia sẻ hệ điều hành lập tức bật lên với danh bạ Zalo, Messenger và các ứng dụng đã cài đặt.
+  2. **Cơ chế dự phòng (Graceful Fallback):**
+     - Đối với các trình duyệt máy tính hoặc môi trường không hỗ trợ `navigator.share`, hệ thống tự động mở cửa sổ tùy chọn đầy đủ (Tab Mạng xã hội, Tab Mã QR quét camera, Tab Chế độ Review mô phỏng 1200x630, nút in PDF).
+  3. Bổ sung thêm 1 nút **[ 🔗 Chia sẻ ]** tương tự ở cuối bài báo (dưới phần chữ ký lãnh đạo MTTQ) để độc giả chia sẻ thuận tiện ngay khi đọc xong bài.
 - **File chỉnh sửa:** `src/components/news/ArticleDetailView.tsx`.
+
 
