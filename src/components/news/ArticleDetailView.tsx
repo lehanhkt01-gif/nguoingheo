@@ -46,8 +46,8 @@ interface Props {
 
 export default function ArticleDetailView({ article, relatedArticles }: Props) {
   const [copied, setCopied] = useState(false);
-  const [showQrModal, setShowQrModal] = useState(false);
-  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareTab, setShareTab] = useState<"social" | "qr" | "review">("social");
   const [activeLightboxImg, setActiveLightboxImg] = useState<string | null>(null);
   const [currentUrl, setCurrentUrl] = useState<string>(article?.shareUrl || "");
 
@@ -206,78 +206,20 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
             </div>
           </div>
 
-          {/* 3. THANH CÔNG CỤ CHIA SẺ ĐA NỀN TẢNG (SHARE BAR) */}
-          <div className="bg-rose-50/50 p-3 sm:p-4 rounded-2xl border border-rose-100 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-              <Share2 className="w-4 h-4 text-rose-600" />
-              <span>Chia sẻ bài báo đa nền tảng:</span>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              {/* Nút Chia sẻ Zalo */}
-              <button
-                type="button"
-                onClick={handleShareZalo}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
-                title="Chia sẻ nhanh qua Zalo"
-              >
-                <MessageCircle className="w-3.5 h-3.5" />
-                <span>Zalo</span>
-              </button>
-
-              {/* Nút Chia sẻ Facebook (Dùng custom FacebookIcon SVG an toàn tuyệt đối) */}
-              <button
-                type="button"
-                onClick={handleShareFacebook}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1877F2] hover:bg-[#166fe5] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
-                title="Chia sẻ lên Facebook cá nhân hoặc Fanpage"
-              >
-                <FacebookIcon className="w-3.5 h-3.5 fill-white" />
-                <span>Facebook</span>
-              </button>
-
-              {/* Nút Quét mã QR */}
-              <button
-                type="button"
-                onClick={() => setShowQrModal(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition-colors cursor-pointer"
-                title="Mã QR để quét đọc trên điện thoại"
-              >
-                <QrCode className="w-3.5 h-3.5 text-rose-600" />
-                <span>Mã QR</span>
-              </button>
-
-              {/* Nút Xem trước Review Card */}
-              <button
-                type="button"
-                onClick={() => setShowReviewModal(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-bold transition-colors cursor-pointer"
-                title="Xem trước chế độ Review hiển thị mạng xã hội"
-              >
-                <Smartphone className="w-3.5 h-3.5" />
-                <span>Chế độ Review</span>
-              </button>
-
-              {/* Nút Sao chép liên kết */}
-              <button
-                type="button"
-                onClick={handleCopyLink}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? "Đã chép link!" : "Sao chép link"}</span>
-              </button>
-
-              {/* Nút In bài viết */}
-              <button
-                type="button"
-                onClick={handlePrint}
-                className="p-1.5 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-white transition-colors cursor-pointer"
-                title="In bài báo / Lưu thành PDF"
-              >
-                <Printer className="w-4 h-4" />
-              </button>
-            </div>
+          {/* 3. NÚT CHIA SẺ ĐA NỀN TẢNG DUY NHẤT */}
+          <div className="pt-2 flex items-center justify-start">
+            <button
+              type="button"
+              onClick={() => {
+                setShareTab("social");
+                setShowShareModal(true);
+              }}
+              className="inline-flex items-center gap-2.5 px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-200 hover:shadow-lg hover:shadow-rose-300 transition-all duration-200 cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
+              title="Chia sẻ bài báo đa nền tảng (Zalo, Facebook, QR Code, In/PDF...)"
+            >
+              <Share2 className="w-4 h-4 text-white" />
+              <span>Chia sẻ đa nền tảng</span>
+            </button>
           </div>
         </div>
 
@@ -574,121 +516,274 @@ export default function ArticleDetailView({ article, relatedArticles }: Props) {
       </div>
 
       {/* ========================================================================= */}
-      {/* MODAL 1: CHẾ ĐỘ REVIEW MẠNG XÃ HỘI (SOCIAL PREVIEW CARD)                  */}
+      {/* MODAL DUY NHẤT: CHIA SẺ BÀI BÁO ĐA NỀN TẢNG                              */}
       {/* ========================================================================= */}
-      {showReviewModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full border border-slate-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-5 text-white flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Smartphone className="w-5 h-5" />
-                <h3 className="font-bold text-sm sm:text-base">Chế Độ Review Mạng Xã Hội (Preview)</h3>
+      {showShareModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+            {/* Header Modal */}
+            <div className="bg-gradient-to-r from-rose-600 via-rose-500 to-pink-600 p-4 sm:p-5 text-white flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
+                  <Share2 className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm sm:text-base leading-tight">Chia sẻ đa nền tảng</h3>
+                  <p className="text-[11px] text-white/80">Lan tỏa bài báo an sinh xã hội tới cộng đồng</p>
+                </div>
               </div>
               <button
                 type="button"
-                onClick={() => setShowReviewModal(false)}
+                onClick={() => setShowShareModal(false)}
                 className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center cursor-pointer transition-colors"
+                title="Đóng cửa sổ"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="p-6 space-y-4">
-              <p className="text-xs text-slate-500">
-                Hình ảnh mô phỏng chính xác thẻ hiển thị (Open Graph Preview Card) khi cán bộ hoặc người dân chia sẻ liên kết bài báo này lên Zalo, Facebook Messenger hoặc bài đăng News Feed:
-              </p>
-
-              {/* Mô phỏng Card Facebook / Zalo */}
-              <div className="rounded-2xl border border-slate-300 overflow-hidden bg-white shadow-sm">
-                <div className="aspect-[12/6.3] bg-slate-200 overflow-hidden relative">
-                  <img
-                    src={article.imageUrl || "/hero-charity-bg.jpg"}
-                    alt={article.title}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.currentTarget as HTMLImageElement;
-                      target.onerror = null;
-                      target.src = "/hero-charity-bg.jpg";
-                    }}
-                  />
-                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/60 text-[10px] text-white font-mono">
-                    1200 x 630 HD
-                  </div>
-                </div>
-                <div className="p-4 space-y-1 bg-slate-50">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
-                    NGUOINGHEO.EASUPSO.COM
+            {/* Thẻ tóm tắt bài báo */}
+            <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50 shrink-0">
+              <div className="flex items-center gap-3">
+                <img
+                  src={article.imageUrl || "/hero-charity-bg.jpg"}
+                  alt={article.title}
+                  className="w-14 h-14 rounded-xl object-cover border border-slate-200 shrink-0"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = "/hero-charity-bg.jpg";
+                  }}
+                />
+                <div className="min-w-0 flex-1 space-y-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600">
+                    {article.categoryLabel} • {article.village}
                   </span>
-                  <h4 className="text-sm font-bold text-slate-900 leading-snug line-clamp-2">
+                  <h4 className="text-xs font-bold text-slate-900 line-clamp-1 leading-snug">
                     {article.title}
                   </h4>
-                  <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                    {article.sapo}
+                  <p className="text-[11px] text-slate-500 line-clamp-1">
+                    {shareTargetUrl}
                   </p>
                 </div>
               </div>
-
-              <div className="pt-2 flex items-center justify-between text-xs">
-                <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  Đầy đủ thẻ Open Graph &amp; Twitter Card
-                </span>
-                <button
-                  type="button"
-                  onClick={handleShareFacebook}
-                  className="px-3 py-1.5 rounded-lg bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 cursor-pointer"
-                >
-                  Thử chia sẻ ngay
-                </button>
-              </div>
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* ========================================================================= */}
-      {/* MODAL 2: MÃ QR QUÉT ĐỌC TRÊN ĐIỆN THOẠI DI ĐỘNG                          */}
-      {/* ========================================================================= */}
-      {showQrModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full border border-slate-200 overflow-hidden text-center p-6 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <span className="text-xs font-bold uppercase text-slate-700 tracking-wider">
-                MÃ QR ĐỌC BÀI BÁO
-              </span>
+            {/* Menu Tabs chuyển đổi */}
+            <div className="px-4 pt-3 pb-1 border-b border-slate-100 flex items-center gap-1 bg-white shrink-0">
               <button
                 type="button"
-                onClick={() => setShowQrModal(false)}
-                className="w-7 h-7 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center cursor-pointer"
+                onClick={() => setShareTab("social")}
+                className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                  shareTab === "social"
+                    ? "bg-rose-50 text-rose-700 border border-rose-200 shadow-xs"
+                    : "text-slate-600 hover:bg-slate-50 border border-transparent"
+                }`}
               >
-                <X className="w-4 h-4" />
+                <Share2 className="w-3.5 h-3.5" />
+                <span>Mạng xã hội</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setShareTab("qr")}
+                className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                  shareTab === "qr"
+                    ? "bg-rose-50 text-rose-700 border border-rose-200 shadow-xs"
+                    : "text-slate-600 hover:bg-slate-50 border border-transparent"
+                }`}
+              >
+                <QrCode className="w-3.5 h-3.5" />
+                <span>Mã QR đọc báo</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setShareTab("review")}
+                className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                  shareTab === "review"
+                    ? "bg-purple-50 text-purple-700 border border-purple-200 shadow-xs"
+                    : "text-slate-600 hover:bg-slate-50 border border-transparent"
+                }`}
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                <span>Chế độ Review</span>
               </button>
             </div>
 
-            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 inline-block">
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(
-                  shareTargetUrl
-                )}`}
-                alt="QR Code bài báo"
-                className="w-48 h-48 mx-auto rounded-lg"
-              />
-            </div>
+            {/* Nội dung Tab có thể cuộn nếu màn hình nhỏ */}
+            <div className="p-4 sm:p-6 overflow-y-auto space-y-4 flex-1">
+              {/* TAB 1: MẠNG XÃ HỘI */}
+              {shareTab === "social" && (
+                <div className="space-y-4">
+                  {/* Grid nút chia sẻ nhanh Zalo & Facebook */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={handleShareZalo}
+                      className="flex items-center gap-3 p-3.5 rounded-2xl bg-blue-50/70 hover:bg-blue-100/80 border border-blue-200 text-blue-700 transition-all cursor-pointer group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+                        <MessageCircle className="w-5 h-5" />
+                      </div>
+                      <div className="text-left min-w-0">
+                        <div className="text-xs font-bold text-slate-900 group-hover:text-blue-700">Chia sẻ Zalo</div>
+                        <div className="text-[11px] text-slate-500 truncate">Nhắn tin hoặc đăng nhật ký</div>
+                      </div>
+                    </button>
 
-            <div className="space-y-1">
-              <h4 className="text-xs font-bold text-slate-900 line-clamp-1">{article.title}</h4>
-              <p className="text-[11px] text-slate-500">
-                Mở camera trên điện thoại hoặc Zalo để quét mã và đọc toàn văn bài báo.
-              </p>
-            </div>
+                    <button
+                      type="button"
+                      onClick={handleShareFacebook}
+                      className="flex items-center gap-3 p-3.5 rounded-2xl bg-[#1877F2]/10 hover:bg-[#1877F2]/15 border border-[#1877F2]/30 text-[#1877F2] transition-all cursor-pointer group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-[#1877F2] text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+                        <FacebookIcon className="w-5 h-5 fill-white" />
+                      </div>
+                      <div className="text-left min-w-0">
+                        <div className="text-xs font-bold text-slate-900 group-hover:text-[#1877F2]">Chia sẻ Facebook</div>
+                        <div className="text-[11px] text-slate-500 truncate">Trang cá nhân &amp; hội nhóm</div>
+                      </div>
+                    </button>
+                  </div>
 
-            <button
-              type="button"
-              onClick={handleCopyLink}
-              className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
-            >
-              {copied ? "Đã sao chép link bài báo!" : "Sao chép liên kết bài báo"}
-            </button>
+                  {/* Native Web Share nếu thiết bị hỗ trợ (di động) */}
+                  {typeof navigator !== "undefined" && typeof (navigator as any).share === "function" && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        try {
+                          (navigator as any).share({
+                            title: article.title,
+                            text: article.sapo,
+                            url: shareTargetUrl,
+                          }).catch(() => {});
+                        } catch {}
+                      }}
+                      className="w-full py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-colors flex items-center justify-center gap-2 border border-rose-200 cursor-pointer"
+                    >
+                      <Share2 className="w-4 h-4" />
+                      <span>Mở chia sẻ hệ thống (Zalo, Messenger, Tin nhắn, Gmail...)</span>
+                    </button>
+                  )}
+
+                  {/* Sao chép liên kết trực tiếp */}
+                  <div className="space-y-1.5 pt-1">
+                    <label className="text-[11px] font-bold text-slate-600 block">
+                      Hoặc sao chép liên kết bài báo:
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        readOnly
+                        value={shareTargetUrl}
+                        className="flex-1 px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-600 focus:outline-hidden select-all"
+                        onClick={(e) => (e.target as HTMLInputElement).select()}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleCopyLink}
+                        className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
+                      >
+                        {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                        <span>{copied ? "Đã chép link!" : "Sao chép"}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Nút In bài báo / Xuất PDF */}
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-[11px] text-slate-500">Bản in lưu trữ phục vụ công tác hồ sơ:</span>
+                    <button
+                      type="button"
+                      onClick={handlePrint}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                    >
+                      <Printer className="w-3.5 h-3.5 text-slate-500" />
+                      <span>In bài báo / PDF</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: MÃ QR ĐỌC BÁO */}
+              {shareTab === "qr" && (
+                <div className="text-center space-y-4 py-2">
+                  <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 inline-block shadow-xs">
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(
+                        shareTargetUrl
+                      )}`}
+                      alt="QR Code bài báo"
+                      className="w-44 h-44 sm:w-48 sm:h-48 mx-auto rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-xs font-bold text-slate-900">{article.title}</h4>
+                    <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
+                      Dùng Camera điện thoại hoặc app Zalo quét mã QR để mở và đọc toàn văn bài báo.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+                  >
+                    {copied ? "Đã sao chép link bài báo!" : "Sao chép liên kết bài báo"}
+                  </button>
+                </div>
+              )}
+
+              {/* TAB 3: CHẾ ĐỘ REVIEW MẠNG XÃ HỘI */}
+              {shareTab === "review" && (
+                <div className="space-y-4">
+                  <p className="text-xs text-slate-500">
+                    Hình ảnh mô phỏng chính xác thẻ hiển thị (Open Graph Preview Card 1200x630) khi chia sẻ lên Zalo hoặc Facebook:
+                  </p>
+
+                  <div className="rounded-2xl border border-slate-300 overflow-hidden bg-white shadow-sm">
+                    <div className="aspect-[12/6.3] bg-slate-200 overflow-hidden relative">
+                      <img
+                        src={article.imageUrl || "/hero-charity-bg.jpg"}
+                        alt={article.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.currentTarget as HTMLImageElement;
+                          target.onerror = null;
+                          target.src = "/hero-charity-bg.jpg";
+                        }}
+                      />
+                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/60 text-[10px] text-white font-mono">
+                        1200 x 630 HD
+                      </div>
+                    </div>
+                    <div className="p-3.5 space-y-1 bg-slate-50">
+                      <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                        NGUOINGHEO.EASUPSO.COM
+                      </span>
+                      <h4 className="text-xs sm:text-sm font-bold text-slate-900 leading-snug line-clamp-2">
+                        {article.title}
+                      </h4>
+                      <p className="text-[11px] text-slate-600 line-clamp-2 leading-relaxed">
+                        {article.sapo}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs pt-1">
+                    <span className="text-emerald-700 font-semibold flex items-center gap-1 text-[11px]">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      Chuẩn Open Graph &amp; Twitter Card
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleShareFacebook}
+                      className="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs cursor-pointer transition-colors"
+                    >
+                      Chia sẻ Facebook ngay
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

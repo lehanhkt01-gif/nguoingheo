@@ -181,3 +181,17 @@ sudo bash deploy-vps.sh
 
 > [!TIP]
 > Cán bộ có thể tự đổi mật khẩu cá nhân ngay tại tab **"Thiết lập quản trị & Cán bộ"** sau khi đăng nhập thành công.
+
+---
+
+## V. NHẬT KÝ NÂNG CẤP GIAO DIỆN (BẢN TIN BÁO CHÍ)
+
+### Cập nhật ngày 20/10/2026: Rút gọn thanh chia sẻ thành 1 nút duy nhất
+- **Yêu cầu:** Toàn bộ phần thanh chia sẻ bài báo (vốn có 6 nút riêng lẻ gây rối mắt) được thu gọn lại thành **1 nút bấm duy nhất**: `[ Chia sẻ đa nền tảng ]`.
+- **Cơ chế hoạt động:**
+  - Khi người đọc hoặc cán bộ bấm vào nút `[ Chia sẻ đa nền tảng ]`, một cửa sổ tương tác (Modal) hiện đại xuất hiện với đầy đủ tiện ích:
+    1. **Tab Mạng xã hội:** Nút chia sẻ Zalo, Facebook, Chia sẻ hệ điều hành (Native Share), Sao chép liên kết, In bài báo/xuất PDF.
+    2. **Tab Mã QR:** Tạo mã QR thời gian thực để người dân dùng camera điện thoại hoặc Zalo quét đọc nhanh.
+    3. **Tab Chế độ Review:** Xem trước thẻ Open Graph 1200x630 hiển thị trên bảng tin mạng xã hội.
+- **File chỉnh sửa:** `src/components/news/ArticleDetailView.tsx`.
+
