@@ -195,6 +195,12 @@ sudo bash deploy-vps.sh
   2. **Cơ chế dự phòng (Graceful Fallback):**
      - Đối với các trình duyệt máy tính hoặc môi trường không hỗ trợ `navigator.share`, hệ thống tự động mở cửa sổ tùy chọn đầy đủ (Tab Mạng xã hội, Tab Mã QR quét camera, Tab Chế độ Review mô phỏng 1200x630, nút in PDF).
   3. Bổ sung thêm 1 nút **[ 🔗 Chia sẻ ]** tương tự ở cuối bài báo (dưới phần chữ ký lãnh đạo MTTQ) để độc giả chia sẻ thuận tiện ngay khi đọc xong bài.
-- **File chỉnh sửa:** `src/components/news/ArticleDetailView.tsx`.
+### Cập nhật ngày 20/10/2026: Chuyển thẳng sang "Mở dạng bài báo & Chia sẻ" (Bỏ popup review)
+- **Yêu cầu:** Khi người dùng click vào bất kỳ bản tin, hoàn cảnh hay đợt trao quà nào trên trang chủ hoặc danh sách, hệ thống không hiện giao diện popup review trung gian nữa mà điều hướng trực tiếp vào trang **"Mở dạng bài báo & Chia sẻ"** (`/tin-tuc/case-[id]` hoặc `/tin-tuc/gift-[id]`).
+- **Thực hiện:**
+  - Cập nhật hàm `handleOpenCaseDetail` và `handleOpenGiftDetail` trong `src/components/home/SocialWelfareList.tsx` sử dụng `router.push(...)` trực tiếp.
+  - Cập nhật các nút thao tác nhanh thành `[ 📰 Mở dạng bài báo & Chia sẻ ]`.
+- **File chỉnh sửa:** `src/components/home/SocialWelfareList.tsx`.
+
 
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { formatVND, formatDate } from "@/lib/utils";
 import {
   Heart,
@@ -97,6 +98,7 @@ export default function SocialWelfareList({
 }: SocialWelfareListProps = {}) {
   const showCases = mode === "ALL" || mode === "CASES_ONLY";
   const showGifts = mode === "ALL" || mode === "GIFTS_ONLY";
+  const router = useRouter();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
@@ -662,17 +664,13 @@ export default function SocialWelfareList({
     }
   };
 
-  // Mở modal xem chi tiết
+  // Chuyển thẳng sang dạng bài báo & chia sẻ theo yêu cầu (không hiện giao diện review modal)
   const handleOpenCaseDetail = (c: WelfareCase) => {
-    setDetailCase(c);
-    const firstImg = c.imageUrl || c.files?.find((f) => f.type === "image")?.url || "";
-    setActiveCasePreviewImg(firstImg);
+    router.push(`/tin-tuc/case-${c.id}`);
   };
 
   const handleOpenGiftDetail = (g: GiftBatch) => {
-    setDetailGift(g);
-    const firstImg = g.imageUrl || g.files?.find((f) => f.type === "image")?.url || "";
-    setActiveGiftPreviewImg(firstImg);
+    router.push(`/tin-tuc/gift-${g.id}`);
   };
 
   // Mở modal ủng hộ VietQR
@@ -987,10 +985,11 @@ export default function SocialWelfareList({
                       <button
                         type="button"
                         onClick={() => handleOpenCaseDetail(item)}
-                        className="py-2 px-3 rounded-xl border border-rose-200 bg-white hover:bg-rose-50 text-rose-700 text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+                        className="py-2 px-3 rounded-xl border border-rose-200 bg-white hover:bg-rose-50 text-rose-700 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+                        title="Mở dạng bài báo & Chia sẻ"
                       >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>Xem đủ</span>
+                        <Newspaper className="w-3.5 h-3.5 text-rose-600" />
+                        <span>Mở dạng bài báo &amp; Chia sẻ</span>
                       </button>
                     </div>
                   </div>
@@ -1190,10 +1189,11 @@ export default function SocialWelfareList({
                       <button
                         type="button"
                         onClick={() => handleOpenGiftDetail(gift)}
-                        className="py-1.5 px-3 rounded-xl bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                        className="py-1.5 px-3 rounded-xl bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
+                        title="Mở dạng bài báo & Chia sẻ"
                       >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>Xem đủ nội dung &amp; ảnh</span>
+                        <Newspaper className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Mở dạng bài báo &amp; Chia sẻ</span>
                       </button>
                     </div>
                   </div>
